@@ -411,10 +411,9 @@ Bu proje, **şartname gereği backend tarafsız ve yalnızca tarayıcı tabanlı
 
 ---
 
-## 33. Demo Video
-Uygulamanın kullanım senaryolarını ve simülatör testlerini gösteren tanıtım videosu proje teslim dosyasında `demo_video.mp4` olarak yer almaktadır.
+## 34. Değerlendirme Yöntemi (Yüz Yüze / Canlı)
+Proje değerlendirmesi yönetici tarafından **canlı, yüz yüze** yapılacaktır. Bu nedenle ayrı bir tanıtım videosu (`demo_video.mp4`) veya statik ekran görüntüsü dosyası teslim setine dahil edilmemiştir. Tüm senaryolar çalışan uygulama üzerinden gösterilir:
 
----
-
-## 34. Ekran Görüntüleri
-Saha Planlama Ekranı, Raporlama Paneli, Kural Sandbox'ı ve Transfer Merkezi ekran görüntüleri teslim klasöründeki `/screenshots` dizininden incelenebilir.
+* Uygulama `npm start` ile `http://localhost:4200` üzerinde çalıştırılır.
+* **Simülasyon** modülü (Bölüm 28) sekiz senaryonun (talep, stok, araç arızası, SLA gecikmesi, teknisyen çakışması, 5.000+ büyük veri, bozuk veri kurtarma, kota aşımı) hepsini canlı tetikleyip sonucu konsol + bildirim olarak gösterir.
+* Bölüm 21'deki keskin şartlar (çakışma engeli, çift rezerve reddi, geçersiz durum geçişi, rollback, deterministik kural çözümü) ilgili ekranlardan elle denenebilir.
