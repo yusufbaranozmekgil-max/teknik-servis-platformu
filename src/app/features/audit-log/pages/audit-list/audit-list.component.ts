@@ -93,13 +93,13 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
           <table class="data-table">
             <thead>
               <tr>
-                <th>Tarih</th>
-                <th>Kullanıcı</th>
-                <th>Rol</th>
-                <th>İşlem</th>
-                <th>Varlık</th>
+                <th class="sortable" (click)="sort('createdAt')">Tarih <span class="sort-icon" *ngIf="sortKey==='createdAt'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('username')">Kullanıcı <span class="sort-icon" *ngIf="sortKey==='username'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('userRole')">Rol <span class="sort-icon" *ngIf="sortKey==='userRole'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('actionType')">İşlem <span class="sort-icon" *ngIf="sortKey==='actionType'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('entityType')">Varlık <span class="sort-icon" *ngIf="sortKey==='entityType'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
                 <th>Açıklama</th>
-                <th>Sonuç</th>
+                <th class="sortable" (click)="sort('result')">Sonuç <span class="sort-icon" *ngIf="sortKey==='result'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
                 <th>İşlemler</th>
               </tr>
             </thead>
@@ -251,6 +251,10 @@ export class AuditListComponent implements OnInit {
   roleFilter = '';
   dateFilter = '';
 
+  // Sıralama (varsayılan: en yeni önce)
+  sortKey = 'createdAt';
+  sortDirection: 'asc' | 'desc' = 'desc';
+
   // Pagination — sayfa boyutu 5 sabit
   page = 1;
   readonly pageSize = 5;
@@ -392,8 +396,42 @@ export class AuditListComponent implements OnInit {
       list = list.filter(l => l.createdAt.startsWith(this.dateFilter));
     }
 
+    // Sıralama
+    if (this.sortKey) {
+      const dir = this.sortDirection === 'asc' ? 1 : -1;
+      list.sort((a, b) => {
+        const va = this.sortValue(a, this.sortKey);
+        const vb = this.sortValue(b, this.sortKey);
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return 0;
+      });
+    }
+
     this.filteredLogs = list;
     this.page = 1; // filtre değişince başa dön
+  }
+
+  sort(key: string): void {
+    if (this.sortKey === key) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey = key;
+      this.sortDirection = 'asc';
+    }
+    this.applyFilters();
+  }
+
+  private sortValue(l: AuditLog, key: string): string | number {
+    switch (key) {
+      case 'createdAt': return new Date(l.createdAt).getTime();
+      case 'username': return (l.username || '').toLowerCase();
+      case 'userRole': return (l.userRole || '').toLowerCase();
+      case 'actionType': return l.actionType || '';
+      case 'entityType': return l.entityType || '';
+      case 'result': return l.result || '';
+      default: return '';
+    }
   }
 
   openDetailModal(log: AuditLog): void {

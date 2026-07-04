@@ -342,3 +342,13 @@
   .diff-new { background: #052e16 !important; color: #86efac !important; }
   .raw-values-grid h5 { color: #cbd5e1 !important; }
 }
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+
+  .sort-icon { font-size: 0.75rem; margin-left: 0.25rem; }
+}

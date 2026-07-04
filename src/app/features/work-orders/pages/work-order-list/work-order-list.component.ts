@@ -58,18 +58,34 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS } from
               <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
             </select>
           </div>
+
+          <div class="filter-group">
+            <label>Global Arama</label>
+            <input type="text" [value]="searchQuery" (input)="searchQuery = $any($event.target).value; applyFilters()"
+                   placeholder="Kod, şube, teknisyen, araç..." maxlength="40" class="form-control" />
+          </div>
+
+          <div class="filter-group">
+            <label>Başlangıç (İlk Tarih)</label>
+            <input type="date" [value]="dateFrom" (change)="dateFrom = $any($event.target).value; applyFilters()" class="form-control" />
+          </div>
+
+          <div class="filter-group">
+            <label>Başlangıç (Son Tarih)</label>
+            <input type="date" [value]="dateTo" (change)="dateTo = $any($event.target).value; applyFilters()" class="form-control" />
+          </div>
         </div>
 
         <div class="table-container">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Kod</th>
-                <th>Şube</th>
-                <th>Teknisyen</th>
-                <th>Araç</th>
-                <th>Zaman Dilimi</th>
-                <th>Durum</th>
+                <th class="sortable" (click)="sort('code')">Kod <span class="sort-icon" *ngIf="sortKey==='code'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('branch')">Şube <span class="sort-icon" *ngIf="sortKey==='branch'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('technician')">Teknisyen <span class="sort-icon" *ngIf="sortKey==='technician'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('vehicle')">Araç <span class="sort-icon" *ngIf="sortKey==='vehicle'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('plannedStart')">Zaman Dilimi <span class="sort-icon" *ngIf="sortKey==='plannedStart'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('status')">Durum <span class="sort-icon" *ngIf="sortKey==='status'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
                 <th>İşlemler</th>
               </tr>
             </thead>
@@ -320,6 +336,11 @@ export class WorkOrderListComponent implements OnInit {
   branches: any[] = [];
   statusFilter = '';
   branchFilter = '';
+  searchQuery = '';
+  dateFrom = '';
+  dateTo = '';
+  sortKey = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   private route = inject(ActivatedRoute);
 
@@ -388,8 +409,64 @@ export class WorkOrderListComponent implements OnInit {
     if (this.branchFilter) {
       filtered = filtered.filter(w => w.branchId === this.branchFilter);
     }
+
+    // Global arama: kod, şube, teknisyen, araç
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      filtered = filtered.filter(w =>
+        (w.code || '').toLowerCase().includes(q) ||
+        this.getBranchName(w.branchId).toLowerCase().includes(q) ||
+        this.getTechnicianName(w.technicianId).toLowerCase().includes(q) ||
+        this.getVehiclePlate(w.vehicleId).toLowerCase().includes(q)
+      );
+    }
+
+    // Tarih aralığı filtresi (planlanan başlangıç)
+    if (this.dateFrom) {
+      const from = new Date(this.dateFrom + 'T00:00:00').getTime();
+      filtered = filtered.filter(w => w.plannedStart && new Date(w.plannedStart).getTime() >= from);
+    }
+    if (this.dateTo) {
+      const to = new Date(this.dateTo + 'T23:59:59').getTime();
+      filtered = filtered.filter(w => w.plannedStart && new Date(w.plannedStart).getTime() <= to);
+    }
+
+    // Sıralama
+    if (this.sortKey) {
+      const dir = this.sortDirection === 'asc' ? 1 : -1;
+      filtered.sort((a, b) => {
+        const va = this.sortValue(a, this.sortKey);
+        const vb = this.sortValue(b, this.sortKey);
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return 0;
+      });
+    }
+
     this.filteredWorkOrders = filtered;
     this.currentPage = 1; // filtre değişince başa dön
+  }
+
+  sort(key: string): void {
+    if (this.sortKey === key) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortKey = key;
+      this.sortDirection = 'asc';
+    }
+    this.applyFilters();
+  }
+
+  private sortValue(w: WorkOrder, key: string): string | number {
+    switch (key) {
+      case 'code': return (w.code || '').toLowerCase();
+      case 'branch': return this.getBranchName(w.branchId).toLowerCase();
+      case 'technician': return this.getTechnicianName(w.technicianId).toLowerCase();
+      case 'vehicle': return this.getVehiclePlate(w.vehicleId).toLowerCase();
+      case 'plannedStart': return w.plannedStart ? new Date(w.plannedStart).getTime() : 0;
+      case 'status': return w.status || '';
+      default: return '';
+    }
   }
 
   trackByWo(index: number, item: WorkOrder): string {

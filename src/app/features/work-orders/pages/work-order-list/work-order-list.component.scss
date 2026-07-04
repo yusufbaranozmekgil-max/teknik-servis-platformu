@@ -380,3 +380,13 @@ h2 {
 
   :host-context(body.dark-theme) & { background: #064e3b; color: #a7f3d0; }
 }
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  &:hover { text-decoration: underline; }
+
+  .sort-icon { font-size: 0.75rem; margin-left: 0.25rem; }
+}
