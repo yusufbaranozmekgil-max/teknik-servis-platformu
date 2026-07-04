@@ -1,4 +1,5 @@
-export type TechnicianLevel = 'JUNIOR' | 'MID' | 'SENIOR' | 'EXPERT';
+// Şartname Bölüm 4: Seviye = Çırak / Kalfa / Usta (3 kademe)
+export type TechnicianLevel = 'JUNIOR' | 'MID' | 'SENIOR';
 export type SkillType = 'WHITE_GOODS' | 'HVAC' | 'ELECTRIC' | 'ELECTRONICS_MOTHERBOARD' | 'PLUMBING' | 'BOILER_HEATING';
 
 import { SkillLevel } from './skill-type.model';

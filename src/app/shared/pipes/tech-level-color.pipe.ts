@@ -10,14 +10,12 @@ export class TechLevelColorPipe implements PipeTransform {
     
     const lvl = String(value).toUpperCase();
     switch (lvl) {
-      case 'JUNIOR':
+      case 'JUNIOR':   // Çırak
         return 'badge-blue';
-      case 'MID':
+      case 'MID':      // Kalfa
         return 'badge-green';
-      case 'SENIOR':
+      case 'SENIOR':   // Usta
         return 'badge-orange';
-      case 'EXPERT':
-        return 'badge-critical';
       default:
         return 'badge-grey';
     }

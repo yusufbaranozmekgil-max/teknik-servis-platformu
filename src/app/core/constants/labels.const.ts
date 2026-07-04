@@ -49,8 +49,7 @@ export const TECHNICIAN_STATUS_LABELS: Record<string, string> = {
 export const TECHNICIAN_LEVEL_LABELS: Record<string, string> = {
   JUNIOR: 'Çırak',
   MID: 'Kalfa',
-  SENIOR: 'Usta',
-  EXPERT: 'Uzman Usta'
+  SENIOR: 'Usta'
 };
 
 // Vardiya / Görev tipi etiketleri (Şartname Bölüm 11).

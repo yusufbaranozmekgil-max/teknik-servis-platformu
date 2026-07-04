@@ -24,7 +24,7 @@ export class SeedService {
   private storage = inject(StorageService);
 
   /** Demo veri sürümü — seed içeriği değiştiğinde artırılır; eski localStorage otomatik tazelenir. */
-  private static readonly SEED_VERSION = '4';
+  private static readonly SEED_VERSION = '5';
   private static readonly SEED_VERSION_KEY = 'ts_seed_version';
 
   seedAll(): void {
@@ -287,7 +287,7 @@ export class SeedService {
     ];
 
     const technicians: Technician[] = [];
-    const levels = ['JUNIOR', 'MID', 'SENIOR', 'EXPERT'] as const;
+    const levels = ['JUNIOR', 'MID', 'SENIOR'] as const;
 
     // 15 teknisyen üretimi
     for (let i = 1; i <= 15; i++) {
@@ -298,7 +298,7 @@ export class SeedService {
       // Her teknisyene 1 ana yetkinlik ve kıdeme göre ek yetkinlikler veriyoruz
       const primarySkill = skills[(i - 1) % skills.length];
       const techSkills = [primarySkill];
-      if (level === 'SENIOR' || level === 'EXPERT') {
+      if (level === 'SENIOR') {
         const secondarySkill = skills[(i + 1) % skills.length];
         techSkills.push(secondarySkill);
       }
@@ -316,7 +316,7 @@ export class SeedService {
 
       // Skill seviyeleri: teknisyen kıdem'ine paralel + biraz çeşitlilik
       const skillLevels: any = {};
-      const levelByRank = { JUNIOR: 'BEGINNER', MID: 'INTERMEDIATE', SENIOR: 'EXPERT', EXPERT: 'EXPERT' } as const;
+      const levelByRank = { JUNIOR: 'BEGINNER', MID: 'INTERMEDIATE', SENIOR: 'EXPERT' } as const;
       techSkills.forEach((sk, idx) => {
         // Ana skill kıdemle paralel, ikincil skill bir kademe altta
         if (idx === 0) {
@@ -358,7 +358,7 @@ export class SeedService {
       email: 'ahmet.yilmaz@operasyon.com',
       branchId: 'branch-1',
       region: 'Cankaya',
-      level: 'EXPERT',
+      level: 'SENIOR',
       skills: ['HVAC', 'ELECTRIC'],
       skillLevels: { HVAC: 'EXPERT', ELECTRIC: 'INTERMEDIATE' },
       workingHoursStart: '08:00',
@@ -845,11 +845,11 @@ export class SeedService {
       if (!hasWorkOrder || !woStatus) continue;
 
       // ============ Uygun teknisyen bul ============
-      // 1. Aynı şube  2. requiredSkill'e sahip  3. Aktif + izinsiz  4. Kural 10: CRITICAL → SENIOR/EXPERT
+      // 1. Aynı şube  2. requiredSkill'e sahip  3. Aktif + izinsiz  4. Kritik işlere Usta (SENIOR) atanır
       const candidateTechs = activeTechs.filter(t =>
         t.branchId === branch.id &&
         t.skills.includes(templ.skill) &&
-        (priority !== 'CRITICAL' || t.level === 'SENIOR' || t.level === 'EXPERT')
+        (priority !== 'CRITICAL' || t.level === 'SENIOR')
       );
 
       // Uygun teknisyen yoksa iş emri OPENED durumunda kalsın (atanmadan)

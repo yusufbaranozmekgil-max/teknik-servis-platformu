@@ -159,9 +159,8 @@ export class TechnicianPerformancePage implements OnInit {
 
   getSkillProficiencyPercent(level: string): number {
     switch (level) {
-      case 'EXPERT': return 100;
-      case 'SENIOR': return 85;
-      case 'MID': return 70;
+      case 'SENIOR': return 100;
+      case 'MID': return 75;
       case 'JUNIOR':
       default:
         return 50;
@@ -170,12 +169,11 @@ export class TechnicianPerformancePage implements OnInit {
 
   getLevelProficiencyText(level: string): string {
     switch (level) {
-      case 'EXPERT': return 'Uzman (%100)';
-      case 'SENIOR': return 'Kıdemli (%85)';
-      case 'MID': return 'Orta (%70)';
+      case 'SENIOR': return 'Usta (%100)';
+      case 'MID': return 'Kalfa (%75)';
       case 'JUNIOR':
       default:
-        return 'Gelişmekte (%50)';
+        return 'Çırak (%50)';
     }
   }
 }

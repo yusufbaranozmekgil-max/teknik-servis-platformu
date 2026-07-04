@@ -176,10 +176,9 @@ export class TechnicianScoringService {
   private calculateSkillScore(tech: Technician, request: ServiceRequest): number {
     // Toplam max 30 puan = kıdem (max 20) + bu yetkinlikteki seviye (max 10)
     const seniorityMap: Record<string, number> = {
-      JUNIOR: 6,
-      MID: 12,
-      SENIOR: 16,
-      EXPERT: 20
+      JUNIOR: 6,   // Çırak
+      MID: 13,     // Kalfa
+      SENIOR: 20   // Usta (en yüksek kıdem)
     };
     const seniorityPart = seniorityMap[tech.level] ?? 6;
 
@@ -296,20 +295,18 @@ export class TechnicianScoringService {
   }
 
   private calculateSlaUrgencyScore(tech: Technician, request: ServiceRequest): number {
-    // Max 10 points
-    // Critical priority matches expert levels, Standard matches junior/mid
+    // Maks 10 puan — kritik işler Usta'ya, standart işler Çırak/Kalfa'ya daha yüksek uyum verir.
     if (request.priority === 'CRITICAL') {
-      if (tech.level === 'EXPERT' || tech.level === 'SENIOR') return 10;
-      if (tech.level === 'MID') return 6;
-      return 2;
+      if (tech.level === 'SENIOR') return 10; // Usta
+      if (tech.level === 'MID') return 6;     // Kalfa
+      return 2;                                // Çırak
     } else if (request.priority === 'URGENT') {
       if (tech.level === 'SENIOR' || tech.level === 'MID') return 10;
-      if (tech.level === 'EXPERT') return 8;
-      return 4;
+      return 4;                                // Çırak
     } else {
-      // STANDARD
+      // STANDARD — çırak/kalfa da rahatça üstlenebilir
       if (tech.level === 'MID' || tech.level === 'JUNIOR') return 10;
-      return 6;
+      return 6;                                // Usta (standart işe fazla nitelikli)
     }
   }
 }

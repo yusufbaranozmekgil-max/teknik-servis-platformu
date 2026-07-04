@@ -542,8 +542,7 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
     const map: Record<string, string> = {
       JUNIOR: 'Çırak',
       MID: 'Kalfa',
-      SENIOR: 'Usta',
-      EXPERT: 'Uzman Usta'
+      SENIOR: 'Usta'
     };
     return map[val] || val;
   }

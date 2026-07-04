@@ -87,7 +87,6 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               <option value="JUNIOR">Çırak</option>
               <option value="MID">Kalfa</option>
               <option value="SENIOR">Usta</option>
-              <option value="EXPERT">Uzman Usta</option>
             </app-form-field>
 
             <app-form-field
