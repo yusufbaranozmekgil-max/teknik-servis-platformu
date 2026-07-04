@@ -110,7 +110,8 @@ export class RuleEngineService {
     return {
       rule,
       allowed: match.allowed,
-      reason: match.reason
+      reason: match.reason,
+      triggered: match.triggered
     };
   }
 
@@ -145,12 +146,12 @@ export class RuleEngineService {
 
         case 'rule-3': // Minimum stok seviyesi
           if (context.sparePart) {
-            const available = context.sparePart.stockQuantity - context.sparePart.reservedQuantity;
-            if (available < context.sparePart.minimumStockLevel) {
+            const available = context.sparePart.stockQuantity - (context.sparePart.reservedQuantity ?? 0);
+            if (available < context.sparePart.minStockThreshold) {
               return {
                 triggered: true,
                 allowed: true,
-                reason: `Stok seviyesi kritik limitin (${context.sparePart.minimumStockLevel}) altına düştü.`
+                reason: `Stok seviyesi kritik limitin (${context.sparePart.minStockThreshold}) altına düştü.`
               };
             }
           }

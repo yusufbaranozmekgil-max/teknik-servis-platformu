@@ -51,6 +51,49 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
               <label>Araç Yakıt Seviyesi (%)</label>
               <input type="number" [value]="mockFuelLevel" (input)="onFuelInput($any($event.target))" class="form-control" />
             </div>
+
+            <div class="form-group">
+              <label>Yedek Parça Stok Durumu</label>
+              <select [value]="mockStockCritical ? '1' : '0'" (change)="mockStockCritical = $any($event.target).value === '1'" class="form-control">
+                <option value="0">Yeterli (stok 50 / eşik 5)</option>
+                <option value="1">Kritik (stok 2 / eşik 5)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>SLA Durumu</label>
+              <select [value]="mockSlaState" (change)="mockSlaState = $any($event.target).value" class="form-control">
+                <option value="NORMAL">Normal (bol süre)</option>
+                <option value="APPROACHING">Yaklaşıyor (2 saatten az)</option>
+                <option value="OVERDUE">Gecikmiş (süre aşıldı)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Teknisyen Durumu</label>
+              <select [value]="mockTechnicianState" (change)="mockTechnicianState = $any($event.target).value" class="form-control">
+                <option value="ACTIVE">Aktif</option>
+                <option value="ON_LEAVE">İzinli</option>
+                <option value="INACTIVE">Pasif</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Şube Günlük Kapasitesi</label>
+              <select [value]="mockBranchFull ? '1' : '0'" (change)="mockBranchFull = $any($event.target).value === '1'" class="form-control">
+                <option value="0">Uygun (2 / 10)</option>
+                <option value="1">Dolu (10 / 10)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Garanti / Müşteri Onayı</label>
+              <select [value]="mockWarranty" (change)="mockWarranty = $any($event.target).value" class="form-control">
+                <option value="PAID_NO_APPROVAL">Garanti dışı, onay YOK</option>
+                <option value="PAID_APPROVED">Garanti dışı, onaylı</option>
+                <option value="WARRANTY">Garanti kapsamında</option>
+              </select>
+            </div>
           </div>
 
           <button (click)="runSimulation()" class="simulate-btn">Simülasyon Değerlendirmesini Başlat</button>
@@ -266,6 +309,11 @@ export class RuleTestComponent {
   mockCost = 1500;
   mockMaintenanceDays = 30;
   mockFuelLevel = 80;
+  mockStockCritical = false;                 // rule-3
+  mockSlaState = 'NORMAL';                    // rule-4 / rule-5
+  mockTechnicianState = 'ACTIVE';             // rule-8
+  mockBranchFull = false;                     // rule-9
+  mockWarranty = 'PAID_NO_APPROVAL';          // rule-10
 
   simulationRan = false;
   simResults: RuleResult[] = [];
@@ -314,10 +362,10 @@ export class RuleTestComponent {
           description: 'Çakışma testi açıklaması',
           requiredSkill: 'HVAC',
           priority: this.mockPriority,
-          status: 'NEW',
-          slaDeadline: new Date(Date.now() + 1.5 * 60 * 60 * 1000).toISOString(),
-          hasWarranty: false,
-          hasCustomerApproval: false,
+          status: 'OPENED',
+          slaDeadline: this.computeMockSla(),
+          hasWarranty: this.mockWarranty === 'WARRANTY',
+          hasCustomerApproval: this.mockWarranty === 'PAID_APPROVED',
           createdAt: new Date().toISOString()
         },
         workOrder: {
@@ -352,8 +400,8 @@ export class RuleTestComponent {
           workingHoursStart: '08:30',
           workingHoursEnd: '17:30',
           workingDays: [1, 2, 3, 4, 5],
-          isActive: true,
-          isOnLeave: true,
+          isActive: this.mockTechnicianState !== 'INACTIVE',
+          isOnLeave: this.mockTechnicianState === 'ON_LEAVE',
           leaveStart: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           leaveEnd: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           performanceScore: 85,
@@ -376,15 +424,28 @@ export class RuleTestComponent {
           isActive: true,
           createdAt: new Date().toISOString()
         },
+        sparePart: {
+          id: 'part-mock', code: 'PM-01', name: 'Test Parça', category: 'FILTER',
+          branchId: 'sube-ist-01', compatibleDevices: '', unit: 'PCS',
+          stockQuantity: this.mockStockCritical ? 2 : 50,
+          reservedQuantity: 0,
+          minStockThreshold: 5,
+          unitPrice: 100, isActive: true, createdAt: new Date().toISOString()
+        },
+        branch: {
+          id: 'sube-ist-01', name: 'İstanbul Merkez', isActive: true, dailyCapacity: 10
+        },
+        branchCurrentOrdersCount: this.mockBranchFull ? 10 : 2,
         estimatedCost: this.mockCost
       };
 
       const activeRules = this.ruleService.getActiveRules();
       const triggered: RuleResult[] = [];
 
+      // Gerçek kural değerlendirmesi: testRule koşulu tetikliyorsa sonuca dahil et.
       for (const r of activeRules) {
         const res = this.ruleService.testRule(r, mockContext);
-        if (this.doesSimulatorRuleMatch(r.id)) {
+        if (res.triggered) {
           triggered.push(res);
         }
       }
@@ -399,15 +460,12 @@ export class RuleTestComponent {
     }
   }
 
-  private doesSimulatorRuleMatch(ruleId: string): boolean {
-    if (ruleId === 'rule-1' && this.mockPriority === 'CRITICAL') return true;
-    if (ruleId === 'rule-2' && this.mockCost > 50000) return true;
-    if (ruleId === 'rule-5' && this.mockPriority === 'CRITICAL') return true;
-    if (ruleId === 'rule-6' && this.mockMaintenanceDays > 180) return true;
-    if (ruleId === 'rule-7' && this.mockFuelLevel < 30) return true;
-    if (ruleId === 'rule-8') return true;
-    if (ruleId === 'rule-10' && this.mockPriority !== 'CRITICAL') return true;
-    return false;
+  /** SLA senaryosuna göre mock son müdahale tarihi üretir (rule-4 gecikme / rule-5 yaklaşma). */
+  private computeMockSla(): string {
+    const now = Date.now();
+    if (this.mockSlaState === 'OVERDUE') return new Date(now - 60 * 60 * 1000).toISOString();
+    if (this.mockSlaState === 'APPROACHING') return new Date(now + 60 * 60 * 1000).toISOString();
+    return new Date(now + 10 * 60 * 60 * 1000).toISOString();
   }
 
   getLoserRules(): RuleResult[] {

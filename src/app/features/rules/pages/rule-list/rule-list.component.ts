@@ -157,6 +157,55 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
               <small class="help-text" *ngIf="mockFuelLevel < 30">Kural 7 tetiklenecek (Düşük Yakıt Engeli)</small>
             </div>
 
+            <div class="form-group">
+              <label>Yedek Parça Stok Durumu</label>
+              <select [value]="mockStockCritical ? '1' : '0'" (change)="mockStockCritical = $any($event.target).value === '1'; runSimulation()" class="form-control">
+                <option value="0">Yeterli (stok 50 / eşik 5)</option>
+                <option value="1">Kritik (stok 2 / eşik 5)</option>
+              </select>
+              <small class="help-text" *ngIf="mockStockCritical">Kural 3 tetiklenecek (Kritik Stok Uyarısı)</small>
+            </div>
+
+            <div class="form-group">
+              <label>SLA Durumu</label>
+              <select [value]="mockSlaState" (change)="mockSlaState = $any($event.target).value; runSimulation()" class="form-control">
+                <option value="NORMAL">Normal (bol süre)</option>
+                <option value="APPROACHING">Yaklaşıyor (2 saatten az)</option>
+                <option value="OVERDUE">Gecikmiş (süre aşıldı)</option>
+              </select>
+              <small class="help-text" *ngIf="mockSlaState === 'OVERDUE'">Kural 4 tetiklenecek (SLA Gecikmesi)</small>
+              <small class="help-text" *ngIf="mockSlaState === 'APPROACHING'">Kural 5 tetiklenecek (SLA Yaklaşıyor)</small>
+            </div>
+
+            <div class="form-group">
+              <label>Teknisyen Durumu</label>
+              <select [value]="mockTechnicianState" (change)="mockTechnicianState = $any($event.target).value; runSimulation()" class="form-control">
+                <option value="ACTIVE">Aktif</option>
+                <option value="ON_LEAVE">İzinli</option>
+                <option value="INACTIVE">Pasif</option>
+              </select>
+              <small class="help-text" *ngIf="mockTechnicianState !== 'ACTIVE'">Kural 8 tetiklenecek (İzinli/Pasif Teknisyen Engeli)</small>
+            </div>
+
+            <div class="form-group">
+              <label>Şube Günlük Kapasitesi</label>
+              <select [value]="mockBranchFull ? '1' : '0'" (change)="mockBranchFull = $any($event.target).value === '1'; runSimulation()" class="form-control">
+                <option value="0">Uygun (2 / 10)</option>
+                <option value="1">Dolu (10 / 10)</option>
+              </select>
+              <small class="help-text" *ngIf="mockBranchFull">Kural 9 tetiklenecek (Şube Kapasite Doldu)</small>
+            </div>
+
+            <div class="form-group">
+              <label>Garanti / Müşteri Onayı</label>
+              <select [value]="mockWarranty" (change)="mockWarranty = $any($event.target).value; runSimulation()" class="form-control">
+                <option value="PAID_NO_APPROVAL">Garanti dışı, onay YOK</option>
+                <option value="PAID_APPROVED">Garanti dışı, onaylı</option>
+                <option value="WARRANTY">Garanti kapsamında</option>
+              </select>
+              <small class="help-text" *ngIf="mockWarranty === 'PAID_NO_APPROVAL'">Kural 10 tetiklenecek (Onaysız Parça Çıkış Engeli)</small>
+            </div>
+
             <button (click)="runSimulation()" class="simulate-btn">Simülasyonu Çalıştır</button>
           </div>
 
@@ -249,6 +298,11 @@ export class RuleListComponent implements OnInit {
   mockCost = 65000;
   mockMaintenanceDays = 190;
   mockFuelLevel = 25;
+  mockStockCritical = false;           // rule-3
+  mockSlaState = 'NORMAL';             // rule-4 / rule-5
+  mockTechnicianState = 'ON_LEAVE';    // rule-8
+  mockBranchFull = false;             // rule-9
+  mockWarranty = 'PAID_NO_APPROVAL';  // rule-10
 
   // Simulator Outputs
   simulationRan = false;
@@ -354,10 +408,10 @@ export class RuleListComponent implements OnInit {
         description: 'Çakışma testi açıklaması',
         requiredSkill: 'HVAC',
         priority: this.mockPriority,
-        status: 'NEW',
-        slaDeadline: new Date(Date.now() + 1.5 * 60 * 60 * 1000).toISOString(), // 1.5 hours remaining (triggers Rule 5)
-        hasWarranty: false,
-        hasCustomerApproval: false,
+        status: 'OPENED',
+        slaDeadline: this.computeMockSla(),
+        hasWarranty: this.mockWarranty === 'WARRANTY',
+        hasCustomerApproval: this.mockWarranty === 'PAID_APPROVED',
         createdAt: new Date().toISOString()
       },
       workOrder: {
@@ -392,8 +446,8 @@ export class RuleListComponent implements OnInit {
         workingHoursStart: '08:30',
         workingHoursEnd: '17:30',
         workingDays: [1, 2, 3, 4, 5],
-        isActive: true,
-        isOnLeave: true, // triggers Rule 8 (isOnLeave)
+        isActive: this.mockTechnicianState !== 'INACTIVE',
+        isOnLeave: this.mockTechnicianState === 'ON_LEAVE', // rule-8
         leaveStart: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
         leaveEnd: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         performanceScore: 85,
@@ -416,19 +470,27 @@ export class RuleListComponent implements OnInit {
         isActive: true,
         createdAt: new Date().toISOString()
       },
+      sparePart: {
+        id: 'part-mock', code: 'PM-01', name: 'Test Parça', category: 'FILTER',
+        branchId: 'sube-ist-01', compatibleDevices: '', unit: 'PCS',
+        stockQuantity: this.mockStockCritical ? 2 : 50,
+        reservedQuantity: 0,
+        minStockThreshold: 5,
+        unitPrice: 100, isActive: true, createdAt: new Date().toISOString()
+      },
+      branch: {
+        id: 'sube-ist-01', name: 'İstanbul Merkez', isActive: true, dailyCapacity: 10
+      },
+      branchCurrentOrdersCount: this.mockBranchFull ? 10 : 2,
       estimatedCost: this.mockCost
     };
 
-    // Run active rules on WORK_ORDER_PLAN trigger
+    // Gerçek kural değerlendirmesi: testRule koşulu tetikliyorsa sonuca dahil et.
     const activeRules = this.ruleService.getActiveRules();
-    
-    // Evaluate manually in component to collect all triggered rules for display
     const triggered: RuleResult[] = [];
     for (const r of activeRules) {
       const res = this.ruleService.testRule(r, mockContext);
-      // We check if rule conditions actually apply/trigger:
-      // For simulator, if allowed is false or some conditions match:
-      if (this.doesSimulatorRuleMatch(r.id)) {
+      if (res.triggered) {
         triggered.push(res);
       }
     }
@@ -439,16 +501,12 @@ export class RuleListComponent implements OnInit {
     this.simResults = this.ruleService.resolveConflicts(triggered);
   }
 
-  // Helper check for simulator matches
-  private doesSimulatorRuleMatch(ruleId: string): boolean {
-    if (ruleId === 'rule-1' && this.mockPriority === 'CRITICAL') return true;
-    if (ruleId === 'rule-2' && this.mockCost > 50000) return true;
-    if (ruleId === 'rule-5' && this.mockPriority === 'CRITICAL') return true; // SLA under 2 hours
-    if (ruleId === 'rule-6' && this.mockMaintenanceDays > 180) return true;
-    if (ruleId === 'rule-7' && this.mockFuelLevel < 30) return true;
-    if (ruleId === 'rule-8') return true; // mock tech is always on leave in simulator
-    if (ruleId === 'rule-10' && this.mockPriority !== 'CRITICAL') return true; // mock request has no customer approval
-    return false;
+  /** SLA senaryosuna göre mock son müdahale tarihi üretir (rule-4 gecikme / rule-5 yaklaşma). */
+  private computeMockSla(): string {
+    const now = Date.now();
+    if (this.mockSlaState === 'OVERDUE') return new Date(now - 60 * 60 * 1000).toISOString();
+    if (this.mockSlaState === 'APPROACHING') return new Date(now + 60 * 60 * 1000).toISOString();
+    return new Date(now + 10 * 60 * 60 * 1000).toISOString();
   }
 
   getLoserRules(): RuleResult[] {
