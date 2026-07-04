@@ -1,0 +1,11 @@
+    .page-container { display: flex; flex-direction: column; gap: 1.5rem; }
+    .header-section { display: flex; justify-content: space-between; align-items: center; }
+    .title-area { display: flex; flex-direction: column; gap: 0.25rem; }
+    .back-link { font-size: 0.875rem; color: #4b5563; text-decoration: none; font-weight: 500; }
+    .back-link:hover { color: #1e40af; }
+    h2 { margin: 0; font-size: 1.5rem; color: #b91c1c; display: flex; align-items: center; gap: 0.5rem; }
+    .subtitle { margin: 0; font-size: 0.875rem; color: #6b7280; }
+    
+    .alert-banner { padding: 1rem; background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 0.5rem; color: #991b1b; font-size: 0.9rem; }
+
+    .table-container { background: white; border-radius: 0.75rem; padding: 1.5rem; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }

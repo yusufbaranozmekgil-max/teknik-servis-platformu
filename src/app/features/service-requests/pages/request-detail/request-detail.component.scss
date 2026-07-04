@@ -1,0 +1,46 @@
+    .page-container { display: flex; flex-direction: column; gap: 1.5rem; max-width: 800px; margin: 0 auto; padding: 1.5rem 0; }
+    .header-section { display: flex; justify-content: space-between; align-items: center; }
+    .title-area { display: flex; flex-direction: column; gap: 0.5rem; }
+    .back-link { font-size: 0.875rem; color: #4b5563; text-decoration: none; font-weight: 500; }
+    .back-link:hover { color: #1e40af; }
+    h2 { margin: 0; font-size: 1.75rem; color: #111827; }
+
+    .card-content { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 2rem; border: 1px solid #e5e7eb; display: flex; flex-direction: column; gap: 1.5rem; }
+    
+    .request-header { display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 1rem; flex-wrap: wrap; }
+    .code-badge { background-color: #f3f4f6; color: #374151; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-weight: 700; font-family: monospace; font-size: 0.95rem; }
+    .request-header h3 { margin: 0; font-size: 1.35rem; color: #111827; flex: 1; }
+    
+    .status-pill { display: inline-block; padding: 0.25rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .status-pill.new { background-color: #d1fae5; color: #065f46; }
+    .status-pill.planned { background-color: #feebc8; color: #744210; }
+    .status-pill.in_progress { background-color: #e0f2fe; color: #0369a1; }
+    .status-pill.closed { background-color: #e5e7eb; color: #374151; }
+    .status-pill.cancelled { background-color: #fee2e2; color: #991b1b; }
+
+    /* SLA Card Styles */
+    .sla-card { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; background-color: #f9fafb; }
+    .sla-card.sla-approaching { background-color: #fffbeb; border-color: #fde68a; color: #92400e; }
+    .sla-card.sla-overdue { background-color: #fef2f2; border-color: #fca5a5; color: #991b1b; }
+    .sla-icon { font-size: 1.5rem; }
+    .sla-details { display: flex; gap: 0.5rem; font-size: 0.9rem; align-items: center; }
+    .sla-alert-text { font-weight: bold; }
+
+    .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    @media (max-width: 640px) {
+      .details-grid { grid-template-columns: 1fr; }
+    }
+    
+    .detail-section h4, .description-section h4 { margin: 0 0 0.75rem 0; font-size: 1rem; color: #374151; border-bottom: 2px solid #f3f4f6; padding-bottom: 0.375rem; }
+    .detail-item { font-size: 0.95rem; color: #4b5563; margin-bottom: 0.5rem; }
+    .detail-item strong { color: #1f2937; }
+    
+    .description-text { font-size: 0.95rem; color: #4b5563; line-height: 1.5; margin: 0; background: #f9fafb; padding: 1rem; border-radius: 0.375rem; border: 1px solid #e5e7eb; }
+
+    .warranty-section { display: flex; gap: 2rem; border-top: 1px solid #e5e7eb; padding-top: 1rem; }
+    .w-item { font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .bool-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; font-weight: 600; background-color: #fee2e2; color: #991b1b; }
+    .bool-badge.true { background-color: #d1fae5; color: #065f46; }
+
+    .meta-section { border-top: 1px solid #e5e7eb; padding-top: 1rem; color: #9ca3af; font-size: 0.8rem; text-align: right; }
+    .error-alert { padding: 0.75rem 1rem; background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; border-radius: 0.375rem; font-size: 0.875rem; font-weight: 500; }

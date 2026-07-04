@@ -1,0 +1,120 @@
+// ====================================================================
+// Status Badge — light + dark mode için güçlü, okunaklı renkler
+// SCSS değişkenleri + mixin ile tek kaynaktan yönetilir
+// ====================================================================
+
+// --- Light mode tonları (canlı, dark mode kadar belirgin) ---
+$opened-bg:       #dcfce7;  $opened-fg:       #166534;  $opened-border:       #86efac;
+$planned-bg:      #1e40af;  $planned-fg:      #ffffff;  $planned-border:      #1e3a8a;
+$on-way-bg:       #c2410c;  $on-way-fg:       #ffffff;  $on-way-border:       #9a3412;
+$on-site-bg:      #475569;  $on-site-fg:      #ffffff;  $on-site-border:      #334155;
+$completed-bg:    #047857;  $completed-fg:    #ffffff;  $completed-border:    #065f46;
+$partial-bg:      #b45309;  $partial-fg:      #ffffff;  $partial-border:      #92400e;
+$failed-bg:       #b91c1c;  $failed-fg:       #ffffff;  $failed-border:       #991b1b;
+$cancelled-bg:    #6b7280;  $cancelled-fg:    #ffffff;  $cancelled-border:    #4b5563;
+$active-bg:       #047857;  $active-fg:       #ffffff;  $active-border:       #065f46;
+$passive-bg:      #6b7280;  $passive-fg:      #ffffff;  $passive-border:      #4b5563;
+$leave-bg:        #b45309;  $leave-fg:        #ffffff;  $leave-border:        #92400e;
+$critical-bg:     #dc2626;  $critical-fg:     #ffffff;  $critical-border:     #b91c1c;
+$urgent-bg:       #ea580c;  $urgent-fg:       #ffffff;  $urgent-border:       #c2410c;
+$standard-bg:     #475569;  $standard-fg:     #ffffff;  $standard-border:     #334155;
+$sla-overdue-bg:  #b91c1c;  $sla-overdue-fg:  #ffffff;  $sla-overdue-border:  #991b1b;
+$sla-warn-bg:     #c2410c;  $sla-warn-fg:     #ffffff;  $sla-warn-border:     #9a3412;
+$low-fuel-bg:     #c2410c;  $low-fuel-fg:     #ffffff;  $low-fuel-border:     #9a3412;
+
+// --- Dark mode tonları (biraz daha doygun + daha güçlü kontrast) ---
+$dark-opened-bg:    #166534;  $dark-opened-fg:    #d1fae5;
+$dark-planned-bg:   #1d4ed8;  $dark-planned-fg:   #dbeafe;
+$dark-on-way-bg:    #ea580c;  $dark-on-way-fg:    #fff7ed;
+$dark-on-site-bg:   #475569;  $dark-on-site-fg:   #f1f5f9;
+$dark-completed-bg: #15803d;  $dark-completed-fg: #d1fae5;
+$dark-partial-bg:   #d97706;  $dark-partial-fg:   #fef3c7;
+$dark-failed-bg:    #dc2626;  $dark-failed-fg:    #fee2e2;
+$dark-cancelled-bg: #6b7280;  $dark-cancelled-fg: #f3f4f6;
+$dark-critical-bg:  #dc2626;  $dark-critical-fg:  #fee2e2;
+$dark-urgent-bg:    #ea580c;  $dark-urgent-fg:    #fff7ed;
+$dark-standard-bg:  #6b7280;  $dark-standard-fg:  #f3f4f6;
+
+// --- Mixin: tek satırda renk seti uygula ---
+@mixin badge-color($bg, $fg, $border: null) {
+  background: $bg;
+  color: $fg;
+  @if $border != null {
+    border: 1px solid $border;
+  }
+}
+
+// === Temel badge ===
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+// === Light mode renkleri ===
+.active, .aktif, .available, .musait     { @include badge-color($active-bg, $active-fg, $active-border); }
+.passive, .pasif, .inactive              { @include badge-color($passive-bg, $passive-fg, $passive-border); }
+.on_leave, .izinli                       { @include badge-color($leave-bg, $leave-fg, $leave-border); }
+.critical, .kritik                       { @include badge-color($critical-bg, $critical-fg, $critical-border); }
+.urgent, .acil                           { @include badge-color($urgent-bg, $urgent-fg, $urgent-border); }
+.standard, .standart                     { @include badge-color($standard-bg, $standard-fg, $standard-border); }
+.sla_overdue, .sla_gecikmis              { @include badge-color($sla-overdue-bg, $sla-overdue-fg, $sla-overdue-border); }
+.sla_warning, .sla_yaklasiyor            { @include badge-color($sla-warn-bg, $sla-warn-fg, $sla-warn-border); }
+.new, .yeni                              { @include badge-color(#dbeafe, #1e40af, #bfdbfe); }
+.closed, .kapatildi, .kapatilmis         { @include badge-color(#f1f5f9, #334155, #cbd5e1); }
+.opened, .acildi                         { @include badge-color($opened-bg, $opened-fg, $opened-border); }
+.planned, .planlandi                     { @include badge-color($planned-bg, $planned-fg, $planned-border); }
+.on_the_way, .yolda                      { @include badge-color($on-way-bg, $on-way-fg, $on-way-border); }
+.on_site, .sahada                        { @include badge-color($on-site-bg, $on-site-fg, $on-site-border); }
+.in_progress, .islemde                   { @include badge-color($on-site-bg, $on-site-fg, $on-site-border); }
+.completed, .tamamlandi                  { @include badge-color($completed-bg, $completed-fg, $completed-border); }
+.partially_completed, .kismi_tamamlandi  { @include badge-color($partial-bg, $partial-fg, $partial-border); }
+.failed, .basarisiz                      { @include badge-color($failed-bg, $failed-fg, $failed-border); }
+.cancelled, .iptal_edildi                { @include badge-color($cancelled-bg, $cancelled-fg, $cancelled-border); }
+.critical_stock, .kritik_stok            { @include badge-color($critical-bg, $critical-fg, $critical-border); }
+.low_fuel, .yakit_dusuk                  { @include badge-color($low-fuel-bg, $low-fuel-fg, $low-fuel-border); }
+.maintenance_overdue, .bakim_gecikmis    { @include badge-color($failed-bg, $failed-fg, $failed-border); }
+.maintenance, .bakimda                   { @include badge-color($failed-bg, $failed-fg, $failed-border); }
+.out_of_service                          { @include badge-color($cancelled-bg, $cancelled-fg, $cancelled-border); }
+
+// === Dark mode renkleri ===
+// Body'ye dark-theme class'ı eklendiğinde geçerli olur.
+// Component encapsulation nedeniyle ::ng-deep gerekmiyor —
+// body.dark-theme app-status-badge .badge zincirinde global styles.scss zaten devreye girer.
+// Yine de bu component scope'unda da güvence olsun diye :host-context ile yazıyoruz.
+
+:host-context(body.dark-theme) {
+  .active, .aktif, .available, .musait, .opened, .acildi, .new, .yeni {
+    @include badge-color(#1e3a8a, #dbeafe);
+  }
+  .passive, .pasif, .inactive, .cancelled, .iptal_edildi, .out_of_service, .standard, .standart, .closed, .kapatildi, .kapatilmis {
+    @include badge-color(#374151, #f3f4f6);
+  }
+  .on_leave, .izinli, .partially_completed, .kismi_tamamlandi {
+    @include badge-color($dark-partial-bg, $dark-partial-fg);
+  }
+  .critical, .kritik, .critical_stock, .kritik_stok, .sla_overdue, .sla_gecikmis,
+  .failed, .basarisiz, .maintenance_overdue, .bakim_gecikmis, .maintenance, .bakimda {
+    @include badge-color($dark-failed-bg, $dark-failed-fg);
+  }
+  .urgent, .acil, .sla_warning, .sla_yaklasiyor, .low_fuel, .yakit_dusuk, .on_the_way, .yolda {
+    @include badge-color($dark-on-way-bg, $dark-on-way-fg);
+  }
+  .planned, .planlandi {
+    @include badge-color($dark-planned-bg, $dark-planned-fg);
+  }
+  .on_site, .sahada, .in_progress, .islemde {
+    @include badge-color($dark-on-site-bg, $dark-on-site-fg);
+  }
+  .completed, .tamamlandi {
+    @include badge-color($dark-completed-bg, $dark-completed-fg);
+  }
+}

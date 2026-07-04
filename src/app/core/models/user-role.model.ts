@@ -1,0 +1,8 @@
+export type UserRole =
+  | 'SYSTEM_ADMIN'
+  | 'OPERATION_MANAGER'
+  | 'BRANCH_MANAGER'
+  | 'DISPATCHER'
+  | 'WAREHOUSE_MANAGER'
+  | 'TECHNICIAN'
+  | 'REPORTING_USER';

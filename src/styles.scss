@@ -1,0 +1,763 @@
+/* Global styles */
+html, body { height: 100%; }
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8fafc;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  // Sayfa içerik genişliği ekran kadar olsun; horizontal scroll'u tek noktadan kapat.
+  overflow-x: hidden;
+  min-width: 320px;
+}
+
+img, svg, video, canvas { max-width: 100%; height: auto; }
+
+// ====================================================================
+// GLOBAL RESPONSIVE — form ve detay grid'lerinin mobile fallback'i.
+// Komponentlerde tek tek media query yazmak yerine tek noktadan zorlanır.
+// ====================================================================
+
+// Tablet ve altı: 2 sütunlu grid'ler tek sütuna düşer
+@media (max-width: 768px) {
+  .form-grid,
+  .details-grid,
+  .meta-info-grid,
+  .raw-values-grid,
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.875rem !important;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.875rem !important;
+  }
+
+  // Modal mobilde tam ekran taşırmayı önle
+  .modal-box,
+  .modal-content,
+  .dialog-box {
+    width: 100% !important;
+    max-width: calc(100vw - 1.5rem) !important;
+    max-height: calc(100vh - 2rem) !important;
+    overflow-y: auto !important;
+  }
+
+  // Tablo overflow zorla
+  .table-responsive,
+  .list-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Sayfa container'ları mobilde padding'i azalt
+  .page-container { padding: 1rem 0.75rem !important; }
+
+  // Header section yatay sıkışma yerine alt alta gelsin
+  .header-section { flex-direction: column !important; align-items: stretch !important; gap: 0.75rem !important; }
+}
+
+// Çok dar (telefon)
+@media (max-width: 480px) {
+  .page-container { padding: 0.75rem 0.5rem !important; }
+  .card,
+  .card-content,
+  .form-card {
+    padding: 1rem !important;
+    border-radius: 0.5rem !important;
+  }
+  .metric-card { padding: 1rem !important; }
+
+  // Modal action butonları stack
+  .modal-actions { flex-wrap: wrap !important; gap: 0.5rem !important; }
+  .modal-actions .btn { flex: 1 1 auto !important; min-width: 0 !important; }
+}
+
+body.dark-theme {
+  background-color: #0b0f19 !important;
+  color: #f3f4f6 !important;
+
+  /* App Shell & Main Content Area */
+  .layout-container {
+    background-color: #0b0f19 !important;
+  }
+  .app-header {
+    background-color: #111827 !important;
+    border-bottom: 1px solid #1f2937 !important;
+  }
+  .sidebar {
+    background-color: #111827 !important;
+    border-right-color: #1f2937 !important;
+    
+    .single-link, .group-header, .group-items a {
+      color: #9ca3af !important;
+      &:hover {
+        background-color: #1f2937 !important;
+        color: #f9fafb !important;
+        .sidebar-material-icon { color: #f9fafb !important; }
+      }
+    }
+    .single-link.active-link, .group-items .active-link {
+      background-color: #2563eb !important;
+      color: white !important;
+      .sidebar-material-icon { color: white !important; }
+    }
+    .sidebar-material-icon {
+      color: #9ca3af !important;
+    }
+  }
+
+  .main-content {
+    background-color: #0b0f19 !important;
+  }
+
+  /* Cards, Containers & Content Sections */
+  .card, .transfer-card, .detail-block, .import-results-card, .results-panel, .control-panel, .resource-card, .parts-selector-box, .added-parts-list, .form-group-wrapper, .request-details-box, .console-box {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .request-details-box, .parts-add-form {
+    background-color: #1f2937 !important;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6, label {
+    color: #f9fafb !important;
+  }
+  p, span, td, th, div:not(.badge):not(.metric-card):not(.alert) {
+    color: #e5e7eb;
+  }
+
+  .subtitle, .card-label, .card-sub, .sub-label, .step-desc, .description-text, .hint, .stat-label {
+    color: #9ca3af !important;
+  }
+
+  /* Metric Cards */
+  .metric-card {
+    border-color: #1f2937 !important;
+    color: #f9fafb !important;
+    
+    &.gradient-red, &.gradient-blue, &.gradient-green, &.gradient-purple, &.gradient-orange {
+      .card-label, .card-value, .card-sub, p, span, h3 {
+        color: white !important;
+      }
+    }
+
+    &:not([class*="gradient-"]) {
+      background-color: #111827 !important;
+      border: 1px solid #1f2937 !important;
+      
+      .card-value {
+        color: #f9fafb !important;
+      }
+    }
+  }
+
+  /* Forms & Input Elements */
+  .form-control, .select-input, .file-input, select, input, textarea, .form-control:focus {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border-color: #374151 !important;
+
+    &:focus {
+      border-color: #2563eb !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+    }
+
+    &::placeholder {
+      color: #6b7280 !important;
+    }
+  }
+
+  /* Tables & Lists — TÜM tablo class'larını kapsa */
+  .list-table, .error-table, .parts-table, .audit-table, .data-table, .premium-table,
+  .rules-table, .report-table, .stock-table, table {
+    border-color: #1f2937 !important;
+    background-color: transparent !important;
+
+    th {
+      background-color: #1f2937 !important;
+      color: #f9fafb !important;
+      border-bottom: 2px solid #374151 !important;
+    }
+
+    td {
+      background-color: #111827 !important;
+      border-bottom: 1px solid #1f2937 !important;
+      color: #e5e7eb !important;
+
+      code {
+        background-color: #1f2937 !important;
+        color: #60a5fa !important;
+      }
+    }
+
+    tr:hover td {
+      background-color: #1f2937 !important;
+    }
+  }
+
+  /* DataTable component'in ana wrapper'ı */
+  .table-wrapper, .table-container, .table-responsive, .table-card {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+  }
+
+  /* DataTable filter row */
+  .filter-row th, .filter-input, .filter-select {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border-color: #374151 !important;
+    &::placeholder { color: #6b7280 !important; }
+  }
+
+  /* Tablo içindeki üst arama/filtre çubuğu */
+  .table-header-controls, .table-actions {
+    background-color: #1f2937 !important;
+    border-bottom-color: #374151 !important;
+  }
+  .global-search-input {
+    background-color: #0b0f19 !important;
+    color: #f9fafb !important;
+    border-color: #374151 !important;
+    &::placeholder { color: #6b7280 !important; }
+  }
+  .filter-toggle-btn {
+    background-color: #0b0f19 !important;
+    color: #cbd5e1 !important;
+    border-color: #374151 !important;
+    &:hover { background-color: #1f2937 !important; color: #f8fafc !important; }
+    &.active { background-color: #1e40af !important; color: white !important; border-color: #2563eb !important; }
+  }
+
+  /* Pagination bar (work-order özel) */
+  .pagination-bar, .pagination-controls {
+    background-color: #111827 !important;
+    border-top-color: #1f2937 !important;
+    color: #cbd5e1 !important;
+    button, select {
+      background-color: #0b0f19 !important;
+      color: #cbd5e1 !important;
+      border-color: #374151 !important;
+      &:hover:not(:disabled) { background-color: #1f2937 !important; }
+      &:disabled { opacity: 0.35 !important; }
+    }
+  }
+
+  /* Text muted / empty rows */
+  .text-muted, .empty-row {
+    color: #6b7280 !important;
+  }
+  .text-center.text-muted { color: #9ca3af !important; }
+
+  /* Pagination inside Dark Theme */
+  .mini-pagination {
+    background-color: #111827 !important;
+    border-top-color: #1f2937 !important;
+    color: #cbd5e1 !important;
+
+    .page-info strong {
+      color: #f8fafc !important;
+    }
+
+    .page-controls {
+      label {
+        color: #cbd5e1 !important;
+      }
+
+      select {
+        background-color: #0b0f19 !important;
+        color: #f8fafc !important;
+        border-color: #374151 !important;
+        &:hover { border-color: #4b5563 !important; }
+      }
+
+      button {
+        background-color: #0b0f19 !important;
+        color: #cbd5e1 !important;
+        border-color: #374151 !important;
+
+        &:hover:not(:disabled) {
+          background-color: #1f2937 !important;
+          color: #f8fafc !important;
+          border-color: #4b5563 !important;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+        }
+
+        &:disabled {
+          background-color: #111827 !important;
+          border-color: #1f2937 !important;
+          color: #475569 !important;
+        }
+      }
+
+      .page-num {
+        color: #f8fafc !important;
+        background-color: #0b0f19 !important;
+      }
+    }
+  }
+
+  /* Alerts */
+  .alert {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+
+    &.alert-info { border-left-color: #3b82f6 !important; }
+    &.alert-warning { border-left-color: #f59e0b !important; }
+    &.alert-success { border-left-color: #10b981 !important; }
+    &.alert-danger { border-left-color: #ef4444 !important; }
+  }
+
+  /* Modals & Dialogs */
+  .modal-content, .dialog-box {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    color: #f9fafb !important;
+  }
+
+  /* Branch selector panel & Status badges */
+  .branch-override-panel {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    
+    .branch-select {
+      background-color: #1f2937 !important;
+      color: #f9fafb !important;
+      border-color: #374151 !important;
+      &:hover { border-color: #4b5563 !important; }
+    }
+  }
+
+  .tech-status-badge {
+    &.status-available {
+      background-color: #065f46 !important;
+      color: #d1fae5 !important;
+    }
+    &.status-busy {
+      background-color: #1e40af !important;
+      color: #dbeafe !important;
+    }
+    &.status-on-leave {
+      background-color: #92400e !important;
+      color: #fef3c7 !important;
+    }
+    &.status-inactive {
+      background-color: #374151 !important;
+      color: #f3f4f6 !important;
+    }
+  }
+
+  .btn-action-remind {
+    background-color: #d97706 !important;
+    color: white !important;
+    &:hover {
+      background-color: #b45309 !important;
+    }
+  }
+
+  /* === Yeni eklenen bileşenler için dark mode === */
+
+  /* Rules + Audit pagination — sayfa-spesifik dark stiller */
+  .rules-pagination, .audit-pagination {
+    background-color: #111827 !important;
+    border-top-color: #1f2937 !important;
+    color: #cbd5e1 !important;
+
+    .page-info strong { color: #f8fafc !important; }
+    .page-num { color: #f8fafc !important; background-color: #1f2937 !important; }
+    .page-controls button {
+      background-color: #0b0f19 !important;
+      color: #cbd5e1 !important;
+      border-color: #374151 !important;
+      &:hover:not(:disabled) { background-color: #1f2937 !important; border-color: #4b5563 !important; }
+      &:disabled { opacity: 0.35 !important; }
+    }
+  }
+
+  /* Reports KPI kartları */
+  .report-info-card {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
+    border-color: #2563eb !important;
+    .info-body h3 { color: #dbeafe !important; }
+    .info-body p { color: #bfdbfe !important; }
+  }
+  .kpi-card {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    .kpi-label { color: #9ca3af !important; }
+    .kpi-value { color: #f9fafb !important; }
+  }
+
+  /* Final state badge'leri (Tamamlandı/Başarısız/İptal) */
+  .final-state-label {
+    background: #064e3b !important;
+    color: #d1fae5 !important;
+    &.failed { background: #7f1d1d !important; color: #fee2e2 !important; }
+    &.cancelled { background: #374151 !important; color: #d1d5db !important; }
+  }
+
+  /* Smart date input */
+  .smart-date-wrapper {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    .d-input { color: #f9fafb !important; }
+    .sep { color: #6b7280 !important; }
+    &:focus-within { border-color: #2563eb !important; }
+  }
+
+  /* Form-field hata mesajı */
+  .error-text { color: #fca5a5 !important; }
+  .char-counter { color: #9ca3af !important; }
+
+  /* Status badge dark variant'ları artık status-badge.component.scss içinde
+     :host-context(body.dark-theme) ile yönetiliyor — burada tekrar tanımlamaya gerek yok. */
+
+  /* Action butonları (Düzenle / Sil) */
+  .action-btn.edit-btn { background-color: #1e3a8a !important; color: #dbeafe !important; }
+  .action-btn.delete-btn { background-color: #7f1d1d !important; color: #fecaca !important; }
+  .action-btn.schedule-btn { background-color: #064e3b !important; color: #d1fae5 !important; }
+  .action-btn.performance-btn { background-color: #4c1d95 !important; color: #ede9fe !important; }
+
+  /* Toast */
+  .toast-success { background-color: #064e3b !important; color: #d1fae5 !important; }
+  .toast-error { background-color: #7f1d1d !important; color: #fee2e2 !important; }
+  .toast-info { background-color: #1e3a8a !important; color: #dbeafe !important; }
+
+  /* Confirm dialog backdrop */
+  .modal-backdrop, .dialog-backdrop { background-color: rgba(0,0,0,0.7) !important; }
+
+  /* Search wrapper içindeki sayaç */
+  .search-counter, .counter { color: #9ca3af !important; }
+
+  /* Bell badge — daha okunaklı */
+  .unread-badge { background-color: #dc2626 !important; color: white !important; }
+
+  /* Empty state */
+  .empty-state, .empty-row {
+    color: #6b7280 !important;
+  }
+
+  /* ================================================================
+     GENEL SAYFA KAPSAYICILARI — dark bloğu olmayan sayfalar için
+     tek noktadan koyu tema (şube formları, stok sayfaları, bildirim
+     merkezi, detay sayfaları vb.)
+     ================================================================ */
+  .page-container,
+  .crud-container {
+    background-color: transparent !important;
+  }
+
+  .card-content,
+  .table-container,
+  .form-card,
+  .list-card,
+  .stat-card,
+  .valuation-card,
+  .filter-form,
+  .tech-profile-card,
+  .detail-section,
+  .description-section,
+  .warranty-section,
+  .info-details,
+  .performance-card,
+  .score-card {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    color: #e5e7eb !important;
+  }
+
+  .back-link {
+    color: #94a3b8 !important;
+    &:hover { color: #93c5fd !important; }
+  }
+
+  /* Kritik stok uyarı bandı */
+  .alert-banner {
+    background-color: #78350f !important;
+    border-color: #b45309 !important;
+    color: #fde68a !important;
+    strong { color: #fef3c7 !important; }
+  }
+
+  /* Bölge etiket girişi (şube formu) */
+  .tag-input-container {
+    input {
+      background-color: #0b0f19 !important;
+      color: #f9fafb !important;
+      border-color: #374151 !important;
+    }
+  }
+  .tag-add-btn {
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+    &:hover { background-color: #374151 !important; }
+  }
+  .tag-chip {
+    background-color: #1e3a8a !important;
+    color: #dbeafe !important;
+  }
+  .no-tags, .area-count { color: #6b7280 !important; }
+  .area-error { color: #fca5a5 !important; }
+
+  /* Yetkinlik seçim satırları (teknisyen formu) */
+  .skill-row {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    &.selected { border-color: #2563eb !important; background-color: #172554 !important; }
+    .skill-check span { color: #e5e7eb !important; }
+    .skill-level {
+      background-color: #0b0f19 !important;
+      color: #f9fafb !important;
+      border-color: #374151 !important;
+    }
+  }
+
+  /* Bildirim merkezi kartları */
+  .notif-title { color: #f9fafb !important; }
+  .notif-message { color: #cbd5e1 !important; }
+  .date-text { color: #6b7280 !important; }
+  .no-notifications {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+    p { color: #6b7280 !important; }
+  }
+  .action-bar {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+  }
+  .card-indicator { opacity: 0.85; }
+
+  /* Detay sayfaları (talep / araç) */
+  .code-badge, .plate-badge {
+    background-color: #1e3a8a !important;
+    color: #dbeafe !important;
+  }
+  .detail-item { color: #e5e7eb !important; strong { color: #f9fafb !important; } }
+  .info-row { color: #e5e7eb !important; border-color: #1f2937 !important; strong { color: #f9fafb !important; } }
+  .sla-card {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    &.sla-overdue { background-color: #7f1d1d !important; border-color: #b91c1c !important; }
+    &.sla-approaching { background-color: #78350f !important; border-color: #b45309 !important; }
+  }
+  .bool-badge {
+    background-color: #374151 !important;
+    color: #f3f4f6 !important;
+    &.true { background-color: #064e3b !important; color: #a7f3d0 !important; }
+  }
+  .meta-section { color: #6b7280 !important; }
+  .description-text { color: #cbd5e1 !important; }
+
+  /* Sekme / özet istatistik kutuları */
+  .stats-overview .stat-card,
+  .summary-cards .stat-card {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+  }
+  .stat-value { color: #f9fafb !important; }
+  .stat-title, .stat-label { color: #9ca3af !important; }
+
+  /* Kart genel başlık şeridi */
+  .card-header {
+    background-color: #0f172a !important;
+    border-color: #1f2937 !important;
+  }
+
+  /* İlerleme / doluluk barları zemini */
+  .progress-bar, .mini-progress-bar, .meter-track {
+    background-color: #1f2937 !important;
+  }
+
+  /* Form aksiyon butonları — tüm oluştur/düzenle sayfaları */
+  .cancel-btn {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #374151 !important;
+    &:hover { background-color: #374151 !important; }
+  }
+  .save-btn:disabled {
+    background-color: #1e3a5f !important;
+    opacity: 0.5 !important;
+  }
+  .form-actions { border-top-color: #1f2937 !important; }
+
+  /* Anahtar / onay kutusu etiketleri */
+  .switch-label, .check-group label, .skill-check {
+    color: #e5e7eb !important;
+    .switch-text { color: #e5e7eb !important; }
+  }
+
+  /* Şube formu — eklenmiş bölgeler kutusu */
+  .chips-container {
+    background-color: #0b0f19 !important;
+    border-color: #374151 !important;
+  }
+
+  /* Teknisyen formu — uzmanlık alanları ızgarası */
+  .skills-grid {
+    background-color: #0b0f19 !important;
+    border-color: #374151 !important;
+  }
+
+  /* Talep detayı — arıza açıklaması kutusu */
+  .description-text {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+  }
+
+  /* Yeni talep — SLA önizleme kutusu */
+  .sla-preview-box {
+    background-color: #064e3b !important;
+    border-color: #047857 !important;
+    color: #a7f3d0 !important;
+  }
+}
+
+/* Rules + Audit pagination — light theme ortak stiller */
+.rules-pagination, .audit-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+  color: #64748b;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  .page-info strong { color: #0f172a; }
+  .page-num {
+    font-weight: 700;
+    color: #0f172a;
+    background-color: #e2e8f0;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+  }
+  .page-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    button {
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid #cbd5e0;
+      background: white;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      transition: all 0.15s;
+      &:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        color: #0f172a;
+      }
+      &:disabled { opacity: 0.35; cursor: not-allowed; }
+    }
+  }
+}
+
+/* Modern pagination overrides (Light Theme) */
+.mini-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 1.25rem !important;
+  background-color: #fafafa !important;
+  border-top: 1px solid #f1f5f9 !important;
+  border-radius: 0 0 0.75rem 0.75rem;
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+
+  .page-info {
+    font-weight: 500;
+    strong {
+      color: #0f172a !important;
+    }
+  }
+
+  .page-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem !important;
+    
+    label {
+      font-size: 0.75rem !important;
+      color: #64748b !important;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+
+    select {
+      padding: 0.3rem 0.6rem !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 0.5rem !important;
+      font-size: 0.75rem !important;
+      background-color: white !important;
+      color: #0f172a !important;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+      &:hover { border-color: #cbd5e1 !important; }
+    }
+
+    button {
+      padding: 0.375rem 0.875rem !important;
+      border: 1px solid #e2e8f0 !important;
+      background-color: white !important;
+      color: #475569 !important;
+      border-radius: 9999px !important;
+      font-size: 0.75rem !important;
+      font-weight: 600 !important;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+
+      &:hover:not(:disabled) {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+
+      &:disabled {
+        opacity: 0.4 !important;
+        cursor: not-allowed !important;
+        background-color: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .page-num {
+      font-weight: 700 !important;
+      color: #0f172a !important;
+      font-size: 0.8rem !important;
+      background-color: #f1f5f9;
+      padding: 0.25rem 0.625rem;
+      border-radius: 9999px;
+    }
+  }
+}
+

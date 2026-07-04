@@ -1,0 +1,89 @@
+// =================================================================
+// Paylaşılan SCSS değişkenleri + themed mixin
+// Kullanım: @use 'src/app/shared/styles/theme' as *;
+//          .x { @include themed(background, $bg-card, $dark-bg-card); }
+// =================================================================
+
+// --- Light tema ---
+$bg-page:        #f8fafc !default;
+$bg-card:        #ffffff !default;
+$bg-table-head:  #f8fafc !default;
+$bg-pagination:  #f8fafc !default;
+$bg-input:       #ffffff !default;
+$bg-modal:       #ffffff !default;
+$bg-row-hover:   #f1f5f9 !default;
+
+$text-strong:    #0f172a !default;
+$text-default:   #334155 !default;
+$text-muted:     #64748b !default;
+$text-faint:     #94a3b8 !default;
+
+$border:         #e2e8f0 !default;
+$border-strong:  #cbd5e1 !default;
+$primary:        #2563eb !default;
+
+// --- Dark tema ---
+$dark-bg-page:        #0b0f19 !default;
+$dark-bg-card:        #111827 !default;
+$dark-bg-table-head:  #1f2937 !default;
+$dark-bg-pagination:  #1f2937 !default;
+$dark-bg-input:       #1f2937 !default;
+$dark-bg-modal:       #111827 !default;
+$dark-bg-row-hover:   #1f2937 !default;
+
+$dark-text-strong:    #f9fafb !default;
+$dark-text-default:   #e5e7eb !default;
+$dark-text-muted:     #9ca3af !default;
+$dark-text-faint:     #6b7280 !default;
+
+$dark-border:         #1f2937 !default;
+$dark-border-strong:  #374151 !default;
+
+// --- Mixin: tek satırda light + dark değer ---
+@mixin themed($prop, $light, $dark) {
+  #{$prop}: $light;
+  :host-context(body.dark-theme) & {
+    #{$prop}: $dark;
+  }
+}
+
+// --- Standart kart stili (her sayfada tekrar edilir) ---
+@mixin card-themed {
+  @include themed(background, $bg-card, $dark-bg-card);
+  @include themed(border, 1px solid $border, 1px solid $dark-border);
+  border-radius: 0.75rem;
+}
+
+// --- Standart input stili ---
+@mixin input-themed {
+  @include themed(background-color, $bg-input, $dark-bg-input);
+  @include themed(color, $text-strong, $dark-text-strong);
+  @include themed(border, 1px solid $border-strong, 1px solid $dark-border-strong);
+  &::placeholder { @include themed(color, $text-faint, $dark-text-faint); }
+  &:focus { border-color: $primary; outline: none; }
+}
+
+// --- Standart tablo stili ---
+@mixin table-themed {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+
+  th, td {
+    padding: 0.875rem 1.25rem;
+    @include themed(border-bottom, 1px solid $border, 1px solid $dark-border);
+  }
+  th {
+    font-weight: 600;
+    @include themed(background-color, $bg-table-head, $dark-bg-table-head);
+    @include themed(color, #475569, $dark-text-strong);
+  }
+  td {
+    @include themed(color, $text-default, $dark-text-default);
+    @include themed(background-color, $bg-card, $dark-bg-card);
+  }
+  tr:hover td {
+    @include themed(background-color, $bg-row-hover, $dark-bg-row-hover);
+  }
+}
