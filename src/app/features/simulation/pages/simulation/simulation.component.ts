@@ -7,6 +7,7 @@ import { ServiceRequestService } from '../../../../core/services/service-request
 import { StockMovementService } from '../../../../core/services/stock-movement.service';
 import { VehicleService } from '../../../../core/services/vehicle.service';
 import { WorkOrderService } from '../../../../core/services/work-order.service';
+import { SchedulingService } from '../../../../core/services/scheduling.service';
 import { AuditLogService } from '../../../../core/services/audit-log.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Branch } from '../../../../core/models/branch.model';
@@ -154,6 +155,7 @@ export class SimulationComponent implements OnInit {
   private stockService = inject(StockMovementService);
   private vehicleService = inject(VehicleService);
   private workOrderService = inject(WorkOrderService);
+  private schedulingService = inject(SchedulingService);
   private auditLogService = inject(AuditLogService);
   private notificationService = inject(NotificationService);
   private simulationService = inject(SimulationService);
@@ -683,7 +685,7 @@ export class SimulationComponent implements OnInit {
   async runScheduleOverlapSim(): Promise<void> {
     const approved = await this.confirmService.confirm(
       'Teknisyen Çakışması Simülasyonu',
-      'Bir teknisyene aynı saat dilimi için çakışan iki iş emri tanımlamak istediğinize emin misiniz?'
+      'Bir teknisyene mevcut işiyle çakışan ikinci bir iş atanmaya çalışılsın; sistemin bunu REDDETTİĞİ doğrulansın mı?'
     );
     if (!approved) return;
 
@@ -692,20 +694,18 @@ export class SimulationComponent implements OnInit {
       const techs = this.storage.getCollection<Technician>(STORAGE_KEYS.TECHNICIANS);
       const vehicles = this.storage.getCollection<Vehicle>(STORAGE_KEYS.VEHICLES);
       const branches = this.storage.getCollection<Branch>(STORAGE_KEYS.BRANCHES);
-      
+
       if (techs.length === 0 || vehicles.length === 0) {
-        throw new Error('Sistemde çakışma oluşturmak için yeterli teknisyen veya araç bulunmamaktadır.');
+        throw new Error('Sistemde çakışma testi için yeterli teknisyen veya araç bulunmamaktadır.');
       }
 
       const tech = techs[0];
       const veh = vehicles[0];
       const branch = branches[0];
-      
-      const startToday = new Date();
-      startToday.setHours(10, 0, 0, 0);
-      const endToday = new Date();
-      endToday.setHours(12, 0, 0, 0);
 
+      // 1) İlk iş emri: teknisyenin 10:00-12:00 slotunu doldurur (PLANNED = aktif).
+      const start1 = new Date(); start1.setHours(10, 0, 0, 0);
+      const end1 = new Date(); end1.setHours(12, 0, 0, 0);
       const wo1: WorkOrder = {
         id: `overlap-wo-1-${Date.now()}`,
         code: `WO-OVR-A-${Math.floor(Math.random() * 1000)}`,
@@ -714,8 +714,8 @@ export class SimulationComponent implements OnInit {
         technicianId: tech.id,
         vehicleId: veh.id,
         status: 'PLANNED',
-        plannedStart: startToday.toISOString(),
-        plannedEnd: endToday.toISOString(),
+        plannedStart: start1.toISOString(),
+        plannedEnd: end1.toISOString(),
         actualStart: null,
         actualEnd: null,
         requiredParts: [],
@@ -723,69 +723,69 @@ export class SimulationComponent implements OnInit {
         estimatedCost: 150,
         actualCost: 0,
         failureReason: null,
-        notes: 'Çakışma Senaryosu A',
+        notes: 'Çakışma Senaryosu — mevcut iş',
         createdAt: new Date().toISOString()
       };
 
-      const startOverlap = new Date();
-      startOverlap.setHours(11, 0, 0, 0);
-      const endOverlap = new Date();
-      endOverlap.setHours(13, 0, 0, 0);
+      // Önceki test kayıtlarını temizleyip yalnız ilk işi ekle (idempotent).
+      const orders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS)
+        .filter(o => !o.id.startsWith('overlap-wo-'));
+      orders.push(wo1);
+      this.storage.updateCollection(STORAGE_KEYS.WORK_ORDERS, orders);
+      this.logConsole(`İlk iş emri ${wo1.code} planlandı: ${tech.fullName}, 10:00-12:00.`, 'info');
 
-      const wo2: WorkOrder = {
-        id: `overlap-wo-2-${Date.now()}`,
-        code: `WO-OVR-B-${Math.floor(Math.random() * 1000)}`,
-        serviceRequestId: 'req-2',
-        branchId: branch.id,
-        technicianId: tech.id,
-        vehicleId: veh.id,
-        status: 'PLANNED',
-        plannedStart: startOverlap.toISOString(),
-        plannedEnd: endOverlap.toISOString(),
-        actualStart: null,
-        actualEnd: null,
-        requiredParts: [],
-        usedParts: [],
-        estimatedCost: 200,
-        actualCost: 0,
-        failureReason: null,
-        notes: 'Çakışma Senaryosu B',
-        createdAt: new Date().toISOString()
-      };
+      // 2) İkinci (çakışan 11:00-13:00) atama GERÇEK çakışma kontrolünden geçirilir — zorla eklenmez.
+      const start2 = new Date(); start2.setHours(11, 0, 0, 0);
+      const end2 = new Date(); end2.setHours(13, 0, 0, 0);
+      const overlapSlot = { start: start2.toISOString(), end: end2.toISOString() };
+      const hasConflict = this.schedulingService.technicianHasConflict(tech.id, overlapSlot);
 
-      const currentOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
-      currentOrders.push(wo1);
-      currentOrders.push(wo2);
-      this.storage.updateCollection(STORAGE_KEYS.WORK_ORDERS, currentOrders);
+      // Kontrol: çakışmayan bir slot (14:00-15:00) atanabilir olmalı (ayırt edicilik kanıtı).
+      const startFree = new Date(); startFree.setHours(14, 0, 0, 0);
+      const endFree = new Date(); endFree.setHours(15, 0, 0, 0);
+      const freeConflict = this.schedulingService.technicianHasConflict(tech.id, { start: startFree.toISOString(), end: endFree.toISOString() });
 
-      this.auditLogService.logAction({
-        actionType: 'CREATE',
-        entityType: 'WORK_ORDER',
-        entityId: wo2.id,
-        oldValue: null,
-        newValue: this.auditLogService.stringifyValue(wo2),
-        description: `Zaman Çakışması Senaryosu: ${tech.fullName} isimli teknisyene çakışan saatlerde (${wo1.code} ve ${wo2.code}) iş emirleri atandı.`
-      });
+      if (hasConflict && !freeConflict) {
+        this.logConsole(`Çakışma motoru çalıştı: ${tech.fullName} 11:00-13:00 aralığında ${wo1.code} ile meşgul. İkinci atama REDDEDİLDİ.`, 'success');
+        this.logConsole('Ayırt edicilik: 14:00-15:00 (çakışmayan) slot için atama serbest — kontrol doğru çalışıyor.', 'info');
 
-      this.notificationService.createNotification({
-        type: 'RULE_CONFLICT',
-        title: '[ZAMAN ÇAKIŞMASI] Planlama Zaman Çakışması Uyarısı',
-        message: `${tech.fullName} için ${wo1.code} (10:00-12:00) ve ${wo2.code} (11:00-13:00) iş emirleri zaman çakışması oluşturuyor!`,
-        branchId: branch.id,
-        targetRole: 'DISPATCHER',
-        targetUserId: null,
-        relatedEntityType: null,
-        relatedEntityId: tech.id,
-        link: '/planlama'
-      });
+        this.auditLogService.logAction({
+          actionType: 'STATE_TRANSITION',
+          entityType: 'WORK_ORDER',
+          entityId: wo1.id,
+          oldValue: `Mevcut: ${wo1.code} 10:00-12:00`,
+          newValue: null,
+          description: `Zaman çakışması nedeniyle ikinci atama engellendi: ${tech.fullName} için 11:00-13:00 talebi ${wo1.code} ile çakışıyor.`,
+          result: 'FAILURE',
+          failureReason: 'Aynı teknisyen çakışan iki zaman dilimine atanamaz (Şartname 21.1).'
+        });
 
-      this.toastService.showSuccess('Zaman çakışması simüle edildi.');
-      this.finishScenario(ctx, true, `Çakışan iş emirleri (${wo1.code} & ${wo2.code}) atandı.`, [
-        { label: 'Teknisyen', value: tech.fullName },
-        { label: 'İş Emri 1', value: wo1.code },
-        { label: 'İş Emri 2', value: wo2.code },
-        { label: 'Çakışma Saati', value: 'Aynı saat dilimi' }
-      ]);
+        this.notificationService.createNotification({
+          type: 'RULE_CONFLICT',
+          title: '[ZAMAN ÇAKIŞMASI] Çakışan Atama Engellendi',
+          message: `${tech.fullName} için 11:00-13:00 talebi ${wo1.code} (10:00-12:00) ile çakıştığından atama reddedildi.`,
+          branchId: branch.id,
+          targetRole: 'DISPATCHER',
+          targetUserId: null,
+          relatedEntityType: null,
+          relatedEntityId: tech.id,
+          link: '/planlama'
+        });
+
+        this.toastService.showSuccess('Çakışan atama sistem tarafından reddedildi (beklenen davranış).');
+        this.finishScenario(ctx, true, `Çakışan ikinci atama REDDEDİLDİ — çakışma motoru doğru çalıştı.`, [
+          { label: 'Teknisyen', value: tech.fullName },
+          { label: 'Mevcut İş', value: `${wo1.code} (10:00-12:00)` },
+          { label: 'Reddedilen Talep', value: '11:00-13:00' },
+          { label: 'Sonuç', value: 'Atama engellendi ✓' }
+        ]);
+      } else {
+        this.logConsole(`Beklenmedik sonuç! Çakışma tespiti: ${hasConflict}, boş slot çakışması: ${freeConflict}.`, 'error');
+        this.finishScenario(ctx, false, 'Çakışma motoru beklenen davranışı göstermedi.', [
+          { label: 'Çakışan slot tespiti', value: String(hasConflict) },
+          { label: 'Boş slot (yanlış pozitif?)', value: String(freeConflict) }
+        ]);
+      }
       this.refreshStats();
     } catch (e: any) {
       this.logConsole(`Hata: ${e.message}`, 'error');
