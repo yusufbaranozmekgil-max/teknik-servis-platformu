@@ -30,7 +30,9 @@ export class SchedulingService {
     return workOrders.some(wo => {
       if (wo.id === excludeWorkOrderId) return false;
       if (wo.technicianId !== technicianId) return false;
-      if (wo.status === 'CANCELLED' || wo.status === 'FAILED') return false;
+      // Yalnız aktif işler zaman dilimini işgal eder. Tamamlanan/kısmi/başarısız/iptal
+      // iş emirleri teknisyenin slot'unu serbest bırakır (Şartname Bölüm 9).
+      if (!SchedulingService.ACTIVE_STATUSES.has(wo.status)) return false;
       if (!wo.plannedStart || !wo.plannedEnd) return false;
       return this.isOverlapping(slot, { start: wo.plannedStart, end: wo.plannedEnd });
     });
@@ -42,14 +44,15 @@ export class SchedulingService {
     return workOrders.some(wo => {
       if (wo.id === excludeWorkOrderId) return false;
       if (wo.vehicleId !== vehicleId) return false;
-      if (wo.status === 'CANCELLED' || wo.status === 'FAILED') return false;
+      // Yalnız aktif işler aracı işgal eder; tamamlanan/başarısız/iptal görev aracı serbest bırakır.
+      if (!SchedulingService.ACTIVE_STATUSES.has(wo.status)) return false;
       if (!wo.plannedStart || !wo.plannedEnd) return false;
       return this.isOverlapping(slot, { start: wo.plannedStart, end: wo.plannedEnd });
     });
   }
 
-  // Aktif (henüz bitmemiş) iş emri durumları kapasiteyi doldurur.
-  // COMPLETED/PARTIALLY_COMPLETED/CANCELLED/FAILED kapasiteye sayılmaz.
+  // Aktif (henüz bitmemiş) iş emri durumları kapasiteyi/zaman dilimini doldurur.
+  // COMPLETED/PARTIALLY_COMPLETED/CANCELLED/FAILED sayılmaz.
   private static readonly ACTIVE_STATUSES = new Set(['PLANNED', 'ON_THE_WAY', 'ON_SITE']);
 
   branchCapacityExceeded(branchId: string, date: string): boolean {
