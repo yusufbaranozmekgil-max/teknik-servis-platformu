@@ -198,6 +198,19 @@ export class WorkOrderService {
     // 8. Branch capacity check
     const dateStr = slot.start.split('T')[0];
     if (this.schedulingService.branchCapacityExceeded(wo.branchId, dateStr)) {
+      // Şartname Bölüm 13: kapasite dolduğunda ilgili role bildirim düşer.
+      try {
+        this.notificationService.createForRole(
+          'BRANCH_MANAGER',
+          'CAPACITY_FULL',
+          'Şube Günlük Kapasitesi Doldu',
+          `${wo.code} nolu iş emri, şubenin ${dateStr} tarihli günlük kapasitesi dolu olduğu için planlanamadı.`,
+          'WARNING',
+          { type: 'WORK_ORDER', id: wo.id, link: '/planlama' }
+        );
+      } catch {
+        // Bildirim hatası ana akışı bloklamaz.
+      }
       throw new Error('Şubenin günlük iş kapasitesi aşılmıştır.');
     }
 
@@ -726,6 +739,20 @@ export class WorkOrderService {
       newValue: JSON.stringify(wo),
       description: `İş Emri KISMİ TAMAMLANDI. Takip talebi oluşturuldu. Takip Notu: ${followUpNote}`
     });
+
+    // Şartname Bölüm 13: kısmi tamamlanma bildirimi ilgili role düşer.
+    try {
+      this.notificationService.createForRole(
+        'BRANCH_MANAGER',
+        'PARTIAL_COMPLETION',
+        'İş Emri Kısmi Tamamlandı',
+        `${wo.code} nolu iş emri kısmi tamamlandı; eksik iş için takip talebi oluşturuldu. Takip Notu: ${followUpNote}`,
+        'WARNING',
+        { type: 'WORK_ORDER', id: wo.id, link: '/is-emirleri' }
+      );
+    } catch {
+      // Bildirim hatası ana akışı bloklamaz.
+    }
   }
 
   /**
