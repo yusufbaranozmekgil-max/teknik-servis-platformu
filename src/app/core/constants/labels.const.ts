@@ -164,7 +164,8 @@ export const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
   UNAUTHORIZED_ACTION: 'Yetkisiz İşlem',
   IMPORT_ERROR: 'İçe Aktarma Hatası',
   APPROVAL_REQUIRED: 'Onay Gerekli',
-  APPROVAL_GRANTED: 'Onay Verildi'
+  APPROVAL_GRANTED: 'Onay Verildi',
+  SIMULATION: 'Simülasyon'
 };
 
 export const NOTIFICATION_SEVERITY_LABELS: Record<string, string> = {

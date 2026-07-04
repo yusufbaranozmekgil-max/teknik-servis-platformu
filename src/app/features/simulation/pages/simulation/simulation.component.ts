@@ -383,6 +383,20 @@ export class SimulationComponent implements OnInit {
     };
     this.logConsole(`${success ? '[BAŞARILI]' : '[BAŞARISIZ]'} ${ctx.title} ${success ? 'tamamlandı' : 'başarısız oldu'} (${durationMs} ms). ${message}`, success ? 'success' : 'error');
 
+    // Şartname Bölüm 13/14: her simülasyon çalıştığında ne yaptığına dair bildirim düşer.
+    try {
+      this.notificationService.createForRole(
+        'SYSTEM_ADMIN',
+        'SIMULATION',
+        `Simülasyon Çalıştırıldı: ${ctx.title}`,
+        `${message} (Sonuç: ${success ? 'Başarılı' : 'Başarısız'}, Süre: ${durationMs} ms)`,
+        success ? 'INFO' : 'WARNING',
+        { type: 'SYSTEM', id: 'simulation', link: '/simulasyon' }
+      );
+    } catch {
+      // Bildirim hatası simülasyon akışını bloklamaz.
+    }
+
     // Görsel feedback: değişimleri hesapla + flash
     this.delta = {
       workOrders: Math.max(0, this.totalWorkOrders - this.prevSnapshot.workOrders),

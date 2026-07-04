@@ -15,7 +15,8 @@ export type NotificationType =
   | 'UNAUTHORIZED_ACTION'
   | 'IMPORT_ERROR'
   | 'APPROVAL_REQUIRED'
-  | 'APPROVAL_GRANTED';
+  | 'APPROVAL_GRANTED'
+  | 'SIMULATION';
 
 export type NotificationSeverity = 'INFO' | 'WARNING' | 'ERROR';
 
