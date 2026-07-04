@@ -199,4 +199,37 @@ export class StorageService {
     }
     backupKeys.sort().slice(0, 5).forEach(k => localStorage.removeItem(k));
   }
+
+  // --- Simülasyon test yardımcıları ---
+  // Ham localStorage erişimi yalnız bu katmanda kalır (storage disiplini). Simülasyon
+  // modülü depolama arızalarını üretmek için aşağıdaki metotları çağırır, doğrudan
+  // localStorage'a dokunmaz.
+
+  /** SİMÜLASYON: verilen koleksiyon anahtarına kasıtlı bozuk (kesik) JSON yazar. */
+  simulateCorruptCollection(key: string): void {
+    localStorage.setItem(key, '{"id": "broken-json", "description": "missing closing tags ...');
+  }
+
+  /**
+   * SİMÜLASYON: büyük veri yazarak kota sınırını tetiklemeye çalışır; sonucu yapılandırılmış
+   * döner ve test bloklarını her durumda temizler.
+   */
+  probeQuotaLimit(): { triggered: boolean; sizeMB: number; errorName?: string; errorMessage?: string } {
+    const dummyKey = 'ts_quota_test_dummy';
+    let content = 'DUMMY_DATA_REPEATER_FIELD_';
+    for (let i = 0; i < 18; i++) content += content;
+    const sizeMB = Math.round(content.length / 1024 / 1024);
+    try {
+      localStorage.setItem(dummyKey, content);
+      localStorage.setItem(dummyKey + '_2', content);
+      localStorage.setItem(dummyKey + '_3', content + content);
+      return { triggered: false, sizeMB };
+    } catch (e: any) {
+      return { triggered: true, sizeMB, errorName: e?.name, errorMessage: e?.message };
+    } finally {
+      localStorage.removeItem(dummyKey);
+      localStorage.removeItem(dummyKey + '_2');
+      localStorage.removeItem(dummyKey + '_3');
+    }
+  }
 }
