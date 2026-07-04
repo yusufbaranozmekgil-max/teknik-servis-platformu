@@ -7,6 +7,7 @@ import { RoleLabelPipe } from '../../../../shared/pipes/role-label.pipe';
 import { PriorityLabelPipe } from '../../../../shared/pipes/priority-label.pipe';
 import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pipe';
 import { PermissionVisibilityDirective } from '../../../../shared/directives/permission-visibility.directive';
+import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { PermissionService } from '../../../../core/services/permission.service';
@@ -14,7 +15,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, RoleLabelPipe, PriorityLabelPipe, TechLevelLabelPipe, PermissionVisibilityDirective],
+  imports: [CommonModule, RouterLink, RoleLabelPipe, PriorityLabelPipe, TechLevelLabelPipe, PermissionVisibilityDirective, StatusBadgeComponent],
   template: `
     <div class="dashboard-container">
       <!-- Welcome Header -->
@@ -675,6 +676,171 @@ import { PermissionService } from '../../../../core/services/permission.service'
           </div>
         </ng-container>
 
+        <!-- ==================== 5. WAREHOUSE MANAGER VIEW ==================== -->
+        <ng-container *ngIf="activeTab === 'warehouse'">
+          <div class="view-title-bar">
+            <h3>Depo / Yedek Parça Sorumlusu Paneli</h3>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-card gradient-blue clickable-card" routerLink="/stok">
+              <div class="card-content">
+                <span class="card-label">Parça Çeşidi</span>
+                <span class="card-value">{{ warehouseMetrics().partVariety }}</span>
+                <span class="card-sub">Aktif yedek parça kalemi →</span>
+              </div>
+            </div>
+
+            <div class="metric-card clickable-card" routerLink="/stok/kritik" [class.gradient-red]="warehouseMetrics().criticalPartsCount > 0" [class.gradient-green]="warehouseMetrics().criticalPartsCount === 0">
+              <div class="card-content">
+                <span class="card-label">Kritik Stok</span>
+                <span class="card-value">{{ warehouseMetrics().criticalPartsCount }}</span>
+                <span class="card-sub">{{ warehouseMetrics().criticalPartsCount > 0 ? 'Acil ikmal gerekli!' : 'Stok seviyeleri güvenli' }} →</span>
+              </div>
+            </div>
+
+            <div class="metric-card clickable-card" routerLink="/stok" [class.gradient-red]="warehouseMetrics().outOfStockCount > 0" [class.gradient-orange]="warehouseMetrics().outOfStockCount === 0">
+              <div class="card-content">
+                <span class="card-label">Tükenen Parça</span>
+                <span class="card-value">{{ warehouseMetrics().outOfStockCount }}</span>
+                <span class="card-sub">Stoğu sıfır olan kalemler →</span>
+              </div>
+            </div>
+
+            <div class="metric-card gradient-purple clickable-card" routerLink="/stok/hareket">
+              <div class="card-content">
+                <span class="card-label font-bold text-white">Stok Özeti</span>
+                <div class="mini-grid">
+                  <div><span>Toplam:</span> <strong>{{ warehouseMetrics().totalStockUnits }}</strong></div>
+                  <div><span>Rezerve:</span> <strong>{{ warehouseMetrics().totalReserved }}</strong></div>
+                  <div><span>Kullanılabilir:</span> <strong>{{ warehouseMetrics().availableUnits }}</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="metric-card gradient-green">
+              <div class="card-content">
+                <span class="card-label">Toplam Stok Değeri</span>
+                <span class="card-value">{{ warehouseMetrics().totalValue | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+                <span class="card-sub">Envanterin tahmini parasal değeri</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="details-section">
+            <div class="detail-block full-width-block" style="grid-column: span 2;">
+              <h4 class="dashboard-section-title">Kritik Seviyedeki Parçalar</h4>
+              <div class="list-wrapper">
+                <table class="list-table">
+                  <thead>
+                    <tr>
+                      <th>Kod</th>
+                      <th>Parça Adı</th>
+                      <th>Mevcut Stok</th>
+                      <th>Min. Eşik</th>
+                      <th>Durum</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let p of warehouseMetrics().criticalParts.slice(0, 8)">
+                      <td><code>{{ p.code }}</code></td>
+                      <td>{{ p.name }}</td>
+                      <td class="text-danger font-bold">{{ p.stockQuantity }}</td>
+                      <td>{{ p.minStockThreshold }}</td>
+                      <td>
+                        <span class="badge" [class.badge-critical]="p.stockQuantity === 0" [class.badge-urgent]="p.stockQuantity > 0">
+                          {{ p.stockQuantity === 0 ? 'Tükendi' : 'Kritik' }}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr *ngIf="warehouseMetrics().criticalParts.length === 0">
+                      <td colspan="5" class="empty-list">Kritik seviyede parça bulunmuyor.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- ==================== 6. TECHNICIAN VIEW ==================== -->
+        <ng-container *ngIf="activeTab === 'technician'">
+          <div class="view-title-bar">
+            <h3>Teknisyen Paneli — {{ technicianMetrics().technicianName }}</h3>
+          </div>
+
+          <div class="no-branch-fallback" *ngIf="!technicianMetrics().hasTechnician">
+            <p>Kullanıcı hesabınıza bağlı bir teknisyen kaydı bulunamadı. Lütfen yöneticinizle iletişime geçin.</p>
+          </div>
+
+          <ng-container *ngIf="technicianMetrics().hasTechnician">
+            <div class="metrics-grid">
+              <div class="metric-card gradient-blue clickable-card" routerLink="/is-emirleri">
+                <div class="card-content">
+                  <span class="card-label">Aktif İşlerim</span>
+                  <span class="card-value">{{ technicianMetrics().activeCount }}</span>
+                  <span class="card-sub">Devam eden atamalarım →</span>
+                </div>
+              </div>
+
+              <div class="metric-card gradient-orange clickable-card" routerLink="/is-emirleri">
+                <div class="card-content">
+                  <span class="card-label">Bugünkü İşlerim</span>
+                  <span class="card-value">{{ technicianMetrics().todayCount }}</span>
+                  <span class="card-sub">Bugün planlı ziyaretler →</span>
+                </div>
+              </div>
+
+              <div class="metric-card gradient-green">
+                <div class="card-content">
+                  <span class="card-label">Tamamladığım İş</span>
+                  <span class="card-value">{{ technicianMetrics().lifetimeCompleted }}</span>
+                  <span class="card-sub">Toplam kariyer boyunca</span>
+                </div>
+              </div>
+
+              <div class="metric-card gradient-purple">
+                <div class="card-content">
+                  <span class="card-label">Performans Puanım</span>
+                  <span class="card-value">{{ technicianMetrics().performanceScore }} / 100</span>
+                  <span class="card-sub">Kıdem: {{ technicianMetrics().level | techLevelLabel }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="details-section">
+              <div class="detail-block full-width-block" style="grid-column: span 2;">
+                <h4 class="dashboard-section-title">Aktif İş Emirlerim</h4>
+                <div class="list-wrapper">
+                  <table class="list-table">
+                    <thead>
+                      <tr>
+                        <th>İş Emri</th>
+                        <th>Başlık</th>
+                        <th>Öncelik</th>
+                        <th>Planlanan Başlangıç</th>
+                        <th>Durum</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let j of technicianMetrics().activeJobs">
+                        <td><code>{{ j.code }}</code></td>
+                        <td>{{ j.title }}</td>
+                        <td><span class="badge" [class.badge-critical]="j.priority === 'CRITICAL'" [class.badge-urgent]="j.priority === 'URGENT'">{{ j.priority | priorityLabel }}</span></td>
+                        <td>{{ j.plannedStart ? (j.plannedStart | date:'dd.MM.yyyy HH:mm') : '—' }}</td>
+                        <td><app-status-badge [status]="j.status"></app-status-badge></td>
+                      </tr>
+                      <tr *ngIf="technicianMetrics().activeJobs.length === 0">
+                        <td colspan="5" class="empty-list">Şu an aktif iş emriniz bulunmuyor.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+
       </div>
     </div>
 
@@ -725,7 +891,7 @@ export class DashboardComponent implements OnInit {
   }
   
   // Tab perspective for admins/reporters
-  activeTab: 'reporting' | 'branch' | 'dispatcher' | 'operation' = 'branch';
+  activeTab: 'reporting' | 'branch' | 'dispatcher' | 'operation' | 'warehouse' | 'technician' = 'branch';
   showTabs = false;
   Math = Math;
 
@@ -736,6 +902,8 @@ export class DashboardComponent implements OnInit {
   dispMetrics = this.dashboardService.dispatcherMetrics;
   opMetrics = this.dashboardService.operationManagerMetrics;
   reportingMetrics = this.dashboardService.reportingUserMetrics;
+  warehouseMetrics = this.dashboardService.warehouseManagerMetrics;
+  technicianMetrics = this.dashboardService.technicianMetrics;
 
   branchName = computed(() => {
     const id = this.activeBranchId();
@@ -927,9 +1095,15 @@ export class DashboardComponent implements OnInit {
     } else if (role === 'OPERATION_MANAGER') {
       this.showTabs = false;
       this.activeTab = 'operation';
+    } else if (role === 'WAREHOUSE_MANAGER') {
+      this.showTabs = false;
+      this.activeTab = 'warehouse';
+    } else if (role === 'TECHNICIAN') {
+      this.showTabs = false;
+      this.activeTab = 'technician';
     } else {
       this.showTabs = false;
-      this.activeTab = 'dispatcher'; // default fallback
+      this.activeTab = 'branch'; // güvenli varsayılan
     }
 
   }

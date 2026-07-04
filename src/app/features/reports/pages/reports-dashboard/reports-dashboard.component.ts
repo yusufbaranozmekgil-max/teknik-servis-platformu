@@ -36,7 +36,8 @@ type ReportId =
   | 'technician-perf'
   | 'vehicle-usage'
   | 'category-dist'
-  | 'critical-stock';
+  | 'critical-stock'
+  | 'daily-trend';
 
 interface HeroKpi {
   label: string;
@@ -283,7 +284,10 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
       description: 'Yedek parçaların şube bazlı stok adedi, rezerve miktarı ve kategorisi.' },
     { id: 'critical-stock', name: 'Kritik Stok Raporu', shortName: 'Kritik Stok',
       chartType: 'bar', group: 'inventory',
-      description: 'Minimum eşik altına düşen yedek parçalar; acil ikmal gerekenleri listeler.' }
+      description: 'Minimum eşik altına düşen yedek parçalar; acil ikmal gerekenleri listeler.' },
+    { id: 'daily-trend', name: 'Günlük Talep ve İş Emri Trendi', shortName: 'Günlük Trend',
+      chartType: 'line', group: 'operations',
+      description: 'Son 14 günde açılan servis talepleri ve oluşturulan iş emirlerinin günlük değişim eğrisi.' }
   ];
 
   currentReport: ReportOption | undefined;
@@ -406,6 +410,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
       case 'vehicle-usage': this.generateVehicleUsageReport(); break;
       case 'category-dist': this.generateCategoryDistReport(); break;
       case 'critical-stock': this.generateCriticalStockReport(); break;
+      case 'daily-trend': this.generateDailyTrendReport(); break;
     }
     this.refreshDerived();
     this.renderChart();
@@ -574,6 +579,16 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
       return [
         { label: 'Kritik Parça Sayısı', value: rows.length, color: 'red' },
         { label: 'Toplam Eksik (Eşik − Stok)', value: totalGap, color: 'red' }
+      ];
+    }
+    if (id === 'daily-trend') {
+      const totalReq = rows.reduce((s, r) => s + (Number(r.requestCount) || 0), 0);
+      const totalWo = rows.reduce((s, r) => s + (Number(r.workOrderCount) || 0), 0);
+      const avgReq = rows.length ? Math.round((totalReq / rows.length) * 10) / 10 : 0;
+      return [
+        { label: 'Son 14 Gün Talep', value: totalReq, color: 'blue' },
+        { label: 'Son 14 Gün İş Emri', value: totalWo, color: 'green' },
+        { label: 'Günlük Ortalama Talep', value: avgReq, color: 'gray' }
       ];
     }
     return [];
@@ -768,6 +783,53 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
     })).sort((a, b) => b.difference - a.difference);
   }
 
+  // Line grafik için günlük zaman serisi (talep + iş emri) — renderChart çift dataset kullanır
+  private trendLabels: string[] = [];
+  private trendRequests: number[] = [];
+  private trendWorkOrders: number[] = [];
+
+  generateDailyTrendReport(): void {
+    this.tableColumns = ['Tarih', 'Açılan Talep', 'Oluşturulan İş Emri'];
+    this.tableKeys = ['dateLabel', 'requestCount', 'workOrderCount'];
+
+    // Son 14 gün
+    const days = 14;
+    const dayMs = 24 * 60 * 60 * 1000;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let reqs = this.requests;
+    let wos = this.workOrders;
+    if (this.filterBranchId) {
+      reqs = reqs.filter(r => r.branchId === this.filterBranchId);
+      wos = wos.filter(w => w.branchId === this.filterBranchId);
+    }
+
+    const sameDay = (iso: string | null, ref: Date) => {
+      if (!iso) return false;
+      const d = new Date(iso);
+      return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth() && d.getDate() === ref.getDate();
+    };
+
+    this.trendLabels = [];
+    this.trendRequests = [];
+    this.trendWorkOrders = [];
+    const rows: ReportRow[] = [];
+
+    for (let i = days - 1; i >= 0; i--) {
+      const day = new Date(today.getTime() - i * dayMs);
+      const label = day.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+      const rc = reqs.filter(r => sameDay(r.createdAt, day)).length;
+      const wc = wos.filter(w => sameDay(w.createdAt, day)).length;
+      this.trendLabels.push(label);
+      this.trendRequests.push(rc);
+      this.trendWorkOrders.push(wc);
+      rows.push({ dateLabel: day.toLocaleDateString('tr-TR'), requestCount: rc, workOrderCount: wc });
+    }
+    // Tabloda en yeni gün en üstte
+    this.tableData = [...rows].reverse();
+  }
+
   private branchName(id: string): string {
     return this.branches.find(b => b.id === id)?.name || 'Belirsiz';
   }
@@ -796,6 +858,81 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
 
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
+
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+
+    // ---- ÇİZGİ GRAFİK (Line) — günlük trend, iki seri ----
+    if (opt.chartType === 'line') {
+      this.chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.trendLabels,
+          datasets: [
+            {
+              label: 'Açılan Talep',
+              data: this.trendRequests,
+              borderColor: '#2563eb',
+              backgroundColor: 'rgba(37, 99, 235, 0.12)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#2563eb'
+            },
+            {
+              label: 'Oluşturulan İş Emri',
+              data: this.trendWorkOrders,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2.5,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              pointBackgroundColor: '#10b981'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          animation: { duration: 700, easing: 'easeOutQuart' },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: {
+                font: { family: 'Inter', size: 11, weight: '600' },
+                color: isDarkTheme ? '#cbd5e1' : '#475569',
+                padding: 14, usePointStyle: true, pointStyle: 'circle', boxWidth: 8
+              }
+            },
+            tooltip: {
+              backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.95)' : 'rgba(30, 41, 59, 0.95)',
+              titleColor: '#f9fafb', bodyColor: '#e5e7eb',
+              padding: 12, cornerRadius: 10,
+              titleFont: { family: 'Inter', size: 12, weight: 'bold' }, bodyFont: { family: 'Inter', size: 11 }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              border: { display: false },
+              grid: { color: isDarkTheme ? 'rgba(255,255,255,0.06)' : '#eef2f7', drawTicks: false },
+              ticks: { color: isDarkTheme ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 11 }, padding: 8, precision: 0 }
+            },
+            x: {
+              border: { display: false },
+              grid: { display: false },
+              ticks: { color: isDarkTheme ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 11 } }
+            }
+          }
+        }
+      });
+      return;
+    }
 
     const palette = [
       'rgba(59, 130, 246, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(249, 115, 22, 0.85)',

@@ -298,4 +298,83 @@ export class DashboardService {
       topBranches
     };
   });
+
+  // 5. Depo / Yedek Parça Sorumlusu Metrikleri — stok odaklı panel
+  warehouseManagerMetrics = computed(() => {
+    const spareParts = this.sparePartsSignal();
+    const branches = this.branchesSignal();
+    const branchId = this.activeBranchId();
+
+    // Depo sorumlusu şubesine bağlıysa yalnız kendi şubesi, değilse tüm parçalar
+    const scoped = branchId ? spareParts.filter(p => p.branchId === branchId) : spareParts;
+    const active = scoped.filter(p => p.isActive);
+
+    const criticalParts = active.filter(p => p.stockQuantity <= p.minStockThreshold);
+    const outOfStock = active.filter(p => p.stockQuantity === 0);
+    const totalStockUnits = active.reduce((s, p) => s + p.stockQuantity, 0);
+    const totalReserved = active.reduce((s, p) => s + (p.reservedQuantity || 0), 0);
+    const totalValue = active.reduce((s, p) => s + p.stockQuantity * (p.unitPrice || 0), 0);
+
+    return {
+      partVariety: active.length,
+      criticalPartsCount: criticalParts.length,
+      criticalParts: criticalParts.sort((a, b) => (a.stockQuantity - a.minStockThreshold) - (b.stockQuantity - b.minStockThreshold)),
+      outOfStockCount: outOfStock.length,
+      totalStockUnits,
+      totalReserved,
+      availableUnits: totalStockUnits - totalReserved,
+      totalValue: Math.round(totalValue),
+      branchCount: branches.length
+    };
+  });
+
+  // 6. Teknisyen Metrikleri — kendine atanan işler odaklı panel
+  technicianMetrics = computed(() => {
+    const workOrders = this.workOrdersSignal();
+    const requests = this.requestsSignal();
+    const technicians = this.techniciansSignal();
+    const user = this.authState.currentUser();
+
+    // Kullanıcının bağlı olduğu teknisyen kaydı
+    const me = technicians.find(t => t.id === (user?.technicianId || ''));
+    const myId = me?.id;
+
+    const myOrders = myId ? workOrders.filter(w => w.technicianId === myId) : [];
+    const ACTIVE = new Set(['PLANNED', 'ON_THE_WAY', 'ON_SITE']);
+
+    const isToday = (d: string | null) => {
+      if (!d) return false;
+      const dt = new Date(d); const now = new Date();
+      return dt.getFullYear() === now.getFullYear() && dt.getMonth() === now.getMonth() && dt.getDate() === now.getDate();
+    };
+
+    const activeJobs = myOrders.filter(w => ACTIVE.has(w.status));
+    const todayJobs = myOrders.filter(w => w.plannedStart && isToday(w.plannedStart) && ACTIVE.has(w.status));
+    const completedJobs = myOrders.filter(w => w.status === 'COMPLETED');
+
+    // İş emirlerini talep başlığıyla zenginleştir
+    const enrichedActive = activeJobs.map(w => {
+      const req = requests.find(r => r.id === w.serviceRequestId);
+      return {
+        code: w.code,
+        title: req?.title || 'Servis işi',
+        status: w.status,
+        plannedStart: w.plannedStart,
+        priority: req?.priority || 'STANDARD'
+      };
+    }).sort((a, b) => new Date(a.plannedStart || 0).getTime() - new Date(b.plannedStart || 0).getTime());
+
+    return {
+      technicianName: me?.fullName || (user?.fullName ?? 'Teknisyen'),
+      hasTechnician: !!me,
+      activeCount: activeJobs.length,
+      todayCount: todayJobs.length,
+      completedCount: completedJobs.length,
+      lifetimeCompleted: me?.completedJobsCount ?? 0,
+      performanceScore: me?.performanceScore ?? 0,
+      level: me?.level ?? 'JUNIOR',
+      skills: me?.skills ?? [],
+      activeJobs: enrichedActive
+    };
+  });
 }

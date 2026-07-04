@@ -2,7 +2,7 @@
 
 Saha operasyonlarının şube bazlı yönetimi, kaynak tahsisatı (teknisyen ve araçlar), envanter/stok takibi ve gerçek zamanlı kural/puanlama motorlarını entegre eden kurumsal düzeyde saha yönetim sistemidir.
 
-> **Canlı Demo:** _(dağıtım sonrası Vercel adresi buraya eklenecek)_
+> **Canlı Demo:** https://teknik-servis-platformu.vercel.app
 >
 > **Teknoloji:** Angular 17 · Signals · Reactive Forms · Chart.js · LocalStorage
 > **Demo giriş:** `admin@demo.com` / `123456` (tüm roller aynı şifre)
