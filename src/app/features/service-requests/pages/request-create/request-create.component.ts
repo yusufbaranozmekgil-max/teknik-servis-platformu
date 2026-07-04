@@ -225,6 +225,9 @@ export class RequestCreatePage implements OnInit, ComponentCanDeactivate {
     try {
       this.branches = this.branchService.getBranches();
       this.updateSlaPreview();
+      // SLA önizlemesi öncelik VEYA hizmet kategorisi (yetkinlik) değişince güncellensin.
+      this.requestForm.get('priority')?.valueChanges.subscribe(() => this.updateSlaPreview());
+      this.requestForm.get('requiredSkill')?.valueChanges.subscribe(() => this.updateSlaPreview());
     } catch (err: any) {
       this.errorMessage = 'Şubeler yüklenemedi: ' + err.message;
     }
@@ -232,7 +235,8 @@ export class RequestCreatePage implements OnInit, ComponentCanDeactivate {
 
   updateSlaPreview(): void {
     const priority = this.requestForm.value.priority as ServicePriority;
-    this.slaPreviewText = this.slaService.calculateSlaDeadline(priority);
+    const category = this.requestForm.value.requiredSkill as string;
+    this.slaPreviewText = this.slaService.calculateSlaDeadline(priority, category);
   }
 
   canDeactivate(): boolean {

@@ -258,11 +258,21 @@ Toplam 100 puanlık bir normalize skor kullanılmasının sebebi; UI'da skor kı
 ---
 
 ## 22. SLA Sistemi
-Servis taleplerinin aciliyetine göre SLA süreleri belirlenir (`SlaService`):
-* `CRITICAL`: 4 Saat içinde çözüm.
-* `URGENT`: 12 Saat içinde çözüm.
-* `STANDARD`: 48 Saat içinde çözüm.
-SLA süresine 2 saatten az kalan işler otomatik olarak `CRITICAL` seviyeye yükseltilerek alarmlar tetiklenir.
+SLA hedef süresi **hizmet kategorisi ve önceliğe göre** belirlenir (`SlaService.calculateSlaDeadline`). Öncelik temel süreyi verir:
+* `CRITICAL`: 4 Saat · `URGENT`: 12 Saat · `STANDARD`: 48 Saat.
+
+Ardından hizmet kategorisine (gerekli yetkinlik) göre bir çarpan uygulanır (referans Beyaz Eşya = 1.0):
+
+| Kategori | Çarpan | Gerekçe |
+| --- | --- | --- |
+| Kombi / Isıtma | 0.75 | Isıtma arızası özellikle kışın hayati, hızlı müdahale gerekir. |
+| Elektrik | 0.75 | Güvenlik riski taşır. |
+| Sıhhi Tesisat | 0.85 | Su kaçağı hasar riski. |
+| Klima / Soğutma | 0.90 | Konfor kaybı, orta aciliyet. |
+| Beyaz Eşya | 1.00 | Referans kategori. |
+| Elektronik / Anakart | 1.25 | Parça tedariki / laboratuvar onarımı uzun sürer. |
+
+Örn. `CRITICAL` + `Kombi/Isıtma` → 4 × 0.75 = **3 saat**. SLA süresine 2 saatten az kalan işler "öncelikli", süresi geçenler "gecikmiş" işaretlenir; dashboard ve bildirimlere yansır.
 
 ---
 

@@ -74,7 +74,7 @@ export class ServiceRequestService {
       throw new Error('Bu talep kodu zaten kullanılıyor.');
     }
 
-    const slaDeadline = this.slaService.calculateSlaDeadline(request.priority);
+    const slaDeadline = this.slaService.calculateSlaDeadline(request.priority, request.requiredSkill);
 
     const newRequest: ServiceRequest = {
       ...request,
@@ -112,7 +112,8 @@ export class ServiceRequestService {
     }
 
     if (request.priority && request.priority !== oldRequest.priority) {
-      request.slaDeadline = this.slaService.calculateSlaDeadline(request.priority, new Date(oldRequest.createdAt));
+      const category = request.requiredSkill ?? oldRequest.requiredSkill;
+      request.slaDeadline = this.slaService.calculateSlaDeadline(request.priority, category, new Date(oldRequest.createdAt));
     }
 
     const updated = this.storage.update<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS, id, request);
