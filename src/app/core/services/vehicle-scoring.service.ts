@@ -195,7 +195,7 @@ export class VehicleScoringService {
     return `Şube Konum Yakınlığı: 0/15 (Konum eşleşmesi yok)`;
   }
 
-  private getRequiredEquipment(skill: string): string[] {
+  getRequiredEquipment(skill: string): string[] {
     const equipMap: Record<string, string[]> = {
       WHITE_GOODS: ['HEAVY_LIFT_STRAPS', 'TOOLKIT_BASIC'],
       HVAC: ['VACUUM_PUMP', 'MANIFOLD_GAUGE'],
@@ -207,7 +207,7 @@ export class VehicleScoringService {
     return equipMap[skill] || ['TOOLKIT_BASIC'];
   }
 
-  private getEstimatedPayloadWeight(skill: string): number {
+  getEstimatedPayloadWeight(skill: string): number {
     const weightMap: Record<string, number> = {
       WHITE_GOODS: 80,
       HVAC: 50,

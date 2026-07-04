@@ -6,6 +6,7 @@ import { ServiceRequest } from '../models/service-request.model';
 import { PermissionService } from './permission.service';
 import { AuditLogService } from './audit-log.service';
 import { SchedulingService } from './scheduling.service';
+import { VehicleScoringService } from './vehicle-scoring.service';
 import { ReservationService } from './reservation.service';
 import { NotificationService } from './notification.service';
 import { TimeSlot } from '../models/time-slot.model';
@@ -33,6 +34,7 @@ export class WorkOrderService {
   private permissionService = inject(PermissionService);
   private auditLog = inject(AuditLogService);
   private schedulingService = inject(SchedulingService);
+  private vehicleScoringService = inject(VehicleScoringService);
   private reservationService = inject(ReservationService);
   private notificationService = inject(NotificationService);
   private inventoryService = inject(InventoryService);
@@ -218,6 +220,22 @@ export class WorkOrderService {
     }
     if (vehicle.fuelLevel < 30) {
       throw new Error('Aracın yakıt seviyesi %30 altındadır.');
+    }
+    // 9b. Araç bakım süresi (Şartname Bölüm 8 — son bakımın üzerinden 180 gün geçtiyse atanamaz)
+    const daysSinceMaint = Math.floor((Date.now() - new Date(vehicle.lastMaintenanceDate).getTime()) / (1000 * 60 * 60 * 24));
+    if (daysSinceMaint > 180) {
+      throw new Error(`Aracın son bakımının üzerinden 180 günden fazla zaman geçti (${daysSinceMaint} gün), atanamaz.`);
+    }
+    // 9c. Ekipman uygunluğu (işin gerektirdiği donanım araçta bulunmalı)
+    const requiredEquip = this.vehicleScoringService.getRequiredEquipment(req.requiredSkill);
+    const missingEquip = requiredEquip.filter(eq => !vehicle.equipments.includes(eq));
+    if (missingEquip.length > 0) {
+      throw new Error(`Araçta işin gerektirdiği ekipmanlar eksik: ${missingEquip.join(', ')}`);
+    }
+    // 9d. Yük kapasitesi yeterliliği
+    const estimatedWeight = this.vehicleScoringService.getEstimatedPayloadWeight(req.requiredSkill);
+    if (vehicle.payloadCapacityKg < estimatedWeight) {
+      throw new Error(`Aracın yük kapasitesi yetersiz (Gereken: ${estimatedWeight} kg, Mevcut: ${vehicle.payloadCapacityKg} kg).`);
     }
     if (this.schedulingService.vehicleHasConflict(vehicleId, slot, workOrderId)) {
       throw new Error('Aracın bu saat diliminde başka bir görevi bulunmaktadır.');
