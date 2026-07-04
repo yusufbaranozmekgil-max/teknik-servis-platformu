@@ -253,7 +253,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
           <!-- BM Lists Section -->
           <div class="details-section" *ngIf="bmMetrics()">
             <div class="detail-block">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">warning</span> Kritik Parça Listesi</h4>
+              <h4 class="dashboard-section-title">Kritik Parça Listesi</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>
@@ -296,7 +296,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
             </div>
 
             <div class="detail-block">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">alarm</span> SLA Yaklaşan Talepler</h4>
+              <h4 class="dashboard-section-title">SLA Yaklaşan Talepler</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>
@@ -340,7 +340,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
 
             <!-- Dynamic Technician Statuses Section -->
             <div class="detail-block full-width-block" style="grid-column: span 2;">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">engineering</span> Şube Personelleri & Teknisyen Durumları</h4>
+              <h4 class="dashboard-section-title">Şube Personelleri & Teknisyen Durumları</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>
@@ -439,7 +439,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
           <!-- Dispatcher details -->
           <div class="details-section">
             <div class="detail-block">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">people</span> Müsait Saha Teknisyenleri</h4>
+              <h4 class="dashboard-section-title">Müsait Saha Teknisyenleri</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>
@@ -480,7 +480,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
             </div>
 
             <div class="detail-block">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">hourglass_empty</span> Atama Bekleyen İş Emirleri</h4>
+              <h4 class="dashboard-section-title">Atama Bekleyen İş Emirleri</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>
@@ -591,7 +591,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
           <!-- OM Details -->
           <div class="details-section">
             <div class="detail-block">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">business</span> Şube Yük Dağılımı</h4>
+              <h4 class="dashboard-section-title">Şube Yük Dağılımı</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>
@@ -635,7 +635,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
             </div>
 
             <div class="detail-block">
-              <h4 class="dashboard-section-title"><span class="material-icons heading-material-icon">assessment</span> Şube Performans Karşılaştırması</h4>
+              <h4 class="dashboard-section-title">Şube Performans Karşılaştırması</h4>
               <div class="list-wrapper">
                 <table class="list-table">
                   <thead>

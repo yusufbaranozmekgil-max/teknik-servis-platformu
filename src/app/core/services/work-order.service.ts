@@ -199,6 +199,12 @@ export class WorkOrderService {
       throw new Error('Şubenin günlük iş kapasitesi aşılmıştır.');
     }
 
+    // 8b. Technician daily capacity check (Şartname Bölüm 7 — teknisyen günlük kapasitesi aşılamaz)
+    if (this.schedulingService.technicianDailyCapacityExceeded(technicianId, dateStr)) {
+      const cap = this.schedulingService.getTechnicianDailyCapacity(technicianId);
+      throw new Error(`Teknisyenin günlük maksimum iş kapasitesi (${cap} iş) aşılmıştır.`);
+    }
+
     // 9. Vehicle check (if assigned)
     const vehicle = this.storage.getById<Vehicle>(STORAGE_KEYS.VEHICLES, vehicleId);
     if (!vehicle) {

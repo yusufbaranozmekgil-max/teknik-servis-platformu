@@ -5,6 +5,7 @@ import { StockMovement } from '../models/stock-movement.model';
 import { SparePart } from '../models/spare-part.model';
 import { PermissionService } from './permission.service';
 import { AuditLogService } from './audit-log.service';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,10 +14,35 @@ export class StockMovementService {
   private storage = inject(StorageService);
   private permissionService = inject(PermissionService);
   private auditLog = inject(AuditLogService);
+  private notificationService = inject(NotificationService);
 
   getStockMovements(): StockMovement[] {
     this.permissionService.assertPermission('STOCK_MOVEMENT_VIEW');
     return this.storage.getCollection<StockMovement>(STORAGE_KEYS.STOCK_MOVEMENTS);
+  }
+
+  /**
+   * Şartname Bölüm 6: minimum eşiğin altına DÜŞEN parça için otomatik LOW_STOCK bildirimi.
+   * Yalnız "önce eşik üstünde iken, işlem sonrası eşiğe/altına inince" tetiklenir (gürültü önlenir).
+   * Stok azaltan tüm hareketlerden (OUT / FIRE / ADJUSTMENT / TRANSFER kaynağı) çağrılır;
+   * rezerve tüketimi kendi bildirimini reservation.service içinde üretir.
+   */
+  private notifyIfCrossedThreshold(part: SparePart, oldStock: number, newStock: number): void {
+    const wasAboveThreshold = oldStock > part.minStockThreshold;
+    const isNowAtOrBelow = newStock <= part.minStockThreshold;
+    if (!wasAboveThreshold || !isNowAtOrBelow) return;
+    try {
+      this.notificationService.createForRole(
+        'WAREHOUSE_MANAGER',
+        'LOW_STOCK',
+        `Kritik Stok: ${part.name}`,
+        `${part.name} (${part.code}) parçası kritik seviyenin altına düştü. Mevcut: ${newStock}, Eşik: ${part.minStockThreshold}. İkmal gerekli.`,
+        'WARNING',
+        { type: 'SPARE_PART', id: part.id, link: '/stok' }
+      );
+    } catch {
+      // Bildirim hatası ana stok akışını bloklamaz.
+    }
   }
 
   createStockMovement(movement: Omit<StockMovement, 'id' | 'createdAt'>): StockMovement {
@@ -37,7 +63,17 @@ export class StockMovementService {
     const part = this.storage.getById<SparePart>(STORAGE_KEYS.SPARE_PARTS, movement.partId);
     if (!part) throw new Error('Stok hareketi yapılacak yedek parça bulunamadı.');
 
-    if (movement.type === 'OUT' || movement.type === 'RESERVE_CONSUME') {
+    const oldStock = part.stockQuantity;
+
+    if (movement.type === 'OUT') {
+      // Manuel çıkışta kullanılabilir miktar (stok − rezerve) eksiye düşemez (Şartname Bölüm 5).
+      const availableQty = part.stockQuantity - (part.reservedQuantity ?? 0);
+      if (availableQty < movement.quantity) {
+        throw new Error(`Yetersiz kullanılabilir stok! Kullanılabilir (stok − rezerve): ${availableQty}, Istenen: ${movement.quantity}`);
+      }
+      part.stockQuantity -= movement.quantity;
+    } else if (movement.type === 'RESERVE_CONSUME') {
+      // Rezerve tüketimi zaten ayrılmış stoktan yapılır; fiziksel stok yeterliliği kontrol edilir.
       if (part.stockQuantity < movement.quantity) {
         throw new Error(`Yetersiz stok! Mevcut stok: ${part.stockQuantity}, Istenen: ${movement.quantity}`);
       }
@@ -49,6 +85,8 @@ export class StockMovementService {
     this.storage.update<SparePart>(STORAGE_KEYS.SPARE_PARTS, part.id, {
       stockQuantity: part.stockQuantity
     });
+
+    this.notifyIfCrossedThreshold(part, oldStock, part.stockQuantity);
 
     const newMovement: StockMovement = {
       ...movement,
@@ -122,6 +160,9 @@ export class StockMovementService {
       stockQuantity: targetPart.stockQuantity + params.quantity
     });
 
+    // Transfer sonrası kaynak şube eşik altına indiyse bildirim (Şartname Bölüm 6).
+    this.notifyIfCrossedThreshold(sourcePart, sourcePart.stockQuantity, sourcePart.stockQuantity - params.quantity);
+
     const ts = Date.now();
     const sourceId = `sm-${ts}-out`;
     const targetId = `sm-${ts}-in`;
@@ -181,13 +222,19 @@ export class StockMovementService {
 
     const part = this.storage.getById<SparePart>(STORAGE_KEYS.SPARE_PARTS, params.partId);
     if (!part) throw new Error('Parça bulunamadı.');
-    if (part.stockQuantity < params.quantity) {
-      throw new Error(`Yetersiz stok! Mevcut: ${part.stockQuantity}, Fire kaydı: ${params.quantity}`);
+    // Fire, kullanılabilir miktarı (stok − rezerve) eksiye düşüremez (Şartname Bölüm 5).
+    // Rezerve edilmiş parça başka iş emrine ayrılmıştır; fire ile tüketilemez.
+    const availableQty = part.stockQuantity - (part.reservedQuantity ?? 0);
+    if (availableQty < params.quantity) {
+      throw new Error(`Yetersiz kullanılabilir stok! Kullanılabilir (stok − rezerve): ${availableQty}, Fire kaydı: ${params.quantity}. Rezerve edilmiş parça fire edilemez.`);
     }
 
+    const newFireStock = part.stockQuantity - params.quantity;
     this.storage.update<SparePart>(STORAGE_KEYS.SPARE_PARTS, part.id, {
-      stockQuantity: part.stockQuantity - params.quantity
+      stockQuantity: newFireStock
     });
+
+    this.notifyIfCrossedThreshold(part, part.stockQuantity, newFireStock);
 
     const movement = this.storage.create<StockMovement>(STORAGE_KEYS.STOCK_MOVEMENTS, {
       id: `sm-${Date.now()}-fire`,
@@ -248,6 +295,8 @@ export class StockMovementService {
     this.storage.update<SparePart>(STORAGE_KEYS.SPARE_PARTS, part.id, {
       stockQuantity: params.newQuantity
     });
+
+    this.notifyIfCrossedThreshold(part, previousQty, params.newQuantity);
 
     const movement = this.storage.create<StockMovement>(STORAGE_KEYS.STOCK_MOVEMENTS, {
       id: `sm-${Date.now()}-adj`,

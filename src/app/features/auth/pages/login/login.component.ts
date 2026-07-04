@@ -16,7 +16,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
         <!-- Sol Bölüm: Logo ve Tanıtım -->
         <div class="intro-section">
           <div class="logo-box">
-            
+            <span class="logo-icon" aria-hidden="true">👷</span>
           </div>
           <h1>Teknik Servis Operasyon Platformu</h1>
           <p class="subtitle">Çok şubeli saha operasyon, stok ve iş emri yönetimi</p>
