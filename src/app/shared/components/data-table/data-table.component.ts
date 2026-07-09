@@ -153,7 +153,7 @@ export interface TableColumn {
                   <span *ngSwitchCase="'actions'" class="cell-actions" (click)="$event.stopPropagation()">
                     <button *ngIf="showScheduleBtn && permissionService.hasPermission('WORK_ORDER_PLAN')" class="action-btn schedule-btn" (click)="onScheduleClick(row)">Takvim</button>
                     <button *ngIf="showPerformanceBtn && permissionService.hasPermission('TECHNICIAN_VIEW')" class="action-btn performance-btn" (click)="onPerformanceClick(row)">Performans</button>
-                    <button *ngIf="showEditBtn && (!requiredEditPermission || permissionService.hasPermission($any(requiredEditPermission)))" class="action-btn edit-btn" (click)="onEditClick(row)">Düzenle</button>
+                    <button *ngIf="showEditBtn && (!requiredEditPermission || permissionService.hasPermission($any(requiredEditPermission)))" class="action-btn edit-btn" (click)="onEditClick(row)">{{ editLabel }}</button>
                     <button *ngIf="showDeleteBtn && (!requiredDeletePermission || permissionService.hasPermission($any(requiredDeletePermission)))" class="action-btn delete-btn" (click)="onDeleteClick(row)">Sil</button>
                   </span>
 
@@ -208,6 +208,8 @@ export class DataTableComponent implements OnInit, OnChanges {
   @Input() showDeleteBtn = true;
   @Input() requiredEditPermission = '';
   @Input() requiredDeletePermission = '';
+  // Salt-okunur detay açan listelerde "Görüntüle" olarak ayarlanır (düzenlenecek bilgi yoksa).
+  @Input() editLabel = 'Düzenle';
 
   permissionService = inject(PermissionService);
 

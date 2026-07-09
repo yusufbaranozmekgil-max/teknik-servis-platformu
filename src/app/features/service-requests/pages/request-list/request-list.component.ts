@@ -31,9 +31,10 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
 
       <div class="table-container">
-        <app-data-table 
-          [data]="requestsWithBranch" 
-          [columns]="columns" 
+        <app-data-table
+          [data]="requestsWithBranch"
+          [columns]="columns"
+          [editLabel]="'Görüntüle'"
           [requiredEditPermission]="'SERVICE_REQUEST_UPDATE'"
           [requiredDeletePermission]="'SERVICE_REQUEST_DELETE'"
           (editClick)="onEdit($event)"
