@@ -15,12 +15,12 @@
     /* Table styles */
     .table-card { overflow: hidden; }
     .table-container { overflow-x: auto; }
-    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.875rem; }
-    .data-table th, .data-table td { padding: 1rem 1.25rem; border-bottom: 1px solid #e2e8f0; }
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.78rem; }
+    .data-table th, .data-table td { padding: 0.5rem 0.5rem; border-bottom: 1px solid #e2e8f0; }
     .data-table th { background-color: #f8fafc; color: #475569; font-weight: 600; }
     .data-table td { color: #334155; }
     .font-bold { font-weight: 700; color: #0f172a; }
-    .desc-cell { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; }
+    .desc-cell { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #64748b; }
     .failed-row { background-color: #fffafb; }
 
     /* Badges */
