@@ -171,7 +171,6 @@ import { PermissionService } from '../../../../core/services/permission.service'
                 <a class="quick-report-link" routerLink="/raporlar">Tüm Raporlar (8 farklı görsel)</a>
                 <a class="quick-report-link" *appPermissionVisibility="'AUDIT_LOG_VIEW'" routerLink="/denetim-kayitlari">Denetim Kayıtları (Tüm değişiklik geçmişi)</a>
                 <a class="quick-report-link" routerLink="/bildirimler">Bildirim Merkezi</a>
-                <a class="quick-report-link" *appPermissionVisibility="'IMPORT_EXECUTE'" routerLink="/veri-transferi">Veri Dışa / İçe Aktar</a>
               </div>
             </div>
           </div>

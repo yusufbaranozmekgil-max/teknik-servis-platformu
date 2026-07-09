@@ -68,7 +68,7 @@ export class SimulationService {
         targetUserId: null,
         relatedEntityType: 'SYSTEM',
         relatedEntityId: 'quota-limit',
-        link: '/ayarlar'
+        link: '/simulasyon'
       });
     } else {
       logCallback('Bu tarayıcının kotası bu veri boyutunda aşılmadı; test blokları temizlendi.', 'info');

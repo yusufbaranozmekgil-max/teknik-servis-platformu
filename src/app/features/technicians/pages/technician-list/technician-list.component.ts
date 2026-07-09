@@ -74,7 +74,8 @@ export class TechnicianListComponent implements OnInit {
 
   loadTechnicians(): void {
     try {
-      this.technicians = this.techService.getTechnicians();
+      // Pasifleştirilen (silinen) teknisyenler listede gösterilmez.
+      this.technicians = this.techService.getTechnicians().filter(t => t.isActive !== false);
       this.techniciansWithBranch = this.technicians.map(t => ({
         ...t,
         branchName: this.getBranchName(t.branchId),

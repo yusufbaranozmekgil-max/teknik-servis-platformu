@@ -289,16 +289,6 @@ export const routes: Routes = [
       },
       { path: 'audit-log', redirectTo: 'denetim-kayitlari', pathMatch: 'full' },
 
-      // ==================== VERİ TRANSFERİ ====================
-      {
-        path: 'veri-transferi',
-        loadComponent: () => import('./features/import-export/pages/import-export/import-export.component').then(m => m.ImportExportComponent),
-        canActivate: [permissionGuard],
-        canDeactivate: [pendingChangesGuard],
-        data: { requiredPermission: 'IMPORT_EXECUTE' }
-      },
-      { path: 'import-export', redirectTo: 'veri-transferi', pathMatch: 'full' },
-
       // ==================== SİMÜLASYON ====================
       {
         path: 'simulasyon',
@@ -306,16 +296,7 @@ export const routes: Routes = [
         canActivate: [permissionGuard],
         data: { requiredPermission: 'SIMULATION_RUN' }
       },
-      { path: 'simulation', redirectTo: 'simulasyon', pathMatch: 'full' },
-
-      // ==================== AYARLAR ====================
-      {
-        path: 'ayarlar',
-        loadComponent: () => import('./features/settings/pages/settings/settings.component').then(m => m.SettingsComponent),
-        canActivate: [permissionGuard],
-        data: { requiredPermission: 'SETTINGS_MANAGE' }
-      },
-      { path: 'settings', redirectTo: 'ayarlar', pathMatch: 'full' }
+      { path: 'simulation', redirectTo: 'simulasyon', pathMatch: 'full' }
     ]
   },
   {

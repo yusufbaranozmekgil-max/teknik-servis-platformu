@@ -63,7 +63,8 @@ export class BranchListComponent implements OnInit {
 
   loadBranches(): void {
     try {
-      this.branches = this.branchService.getBranches();
+      // Pasifleştirilen (silinen) şubeler listede gösterilmez.
+      this.branches = this.branchService.getBranches().filter(b => b.isActive !== false);
     } catch (err: any) {
       console.error('Şubeler yüklenemedi:', err.message);
     }

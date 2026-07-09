@@ -41,7 +41,7 @@ export interface TableColumn {
           class="filter-toggle-btn"
           [class.active]="showFilters"
         >
-          Detaylı Filtrele
+          Gelişmiş Arama
         </button>
       </div>
 
@@ -111,7 +111,7 @@ export interface TableColumn {
                     [value]="columnFilters[col.key] || ''"
                     (keydown)="onNumberKeyDown($event)"
                     (input)="onNumberFilterInput($any($event.target), col)"
-                    placeholder="Filtrele..."
+                    placeholder="Ara..."
                     class="filter-input"
                     [attr.min]="col.filterMin ?? 0"
                     [attr.max]="col.filterMax ?? 100000"
@@ -123,7 +123,7 @@ export interface TableColumn {
                     type="text"
                     [value]="columnFilters[col.key] || ''"
                     (input)="onTextFilterInput($any($event.target), col)"
-                    placeholder="Filtrele..."
+                    placeholder="Ara..."
                     class="filter-input"
                     [attr.maxlength]="col.filterMaxLength ?? filterMaxLength"
                   />

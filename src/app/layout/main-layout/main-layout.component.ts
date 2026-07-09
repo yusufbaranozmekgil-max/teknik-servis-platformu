@@ -159,8 +159,6 @@ export class MainLayoutComponent implements OnInit {
       items: [
         { label: 'Raporlar', route: '/raporlar', permission: 'REPORT_VIEW' },
         { label: 'Denetim Kayıtları', route: '/denetim-kayitlari', permission: 'AUDIT_LOG_VIEW' },
-        { label: 'Veri Transferi', route: '/veri-transferi', permission: 'IMPORT_EXECUTE' },
-        { label: 'Ayarlar', route: '/ayarlar', permission: 'SETTINGS_MANAGE' },
       ]
     }
   ];
