@@ -390,3 +390,15 @@ th.sortable {
 
   .sort-icon { font-size: 0.75rem; margin-left: 0.25rem; }
 }
+
+// Tarih aralığı: iki kompakt tarih girişi tek satırda, arada tire
+.date-range-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  .range-dash {
+    color: #94a3b8;
+    font-weight: 600;
+  }
+}

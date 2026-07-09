@@ -67,13 +67,12 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_
           </div>
 
           <div class="filter-group">
-            <label>Başlangıç (İlk Tarih)</label>
-            <app-smart-date-input [value]="dateFrom" (valueChange)="dateFrom = $event || ''; applyFilters()"></app-smart-date-input>
-          </div>
-
-          <div class="filter-group">
-            <label>Başlangıç (Son Tarih)</label>
-            <app-smart-date-input [value]="dateTo" (valueChange)="dateTo = $event || ''; applyFilters()"></app-smart-date-input>
+            <label>Planlanan Tarih Aralığı</label>
+            <div class="date-range-row">
+              <app-smart-date-input [value]="dateFrom" (valueChange)="dateFrom = $event || ''; applyFilters()"></app-smart-date-input>
+              <span class="range-dash">–</span>
+              <app-smart-date-input [value]="dateTo" (valueChange)="dateTo = $event || ''; applyFilters()"></app-smart-date-input>
+            </div>
           </div>
         </div>
 
