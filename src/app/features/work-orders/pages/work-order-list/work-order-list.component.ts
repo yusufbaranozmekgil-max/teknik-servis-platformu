@@ -13,7 +13,7 @@ import { StatusBadgeComponent } from '../../../../shared/components/status-badge
 import { SmartDateInputComponent } from '../../../../shared/components/smart-date-input/smart-date-input.component';
 import { ConfirmService } from '../../../../core/services/confirm.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS } from '../../../../core/constants/labels.const';
+import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_ORDER_STATUS_LABELS } from '../../../../core/constants/labels.const';
 
 @Component({
   selector: 'app-work-order-list',
@@ -63,7 +63,7 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS } from
           <div class="filter-group">
             <label>Global Arama</label>
             <input type="text" [value]="searchQuery" (input)="searchQuery = $any($event.target).value; applyFilters()"
-                   placeholder="Kod, şube, teknisyen, araç..." maxlength="40" class="form-control" />
+                   placeholder="Kod, şube, teknisyen, araç, durum..." maxlength="40" class="form-control" />
           </div>
 
           <div class="filter-group">
@@ -418,7 +418,8 @@ export class WorkOrderListComponent implements OnInit {
         (w.code || '').toLowerCase().includes(q) ||
         this.getBranchName(w.branchId).toLowerCase().includes(q) ||
         this.getTechnicianName(w.technicianId).toLowerCase().includes(q) ||
-        this.getVehiclePlate(w.vehicleId).toLowerCase().includes(q)
+        this.getVehiclePlate(w.vehicleId).toLowerCase().includes(q) ||
+        (WORK_ORDER_STATUS_LABELS[w.status] || w.status).toLowerCase().includes(q)
       );
     }
 
