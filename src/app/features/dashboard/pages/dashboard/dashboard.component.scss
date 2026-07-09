@@ -63,12 +63,14 @@
 
     .tab-controls {
       display: flex;
+      flex-wrap: wrap;                 // dar ekranda butonlar alt satıra sarsın (mobil erişilebilirlik)
       gap: 0.5rem;
       background-color: #e2e8f0;
       padding: 0.25rem;
       border-radius: 0.5rem;
       margin-bottom: 1.5rem;
       width: fit-content;
+      max-width: 100%;                 // viewport'u aşmasın
     }
 
     .tab-controls button {
