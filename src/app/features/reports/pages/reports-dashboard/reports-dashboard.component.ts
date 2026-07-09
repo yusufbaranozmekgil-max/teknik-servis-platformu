@@ -2,6 +2,7 @@ import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewI
 import { CommonModule } from '@angular/common';
 import { StorageService } from '../../../../core/storage/storage.service';
 import { STORAGE_KEYS } from '../../../../core/storage/storage-keys';
+import { AuthStateService } from '../../../../core/auth/auth-state.service';
 import { Branch } from '../../../../core/models/branch.model';
 import { WorkOrder } from '../../../../core/models/work-order.model';
 import { SparePart } from '../../../../core/models/spare-part.model';
@@ -124,10 +125,11 @@ const SKILL_LABELS: Record<string, string> = {
         <div class="filter-row">
           <div class="filter-group">
             <label>Şube</label>
-            <select [value]="filterBranchId" (change)="filterBranchId = $any($event.target).value; applyFilters()" class="select-input">
-              <option value="">Tüm Şubeler</option>
+            <select [value]="filterBranchId" [disabled]="branchLocked" (change)="filterBranchId = $any($event.target).value; applyFilters()" class="select-input">
+              <option *ngIf="!branchLocked" value="">Tüm Şubeler</option>
               <option *ngFor="let b of branches" [value]="b.id">{{ b.name }} — {{ b.city }}</option>
             </select>
+            <small class="lock-hint" *ngIf="branchLocked">Yalnızca sorumlu olduğunuz şube ({{ lockedBranchName }}) gösterilir.</small>
           </div>
 
           <div class="filter-group filter-group--date">
@@ -250,6 +252,7 @@ const SKILL_LABELS: Record<string, string> = {
 })
 export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   private storage = inject(StorageService);
+  private authState = inject(AuthStateService);
 
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
@@ -297,6 +300,9 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
   selectedReportId: ReportId = 'branch-load';
 
   filterBranchId = '';
+  // Şube Sorumlusu yalnız kendi şubesinin raporunu görür → filtre kilitli, şube listesi tek şube.
+  branchLocked = false;
+  lockedBranchName = '';
   filterStartDate = '';
   filterEndDate = '';
   filterStatus = '';
@@ -328,11 +334,34 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
 
   loadCollections(): void {
     this.branches = this.storage.getCollection<Branch>(STORAGE_KEYS.BRANCHES);
+
+    // Rol bazlı rapor kapsamı (Şartname Bölüm 15/16):
+    //  - SYSTEM_ADMIN / OPERATION_MANAGER (ve raporlama/dispeçer): tüm şubeler.
+    //  - BRANCH_MANAGER: yalnız sorumlu olduğu şube. Şube listesi ve filtre bu şubeye kilitlenir.
+    const user = this.authState.currentUser();
+    if (user?.role === 'BRANCH_MANAGER' && user.branchId) {
+      this.branchLocked = true;
+      this.filterBranchId = user.branchId;
+      this.lockedBranchName = this.branches.find(b => b.id === user.branchId)?.name || '';
+      this.branches = this.branches.filter(b => b.id === user.branchId);
+    }
+
     this.workOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
     this.spareParts = this.storage.getCollection<SparePart>(STORAGE_KEYS.SPARE_PARTS);
     this.requests = this.storage.getCollection<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS);
     this.technicians = this.storage.getCollection<Technician>(STORAGE_KEYS.TECHNICIANS);
     this.vehicles = this.storage.getCollection<Vehicle>(STORAGE_KEYS.VEHICLES);
+
+    // Şube Sorumlusu: ham veri de kaynağında kendi şubesine daraltılır; böylece
+    // üst özet KPI'lar (computeHeroKpis) ve tüm şube-bazlı raporlar tek şubeye kapsanır.
+    if (this.branchLocked && this.filterBranchId) {
+      const bid = this.filterBranchId;
+      this.workOrders = this.workOrders.filter(w => w.branchId === bid);
+      this.spareParts = this.spareParts.filter(p => p.branchId === bid);
+      this.requests = this.requests.filter(r => r.branchId === bid);
+      this.technicians = this.technicians.filter(t => t.branchId === bid);
+      this.vehicles = this.vehicles.filter(v => v.branchId === bid);
+    }
   }
 
   changeReport(id: ReportId): void {
@@ -392,7 +421,8 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   resetFilters(): void {
-    this.filterBranchId = '';
+    // Şube Sorumlusu için şube filtresi sıfırlanmaz (kendi şubesine kilitli kalır).
+    if (!this.branchLocked) this.filterBranchId = '';
     this.filterStartDate = '';
     this.filterEndDate = '';
     this.filterStatus = '';
