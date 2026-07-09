@@ -10,6 +10,7 @@ import { InventoryService } from '../../../../core/services/inventory.service';
 import { SparePart } from '../../../../core/models/spare-part.model';
 import { ReservationService } from '../../../../core/services/reservation.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
+import { SmartDateInputComponent } from '../../../../shared/components/smart-date-input/smart-date-input.component';
 import { ConfirmService } from '../../../../core/services/confirm.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS } from '../../../../core/constants/labels.const';
@@ -17,7 +18,7 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS } from
 @Component({
   selector: 'app-work-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent],
+  imports: [CommonModule, RouterModule, StatusBadgeComponent, SmartDateInputComponent],
   template: `
     <div class="page-container">
       <div class="header-section">
@@ -67,12 +68,12 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS } from
 
           <div class="filter-group">
             <label>Başlangıç (İlk Tarih)</label>
-            <input type="date" [value]="dateFrom" (change)="dateFrom = $any($event.target).value; applyFilters()" class="form-control" />
+            <app-smart-date-input [value]="dateFrom" (valueChange)="dateFrom = $event || ''; applyFilters()"></app-smart-date-input>
           </div>
 
           <div class="filter-group">
             <label>Başlangıç (Son Tarih)</label>
-            <input type="date" [value]="dateTo" (change)="dateTo = $any($event.target).value; applyFilters()" class="form-control" />
+            <app-smart-date-input [value]="dateTo" (valueChange)="dateTo = $event || ''; applyFilters()"></app-smart-date-input>
           </div>
         </div>
 
