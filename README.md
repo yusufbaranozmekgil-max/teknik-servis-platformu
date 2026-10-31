@@ -26,7 +26,7 @@ Giriş ekranındaki demo kullanıcılarından birini seçmek yeterli (ortak şif
 
 ## Teknolojiler
 
-Angular 21 (standalone bileşenler, Signals, Reactive Forms, lazy loading) · TypeScript · SCSS · Chart.js · Jasmine + Karma · GitHub Actions · Vercel
+Angular 22 (standalone bileşenler, Signals, Reactive Forms, lazy loading) · TypeScript · SCSS · Chart.js · Vitest · GitHub Actions · Vercel
 
 ## Mimari
 
@@ -47,7 +47,7 @@ npm install
 npm start        # http://localhost:4200
 npm run build    # üretim derlemesi
 npm test         # testler (izleme modunda)
-npm run test:ci  # testler (tek sefer, başsız Chrome)
+npm run test:ci  # testler (tek sefer)
 ```
 
 ## Testler
