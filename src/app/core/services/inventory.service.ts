@@ -136,6 +136,9 @@ export class InventoryService {
     this.permissionService.assertPermission('INVENTORY_DELETE');
     const oldPart = this.storage.getById<SparePart>(STORAGE_KEYS.SPARE_PARTS, id);
     if (!oldPart) throw new Error('Silinecek parça bulunamadı.');
+    if (oldPart.reservedQuantity > 0) {
+      throw new Error('Bu parça iş emirleri için rezerve edilmiş; önce rezervasyonları serbest bırakın.');
+    }
 
     const isAdmin = this.authState.currentRole() === 'SYSTEM_ADMIN';
 

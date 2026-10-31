@@ -1,3 +1,4 @@
+import { WorkOrder } from '../models/work-order.model';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -146,6 +147,11 @@ export class TechnicianService {
     this.permissionService.assertPermission('TECHNICIAN_DELETE');
     const oldTech = this.storage.getById<Technician>(STORAGE_KEYS.TECHNICIANS, id);
     if (!oldTech) throw new Error('Silinecek teknisyen bulunamadı.');
+
+    const workOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
+    if (workOrders.some(wo => wo.technicianId === id && ['PLANNED', 'ON_THE_WAY', 'ON_SITE'].includes(wo.status))) {
+      throw new Error('Bu teknisyenin aktif iş emri var; önce iş emrini tamamlayın veya iptal edin.');
+    }
 
     const isAdmin = this.authState.currentRole() === 'SYSTEM_ADMIN';
 

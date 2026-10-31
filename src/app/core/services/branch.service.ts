@@ -1,3 +1,4 @@
+import { WorkOrder } from '../models/work-order.model';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -147,6 +148,11 @@ export class BranchService {
     this.permissionService.assertPermission('BRANCH_DELETE');
     const oldBranch = this.storage.getById<Branch>(STORAGE_KEYS.BRANCHES, id);
     if (!oldBranch) throw new Error('Silinecek şube bulunamadı.');
+
+    const workOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
+    if (workOrders.some(wo => wo.branchId === id && ['OPENED', 'PLANNED', 'ON_THE_WAY', 'ON_SITE'].includes(wo.status))) {
+      throw new Error('Bu şubenin aktif iş emri var; önce iş emirlerini kapatın.');
+    }
 
     const isAdmin = this.authState.currentRole() === 'SYSTEM_ADMIN';
 

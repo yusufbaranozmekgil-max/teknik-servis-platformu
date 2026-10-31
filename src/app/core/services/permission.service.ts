@@ -76,7 +76,7 @@ export class PermissionService {
         relatedEntityId: null
       });
 
-      throw new Error(`Yetki Hatasi: Bu islemi yapmak icin '${permission}' yetkiniz bulunmamaktadir.`);
+      throw new Error(`Yetki hatası: Bu işlemi yapmak için '${permission}' yetkiniz bulunmamaktadır.`);
     }
   }
 

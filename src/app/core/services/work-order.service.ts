@@ -10,6 +10,7 @@ import { VehicleScoringService } from './vehicle-scoring.service';
 import { ReservationService } from './reservation.service';
 import { NotificationService } from './notification.service';
 import { TimeSlot } from '../models/time-slot.model';
+import { isOnLeaveDuring } from '../utils/leave.util';
 import { Technician } from '../models/technician.model';
 import { Vehicle } from '../models/vehicle.model';
 import { SparePart } from '../models/spare-part.model';
@@ -172,7 +173,7 @@ export class WorkOrderService {
     }
 
     // 4b. Technician leave check (Kural 8 — izinli personel atanamaz)
-    if (tech.isOnLeave) {
+    if (isOnLeaveDuring(tech, slot)) {
       throw new Error('Teknisyen izinli olduğu için atanamaz.');
     }
 

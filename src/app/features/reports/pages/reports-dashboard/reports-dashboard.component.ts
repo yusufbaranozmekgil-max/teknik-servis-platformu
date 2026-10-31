@@ -1,3 +1,4 @@
+import { toLocalDateISO } from '../../../../core/constants/form-limits.const';
 import { Chart, registerables } from 'chart.js';
 import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -401,7 +402,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   setDatePreset(preset: 'today' | '7' | '30' | 'all'): void {
-    const fmt = (d: Date) => d.toISOString().split('T')[0];
+    const fmt = toLocalDateISO;
     const today = new Date();
     if (preset === 'today') {
       this.filterStartDate = fmt(today);

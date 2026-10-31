@@ -1,3 +1,4 @@
+import { todayISO, toLocalDateISO } from '../../../../core/constants/form-limits.const';
 import { PermissionService } from '../../../../core/services/permission.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -279,7 +280,7 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
   slotDate = '';
   slotStart = '09:00';
   slotEnd = '11:00';
-  todayISO = new Date().toISOString().substring(0, 10);
+  todayISO = todayISO();
 
   // Planned payload
   plannedParts: RequiredPart[] = [];
@@ -324,9 +325,7 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
     while (date.getDay() === 0 || date.getDay() === 6) {
       date.setDate(date.getDate() + 1);
     }
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    this.slotDate = `${date.getFullYear()}-${month}-${day}`;
+    this.slotDate = toLocalDateISO(date);
   }
 
   loadOpenRequests(): void {

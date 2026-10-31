@@ -1,3 +1,5 @@
+import { SKILL_LABELS } from '../constants/labels.const';
+import { isOnLeaveDuring } from '../utils/leave.util';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -87,7 +89,7 @@ export class ShiftAssignmentService {
     const tech = this.storage.getById<Technician>(STORAGE_KEYS.TECHNICIANS, technicianId);
     if (!tech) throw new Error('Teknisyen bulunamadı.');
     if (!tech.isActive) throw new Error(`${tech.fullName} aktif değil; vardiyaya atanamaz.`);
-    if (tech.isOnLeave) throw new Error(`${tech.fullName} şu an izinli; vardiyaya atanamaz.`);
+    if (isOnLeaveDuring(tech, { start: shift.start, end: shift.end })) throw new Error(`${tech.fullName} şu an izinli; vardiyaya atanamaz.`);
 
     if (shift.assignedTechnicianIds.includes(technicianId)) {
       throw new Error(`${tech.fullName} bu vardiyaya zaten atanmış.`);
@@ -226,13 +228,13 @@ export class ShiftAssignmentService {
 
     const techs = this.storage.getCollection<Technician>(STORAGE_KEYS.TECHNICIANS);
     const evaluated = techs
-      .filter(t => t.isActive && !t.isOnLeave)
+      .filter(t => t.isActive && !isOnLeaveDuring(t, { start: shift.start, end: shift.end }))
       .map(t => {
         if (shift.assignedTechnicianIds.includes(t.id)) {
           return { technician: t, reason: 'Zaten atanmış' as string | null };
         }
         if (!t.skills?.includes(shift.requiredSkill)) {
-          return { technician: t, reason: `'${shift.requiredSkill}' yetkinliği yok` as string | null };
+          return { technician: t, reason: `'${SKILL_LABELS[shift.requiredSkill] || shift.requiredSkill}' yetkinliği yok` as string | null };
         }
         const sameBranch = t.branchId === shift.branchId;
         const sameRegion = t.region && shift.region && t.region.toLowerCase() === shift.region.toLowerCase();

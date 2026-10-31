@@ -97,7 +97,7 @@ export class StorageService {
     } catch (e: any) {
       if (e.name === 'QuotaExceededError' || e.code === 22) {
         this.handleQuotaExceeded();
-        throw new Error('Tarayici depolama kotasi asildi. Lutfen gereksiz verileri veya eski loglari temizleyin.');
+        throw new Error('Tarayıcı depolama kotası aşıldı. Lütfen gereksiz verileri veya eski kayıtları temizleyin.');
       }
       throw e;
     }

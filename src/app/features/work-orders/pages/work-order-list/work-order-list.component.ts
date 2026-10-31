@@ -532,7 +532,7 @@ export class WorkOrderListComponent implements OnInit {
     this.successMessage = null;
     try {
       this.woService.transitionWorkOrder(id, status, payload);
-      const msg = `İş emri durumu güncellendi: ${status}`;
+      const msg = `İş emri durumu güncellendi: ${WORK_ORDER_STATUS_LABELS[status] || status}`;
       this.successMessage = msg;
       this.toastService.showSuccess(msg);
       this.loadWorkOrders();

@@ -360,7 +360,7 @@ export class SimulationComponent implements OnInit {
         this.logConsole(`  Adım ${i + 1}: ${step}`, 'default');
         setTimeout(() => { if (this.isRunning) this.runningStep = step; }, (i + 1) * 80);
       });
-      this.logConsole('Yürütüluyor...', 'info');
+      this.logConsole('Yürütülüyor...', 'info');
     }
     return { startedAt: Date.now(), title };
   }
