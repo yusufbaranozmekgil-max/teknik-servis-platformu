@@ -40,6 +40,11 @@ describe('PermissionService kapsam', () => {
     expect(service.scopeToBranch(orders).length).toBe(2);
   });
 
+  it('şube sorumlusunun şube seçicisi kendi şubesiyle sınırlıdır', () => {
+    user = { role: 'BRANCH_MANAGER', branchId: 'branch-1' };
+    expect(service.scopeBranches([{ id: 'branch-1' }, { id: 'branch-2' }])).toEqual([{ id: 'branch-1' }]);
+  });
+
   it('teknisyen yalnız kendi iş emirlerini görür', () => {
     user = { role: 'TECHNICIAN', branchId: 'branch-1', technicianId: 'tech-2' };
     expect(service.scopeWorkOrders(orders).map(o => o.id)).toEqual(['b']);

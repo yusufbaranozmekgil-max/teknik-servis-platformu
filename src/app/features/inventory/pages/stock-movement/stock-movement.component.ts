@@ -325,7 +325,8 @@ export class StockMovementPage implements OnInit {
 
   loadMovements(): void {
     try {
-      this.movements = this.movementService.getStockMovements();
+      const visibleParts = new Set(this.permissionService.scopeToBranch(this.inventoryService.getSpareParts()).map(p => p.id));
+      this.movements = this.movementService.getStockMovements().filter(m => visibleParts.has(m.partId));
       this.movementsWithPartInfo = this.movements.map(m => {
         const part = this.parts.find(p => p.id === m.partId);
         return {
@@ -343,7 +344,7 @@ export class StockMovementPage implements OnInit {
 
   loadParts(): void {
     try {
-      this.parts = this.inventoryService.getSpareParts();
+      this.parts = this.permissionService.scopeToBranch(this.inventoryService.getSpareParts());
     } catch (err: any) {
       console.error('Parçalar yüklenemedi:', err.message);
     }

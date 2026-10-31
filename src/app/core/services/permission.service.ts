@@ -21,6 +21,13 @@ export class PermissionService {
     return items.filter(item => item.branchId === user.branchId);
   }
 
+  /** Şube sorumlusunun şube seçicisinde yalnız kendi şubesi bulunur. */
+  scopeBranches<T extends { id: string }>(branches: T[]): T[] {
+    const user = this.authState.currentUser();
+    if (user?.role !== 'BRANCH_MANAGER' || !user.branchId) return branches;
+    return branches.filter(branch => branch.id === user.branchId);
+  }
+
   /** Teknisyen yalnız kendisine atanan iş emirlerini görür. */
   scopeWorkOrders<T extends { branchId: string | null; technicianId: string | null }>(items: T[]): T[] {
     const user = this.authState.currentUser();

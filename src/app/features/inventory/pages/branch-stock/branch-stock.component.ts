@@ -1,3 +1,4 @@
+import { PermissionService } from '../../../../core/services/permission.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -67,6 +68,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
 })
 export class BranchStockPage implements OnInit {
   private inventoryService = inject(InventoryService);
+  private permissionService = inject(PermissionService);
   private branchService = inject(BranchService);
   private fb = inject(FormBuilder);
 
@@ -104,7 +106,7 @@ export class BranchStockPage implements OnInit {
 
   loadBranches(): void {
     try {
-      this.branches = this.branchService.getBranches();
+      this.branches = this.permissionService.scopeBranches(this.branchService.getBranches());
     } catch (err: any) {
       console.error('Şubeler yüklenemedi:', err.message);
     }
@@ -112,7 +114,7 @@ export class BranchStockPage implements OnInit {
 
   loadParts(): void {
     try {
-      this.parts = this.inventoryService.getSpareParts();
+      this.parts = this.permissionService.scopeToBranch(this.inventoryService.getSpareParts());
       this.onBranchChange(); // Initial stats & filter
     } catch (err: any) {
       console.error('Parçalar yüklenemedi:', err.message);

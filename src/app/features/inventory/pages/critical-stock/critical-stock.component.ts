@@ -1,3 +1,4 @@
+import { PermissionService } from '../../../../core/services/permission.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -36,6 +37,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
 })
 export class CriticalStockPage implements OnInit {
   private inventoryService = inject(InventoryService);
+  private permissionService = inject(PermissionService);
   private branchService = inject(BranchService);
 
   criticalParts: any[] = [];
@@ -74,7 +76,7 @@ export class CriticalStockPage implements OnInit {
 
   loadCriticalParts(): void {
     try {
-      const allParts = this.inventoryService.getSpareParts();
+      const allParts = this.permissionService.scopeToBranch(this.inventoryService.getSpareParts());
       this.criticalParts = allParts
         .map(p => {
           const availableQuantity = this.inventoryService.getAvailableQuantity(p.id);
