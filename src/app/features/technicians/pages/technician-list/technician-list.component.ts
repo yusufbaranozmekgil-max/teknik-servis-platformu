@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { TechnicianService } from '../../../../core/services/technician.service';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -13,19 +13,21 @@ import { TECHNICIAN_LEVEL_LABELS } from '../../../../core/constants/labels.const
 
 @Component({
     selector: 'app-technician-list',
-    imports: [CommonModule, RouterModule, DataTableComponent],
+    imports: [RouterModule, DataTableComponent],
     template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Teknisyen Yönetimi</h2>
-        <button *ngIf="permissionService.hasPermission('TECHNICIAN_CREATE')" (click)="openCreatePage()" class="primary-btn">
-          + Yeni Teknisyen Ekle
-        </button>
+        @if (permissionService.hasPermission('TECHNICIAN_CREATE')) {
+          <button (click)="openCreatePage()" class="primary-btn">
+            + Yeni Teknisyen Ekle
+          </button>
+        }
       </div>
-
+    
       <div class="table-container">
-        <app-data-table 
-          [data]="techniciansWithBranch" 
+        <app-data-table
+          [data]="techniciansWithBranch"
           [columns]="columns"
           [showScheduleBtn]="true"
           [showPerformanceBtn]="true"
@@ -39,7 +41,7 @@ import { TECHNICIAN_LEVEL_LABELS } from '../../../../core/constants/labels.const
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./technician-list.component.scss']
 })
 export class TechnicianListComponent implements OnInit {

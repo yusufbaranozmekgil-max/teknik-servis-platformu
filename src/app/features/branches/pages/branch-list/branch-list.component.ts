@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { BranchService } from '../../../../core/services/branch.service';
 import { PermissionService } from '../../../../core/services/permission.service';
@@ -10,21 +10,23 @@ import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
     selector: 'app-branch-list',
-    imports: [CommonModule, RouterModule, DataTableComponent],
+    imports: [RouterModule, DataTableComponent],
     template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Şube Yönetimi</h2>
-        <button *ngIf="permissionService.hasPermission('BRANCH_CREATE')" (click)="openCreatePage()" class="primary-btn">
-          + Yeni Şube Ekle
-        </button>
+        @if (permissionService.hasPermission('BRANCH_CREATE')) {
+          <button (click)="openCreatePage()" class="primary-btn">
+            + Yeni Şube Ekle
+          </button>
+        }
       </div>
-
+    
       <!-- Main Data Table -->
       <div class="table-container">
-        <app-data-table 
-          [data]="branches" 
-          [columns]="columns" 
+        <app-data-table
+          [data]="branches"
+          [columns]="columns"
           [requiredEditPermission]="'BRANCH_UPDATE'"
           [requiredDeletePermission]="'BRANCH_DELETE'"
           (editClick)="onEdit($event)"
@@ -33,7 +35,7 @@ import { ToastService } from '../../../../core/services/toast.service';
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./branch-list.component.scss']
 })
 export class BranchListComponent implements OnInit {

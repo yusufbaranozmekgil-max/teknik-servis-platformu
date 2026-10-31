@@ -23,173 +23,211 @@ export interface TableColumn {
     template: `
     <div class="table-wrapper">
       <!-- Search & Filters Controls -->
-      <div class="table-header-controls" *ngIf="showSearch">
-        <div class="search-wrapper">
-          <input
-            type="text"
-            [value]="searchQuery"
-            (input)="onSearchInput($any($event.target).value)"
-            placeholder="Tabloda ara..."
-            class="global-search-input"
-            [attr.maxlength]="searchMaxLength"
-          />
-          <span class="search-counter">{{ searchQuery.length }} / {{ searchMaxLength }}</span>
+      @if (showSearch) {
+        <div class="table-header-controls">
+          <div class="search-wrapper">
+            <input
+              type="text"
+              [value]="searchQuery"
+              (input)="onSearchInput($any($event.target).value)"
+              placeholder="Tabloda ara..."
+              class="global-search-input"
+              [attr.maxlength]="searchMaxLength"
+              />
+            <span class="search-counter">{{ searchQuery.length }} / {{ searchMaxLength }}</span>
+          </div>
+          <button
+            (click)="toggleFilters()"
+            class="filter-toggle-btn"
+            [class.active]="showFilters"
+            >
+            Gelişmiş Arama
+          </button>
         </div>
-        <button
-          (click)="toggleFilters()"
-          class="filter-toggle-btn"
-          [class.active]="showFilters"
-        >
-          Gelişmiş Arama
-        </button>
-      </div>
-
+      }
+    
       <!-- Main Data Table -->
       <div class="table-responsive">
         <table class="premium-table">
           <thead>
             <tr>
-              <th *ngFor="let col of columns" (click)="sort(col)" [class.sortable]="col.sortable">
-                <div class="th-content">
-                  {{ col.label }}
-                  <span class="sort-icon" *ngIf="col.sortable && sortKey === col.key">
-                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                  </span>
-                </div>
-              </th>
-            </tr>
-            
-            <!-- Column-based Filters Row -->
-            <tr *ngIf="showFilters" class="filter-row" (click)="$event.stopPropagation()">
-              <th *ngFor="let col of columns">
-                <ng-container [ngSwitch]="col.type">
-                  <!-- Actions column gets no filter -->
-                  <span *ngSwitchCase="'actions'"></span>
-                  
-                  <!-- Date range filter (akıllı tarih girişi: GG/AA/YYYY) -->
-                  <div *ngSwitchCase="'date'" class="date-filter-group">
-                    <app-smart-date-input
-                      [value]="dateRangeFilters[col.key].start || ''"
-                      (valueChange)="dateRangeFilters[col.key].start = $event || ''; onFilterChange()"
-                    ></app-smart-date-input>
-                    <app-smart-date-input
-                      [value]="dateRangeFilters[col.key].end || ''"
-                      (valueChange)="dateRangeFilters[col.key].end = $event || ''; onFilterChange()"
-                    ></app-smart-date-input>
+              @for (col of columns; track col) {
+                <th (click)="sort(col)" [class.sortable]="col.sortable">
+                  <div class="th-content">
+                    {{ col.label }}
+                    @if (col.sortable && sortKey === col.key) {
+                      <span class="sort-icon">
+                        {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                      </span>
+                    }
                   </div>
-
-                  <!-- Boolean filter -->
-                  <select 
-                    *ngSwitchCase="'boolean'" 
-                    [value]="columnFilters[col.key] || ''" 
-                    (change)="columnFilters[col.key] = $any($event.target).value; onFilterChange()"
-                    class="filter-select"
-                  >
-                    <option value="">Tümü</option>
-                    <option value="true">Evet</option>
-                    <option value="false">Hayır</option>
-                  </select>
-
-                  <!-- Status filter -->
-                  <select 
-                    *ngSwitchCase="'status'" 
-                    [value]="columnFilters[col.key] || ''" 
-                    (change)="columnFilters[col.key] = $any($event.target).value; onFilterChange()"
-                    class="filter-select"
-                  >
-                    <option value="">Tümü</option>
-                    <option *ngFor="let opt of getUniqueStatusValues(col.key)" [value]="opt">
-                      {{ opt }}
-                    </option>
-                  </select>
-
-                  <!-- Number filter (min/max + JS-enforced maxlength + e/E/+ engeli) -->
-                  <input
-                    *ngSwitchCase="'number'"
-                    type="number"
-                    [value]="columnFilters[col.key] || ''"
-                    (keydown)="onNumberKeyDown($event)"
-                    (input)="onNumberFilterInput($any($event.target), col)"
-                    placeholder="Ara..."
-                    class="filter-input"
-                    [attr.min]="col.filterMin ?? 0"
-                    [attr.max]="col.filterMax ?? 100000"
-                  />
-
-                  <!-- Default text filter -->
-                  <input
-                    *ngSwitchDefault
-                    type="text"
-                    [value]="columnFilters[col.key] || ''"
-                    (input)="onTextFilterInput($any($event.target), col)"
-                    placeholder="Ara..."
-                    class="filter-input"
-                    [attr.maxlength]="col.filterMaxLength ?? filterMaxLength"
-                  />
-                </ng-container>
-              </th>
+                </th>
+              }
             </tr>
+    
+            <!-- Column-based Filters Row -->
+            @if (showFilters) {
+              <tr class="filter-row" (click)="$event.stopPropagation()">
+                @for (col of columns; track col) {
+                  <th>
+                    @switch (col.type) {
+                      <!-- Actions column gets no filter -->
+                      @case ('actions') {
+                        <span></span>
+                      }
+                      <!-- Date range filter (akıllı tarih girişi: GG/AA/YYYY) -->
+                      @case ('date') {
+                        <div class="date-filter-group">
+                          <app-smart-date-input
+                            [value]="dateRangeFilters[col.key].start || ''"
+                            (valueChange)="dateRangeFilters[col.key].start = $event || ''; onFilterChange()"
+                          ></app-smart-date-input>
+                          <app-smart-date-input
+                            [value]="dateRangeFilters[col.key].end || ''"
+                            (valueChange)="dateRangeFilters[col.key].end = $event || ''; onFilterChange()"
+                          ></app-smart-date-input>
+                        </div>
+                      }
+                      <!-- Boolean filter -->
+                      @case ('boolean') {
+                        <select
+                          [value]="columnFilters[col.key] || ''"
+                          (change)="columnFilters[col.key] = $any($event.target).value; onFilterChange()"
+                          class="filter-select"
+                          >
+                          <option value="">Tümü</option>
+                          <option value="true">Evet</option>
+                          <option value="false">Hayır</option>
+                        </select>
+                      }
+                      <!-- Status filter -->
+                      @case ('status') {
+                        <select
+                          [value]="columnFilters[col.key] || ''"
+                          (change)="columnFilters[col.key] = $any($event.target).value; onFilterChange()"
+                          class="filter-select"
+                          >
+                          <option value="">Tümü</option>
+                          @for (opt of getUniqueStatusValues(col.key); track opt) {
+                            <option [value]="opt">
+                              {{ opt }}
+                            </option>
+                          }
+                        </select>
+                      }
+                      <!-- Number filter (min/max + JS-enforced maxlength + e/E/+ engeli) -->
+                      @case ('number') {
+                        <input
+                          type="number"
+                          [value]="columnFilters[col.key] || ''"
+                          (keydown)="onNumberKeyDown($event)"
+                          (input)="onNumberFilterInput($any($event.target), col)"
+                          placeholder="Ara..."
+                          class="filter-input"
+                          [attr.min]="col.filterMin ?? 0"
+                          [attr.max]="col.filterMax ?? 100000"
+                          />
+                      }
+                      <!-- Default text filter -->
+                      @default {
+                        <input
+                          type="text"
+                          [value]="columnFilters[col.key] || ''"
+                          (input)="onTextFilterInput($any($event.target), col)"
+                          placeholder="Ara..."
+                          class="filter-input"
+                          [attr.maxlength]="col.filterMaxLength ?? filterMaxLength"
+                          />
+                      }
+                    }
+                  </th>
+                }
+              </tr>
+            }
           </thead>
           <tbody>
-            <tr *ngFor="let row of paginatedData; trackBy: trackByFn" (click)="onRowClick(row)">
-              <td *ngFor="let col of columns">
-                <!-- Cell Content Formatting -->
-                <ng-container [ngSwitch]="col.type">
-                  <span *ngSwitchCase="'currency'" class="cell-currency">
-                    {{ row[col.key] | currency:'TRY':'symbol-narrow':'1.2-2' }}
-                  </span>
-                  
-                  <span *ngSwitchCase="'date'" class="cell-date">
-                    {{ row[col.key] ? (row[col.key] | date:'dd.MM.yyyy HH:mm') : '-' }}
-                  </span>
-                  
-                  <span *ngSwitchCase="'boolean'" class="cell-boolean" [ngClass]="row[col.key] ? 'bool-true' : 'bool-false'">
-                    {{ row[col.key] ? 'Evet' : 'Hayır' }}
-                  </span>
-
-                  <app-status-badge *ngSwitchCase="'status'" [status]="row[col.key]"></app-status-badge>
-
-                  <span *ngSwitchCase="'actions'" class="cell-actions" (click)="$event.stopPropagation()">
-                    <button *ngIf="showScheduleBtn && permissionService.hasPermission('WORK_ORDER_PLAN')" class="action-btn schedule-btn" (click)="onScheduleClick(row)">Takvim</button>
-                    <button *ngIf="showPerformanceBtn && permissionService.hasPermission('TECHNICIAN_VIEW')" class="action-btn performance-btn" (click)="onPerformanceClick(row)">Performans</button>
-                    <button *ngIf="showEditBtn && (!requiredEditPermission || permissionService.hasPermission($any(requiredEditPermission)))" class="action-btn edit-btn" (click)="onEditClick(row)">{{ editLabel }}</button>
-                    <button *ngIf="showDeleteBtn && (!requiredDeletePermission || permissionService.hasPermission($any(requiredDeletePermission)))" class="action-btn delete-btn" (click)="onDeleteClick(row)">Sil</button>
-                  </span>
-
-                  <span *ngSwitchDefault>
-                    {{ row[col.key] !== undefined && row[col.key] !== null ? row[col.key] : '-' }}
-                  </span>
-                </ng-container>
-              </td>
-            </tr>
-            <tr *ngIf="filteredData.length === 0">
-              <td [attr.colspan]="columns.length" class="empty-state-cell">
-                <div class="empty-state-container">
-                  <div class="empty-state-icon"></div>
-                  <div class="empty-state-title">Kayıt Bulunmadı</div>
-                  <div class="empty-state-desc">Arama kriterlerinize veya filtrelerinize uygun herhangi bir veri bulunamadı. Lütfen kriterlerinizi kontrol edin veya yeni bir arama yapın.</div>
-                </div>
-              </td>
-            </tr>
+            @for (row of paginatedData; track trackByFn($index, row)) {
+              <tr (click)="onRowClick(row)">
+                @for (col of columns; track col) {
+                  <td>
+                    <!-- Cell Content Formatting -->
+                    @switch (col.type) {
+                      @case ('currency') {
+                        <span class="cell-currency">
+                          {{ row[col.key] | currency:'TRY':'symbol-narrow':'1.2-2' }}
+                        </span>
+                      }
+                      @case ('date') {
+                        <span class="cell-date">
+                          {{ row[col.key] ? (row[col.key] | date:'dd.MM.yyyy HH:mm') : '-' }}
+                        </span>
+                      }
+                      @case ('boolean') {
+                        <span class="cell-boolean" [ngClass]="row[col.key] ? 'bool-true' : 'bool-false'">
+                          {{ row[col.key] ? 'Evet' : 'Hayır' }}
+                        </span>
+                      }
+                      @case ('status') {
+                        <app-status-badge [status]="row[col.key]"></app-status-badge>
+                      }
+                      @case ('actions') {
+                        <span class="cell-actions" (click)="$event.stopPropagation()">
+                          @if (showScheduleBtn && permissionService.hasPermission('WORK_ORDER_PLAN')) {
+                            <button class="action-btn schedule-btn" (click)="onScheduleClick(row)">Takvim</button>
+                          }
+                          @if (showPerformanceBtn && permissionService.hasPermission('TECHNICIAN_VIEW')) {
+                            <button class="action-btn performance-btn" (click)="onPerformanceClick(row)">Performans</button>
+                          }
+                          @if (showEditBtn && (!requiredEditPermission || permissionService.hasPermission($any(requiredEditPermission)))) {
+                            <button class="action-btn edit-btn" (click)="onEditClick(row)">{{ editLabel }}</button>
+                          }
+                          @if (showDeleteBtn && (!requiredDeletePermission || permissionService.hasPermission($any(requiredDeletePermission)))) {
+                            <button class="action-btn delete-btn" (click)="onDeleteClick(row)">Sil</button>
+                          }
+                        </span>
+                      }
+                      @default {
+                        <span>
+                          {{ row[col.key] !== undefined && row[col.key] !== null ? row[col.key] : '-' }}
+                        </span>
+                      }
+                    }
+                  </td>
+                }
+              </tr>
+            }
+            @if (filteredData.length === 0) {
+              <tr>
+                <td [attr.colspan]="columns.length" class="empty-state-cell">
+                  <div class="empty-state-container">
+                    <div class="empty-state-icon"></div>
+                    <div class="empty-state-title">Kayıt Bulunmadı</div>
+                    <div class="empty-state-desc">Arama kriterlerinize veya filtrelerinize uygun herhangi bir veri bulunamadı. Lütfen kriterlerinizi kontrol edin veya yeni bir arama yapın.</div>
+                  </div>
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
-
+    
       <!-- Pagination (sayfa boyutu 5 sabit) -->
-      <div class="mini-pagination" *ngIf="showPagination && filteredData.length > 0">
-        <div class="page-info">
-          Toplam <strong>{{ filteredData.length }}</strong> kayıt — {{ startIndex + 1 }}-{{ endIndex }} arası
+      @if (showPagination && filteredData.length > 0) {
+        <div class="mini-pagination">
+          <div class="page-info">
+            Toplam <strong>{{ filteredData.length }}</strong> kayıt — {{ startIndex + 1 }}-{{ endIndex }} arası
+          </div>
+          <div class="page-controls">
+            <button [disabled]="currentPage === 1" (click)="setPage(1)" title="İlk sayfa">«</button>
+            <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)" title="Önceki">‹</button>
+            <span class="page-num">{{ currentPage }} / {{ totalPages || 1 }}</span>
+            <button [disabled]="currentPage >= totalPages" (click)="setPage(currentPage + 1)" title="Sonraki">›</button>
+            <button [disabled]="currentPage >= totalPages" (click)="setPage(totalPages)" title="Son sayfa">»</button>
+          </div>
         </div>
-        <div class="page-controls">
-          <button [disabled]="currentPage === 1" (click)="setPage(1)" title="İlk sayfa">«</button>
-          <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)" title="Önceki">‹</button>
-          <span class="page-num">{{ currentPage }} / {{ totalPages || 1 }}</span>
-          <button [disabled]="currentPage >= totalPages" (click)="setPage(currentPage + 1)" title="Sonraki">›</button>
-          <button [disabled]="currentPage >= totalPages" (click)="setPage(totalPages)" title="Son sayfa">»</button>
-        </div>
-      </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./data-table.component.scss']
 })
 export class DataTableComponent implements OnInit, OnChanges {

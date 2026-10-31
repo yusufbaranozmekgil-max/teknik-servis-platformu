@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { StorageService } from '../../../../core/storage/storage.service';
 import { STORAGE_KEYS } from '../../../../core/storage/storage-keys';
 import { SeedService } from '../../../../core/storage/seed.service';
@@ -22,112 +22,137 @@ import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
     selector: 'app-simulation',
-    imports: [CommonModule],
+    imports: [],
     template: `
     <div class="simulation-container">
       <header class="simulation-header animate-fade-in">
         <h1>Saha Simülasyon Kontrol Paneli</h1>
         <p>Sistem davranışlarını test etmek, limitleri denetlemek ve veri yoğunluğunu simüle etmek için senaryoları çalıştırın.</p>
       </header>
-
+    
       <!-- System Stats Bar -->
       <div class="stats-bar animate-slide-in">
         <div class="stat-item" [class.flash]="flashStats">
           <span class="label">Toplam İş Emri</span>
           <span class="val">{{ totalWorkOrders }}
-            <span class="delta" *ngIf="delta.workOrders > 0">+{{ delta.workOrders }}</span>
+            @if (delta.workOrders > 0) {
+              <span class="delta">+{{ delta.workOrders }}</span>
+            }
           </span>
         </div>
         <div class="stat-item" [class.flash]="flashStats">
           <span class="label">Toplam Talep</span>
           <span class="val">{{ totalRequests }}
-            <span class="delta" *ngIf="delta.requests > 0">+{{ delta.requests }}</span>
+            @if (delta.requests > 0) {
+              <span class="delta">+{{ delta.requests }}</span>
+            }
           </span>
         </div>
         <div class="stat-item" [class.flash]="flashStats">
           <span class="label">Kritik Uyarılar</span>
           <span class="val danger">{{ criticalNotifications }}
-            <span class="delta danger-delta" *ngIf="delta.notifications > 0">+{{ delta.notifications }}</span>
+            @if (delta.notifications > 0) {
+              <span class="delta danger-delta">+{{ delta.notifications }}</span>
+            }
           </span>
         </div>
         <div class="stat-item" [class.flash]="flashStats">
           <span class="label">Audit Kayıtları</span>
           <span class="val info">{{ totalAuditLogs }}
-            <span class="delta info-delta" *ngIf="delta.audit > 0">+{{ delta.audit }}</span>
+            @if (delta.audit > 0) {
+              <span class="delta info-delta">+{{ delta.audit }}</span>
+            }
           </span>
         </div>
       </div>
-
+    
       <!-- Çalışıyor banner'ı -->
-      <div class="running-banner" *ngIf="isRunning">
-        <div class="spinner"></div>
-        <div class="running-text">
-          <strong>{{ runningTitle }}</strong> çalıştırılıyor...
-          <span class="running-step" *ngIf="runningStep">{{ runningStep }}</span>
+      @if (isRunning) {
+        <div class="running-banner">
+          <div class="spinner"></div>
+          <div class="running-text">
+            <strong>{{ runningTitle }}</strong> çalıştırılıyor...
+            @if (runningStep) {
+              <span class="running-step">{{ runningStep }}</span>
+            }
+          </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Simulation Grid (kartlara açıklama + adım listesi) -->
       <div class="simulation-grid">
-        <div *ngFor="let s of scenarios" class="sim-card" [class]="'card-glow-' + s.color">
-          <div class="card-header">
-            <h3>{{ s.title }}</h3>
-            <span class="badge" [class]="'badge-' + s.color">{{ s.badge }}</span>
-          </div>
-          <p class="desc">{{ s.description }}</p>
-
-          <button class="toggle-details" type="button" (click)="toggleDetails(s.id)">
-            
-            {{ isExpanded(s.id) ? 'Detayları Gizle' : 'Ne yapacak? (' + s.steps.length + ' adım)' }}
-          </button>
-
-          <div class="details-box" *ngIf="isExpanded(s.id)">
-            <div class="details-section">
-              <h5>İşlem Adımları</h5>
-              <ol class="step-list">
-                <li *ngFor="let st of s.steps">{{ st }}</li>
-              </ol>
+        @for (s of scenarios; track s) {
+          <div class="sim-card" [class]="'card-glow-' + s.color">
+            <div class="card-header">
+              <h3>{{ s.title }}</h3>
+              <span class="badge" [class]="'badge-' + s.color">{{ s.badge }}</span>
             </div>
-            <div class="details-section" *ngIf="s.affects.length > 0">
-              <h5>Etkileyeceği Modüller</h5>
-              <div class="chip-list">
-                <span class="chip" *ngFor="let a of s.affects">{{ a }}</span>
+            <p class="desc">{{ s.description }}</p>
+            <button class="toggle-details" type="button" (click)="toggleDetails(s.id)">
+              {{ isExpanded(s.id) ? 'Detayları Gizle' : 'Ne yapacak? (' + s.steps.length + ' adım)' }}
+            </button>
+            @if (isExpanded(s.id)) {
+              <div class="details-box">
+                <div class="details-section">
+                  <h5>İşlem Adımları</h5>
+                  <ol class="step-list">
+                    @for (st of s.steps; track st) {
+                      <li>{{ st }}</li>
+                    }
+                  </ol>
+                </div>
+                @if (s.affects.length > 0) {
+                  <div class="details-section">
+                    <h5>Etkileyeceği Modüller</h5>
+                    <div class="chip-list">
+                      @for (a of s.affects; track a) {
+                        <span class="chip">{{ a }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+                @if (s.expected) {
+                  <div class="details-section">
+                    <h5>Beklenen Sonuç</h5>
+                    <p class="expected">{{ s.expected }}</p>
+                  </div>
+                }
               </div>
-            </div>
-            <div class="details-section" *ngIf="s.expected">
-              <h5>Beklenen Sonuç</h5>
-              <p class="expected">{{ s.expected }}</p>
-            </div>
+            }
+            <button (click)="runScenario(s.id)" class="btn-sim" [class]="s.color">
+              {{ s.buttonLabel || 'Tetikle' }}
+            </button>
           </div>
-
-          <button (click)="runScenario(s.id)" class="btn-sim" [class]="s.color">
-            {{ s.buttonLabel || 'Tetikle' }}
-          </button>
-        </div>
+        }
       </div>
-
+    
       <!-- Son senaryo özeti -->
-      <div class="last-result-card" *ngIf="lastResult">
-        <div class="last-header">
-          <h3>
-            
-            Son Simülasyon: {{ lastResult.title }}
-          </h3>
-          <span class="time-pill">{{ lastResult.timestamp }} ({{ lastResult.durationMs }} ms)</span>
-        </div>
-        <div class="last-body">
-          <div class="result-stats">
-            <div *ngFor="let stat of lastResult.stats" class="result-stat">
-              <span class="stat-label">{{ stat.label }}</span>
-              <span class="stat-value">{{ stat.value }}</span>
+      @if (lastResult) {
+        <div class="last-result-card">
+          <div class="last-header">
+            <h3>
+              Son Simülasyon: {{ lastResult.title }}
+            </h3>
+            <span class="time-pill">{{ lastResult.timestamp }} ({{ lastResult.durationMs }} ms)</span>
+          </div>
+          <div class="last-body">
+            <div class="result-stats">
+              @for (stat of lastResult.stats; track stat) {
+                <div class="result-stat">
+                  <span class="stat-label">{{ stat.label }}</span>
+                  <span class="stat-value">{{ stat.value }}</span>
+                </div>
+              }
             </div>
-          </div>
-          <div class="result-message" *ngIf="lastResult.message">
-            <strong>{{ lastResult.success ? 'Mesaj:' : 'Hata:' }}</strong> {{ lastResult.message }}
+            @if (lastResult.message) {
+              <div class="result-message">
+                <strong>{{ lastResult.success ? 'Mesaj:' : 'Hata:' }}</strong> {{ lastResult.message }}
+              </div>
+            }
           </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Realtime Monitor Console -->
       <div class="monitor-console">
         <div class="console-header">
@@ -136,15 +161,19 @@ import { ToastService } from '../../../../core/services/toast.service';
           <button (click)="clearConsole()" class="btn-clear-console">Konsolu Temizle</button>
         </div>
         <div class="console-body" #consoleBody>
-          <div class="console-line" *ngFor="let log of consoleLogs" [class.danger]="log.type==='error'" [class.success]="log.type==='success'" [class.info]="log.type==='info'">
-            <span class="time">[{{ log.time }}]</span>
-            <span class="message">{{ log.text }}</span>
-          </div>
-          <div class="console-line empty" *ngIf="consoleLogs.length === 0">Konsol çıktı bekliyor... Herhangi bir senaryoyu tetikleyin.</div>
+          @for (log of consoleLogs; track log) {
+            <div class="console-line" [class.danger]="log.type==='error'" [class.success]="log.type==='success'" [class.info]="log.type==='info'">
+              <span class="time">[{{ log.time }}]</span>
+              <span class="message">{{ log.text }}</span>
+            </div>
+          }
+          @if (consoleLogs.length === 0) {
+            <div class="console-line empty">Konsol çıktı bekliyor... Herhangi bir senaryoyu tetikleyin.</div>
+          }
         </div>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./simulation.component.scss']
 })
 export class SimulationComponent implements OnInit {

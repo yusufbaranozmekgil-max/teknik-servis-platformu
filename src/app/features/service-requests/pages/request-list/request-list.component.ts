@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ServiceRequestService } from '../../../../core/services/service-request.service';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -10,25 +10,29 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
 
 @Component({
     selector: 'app-request-list',
-    imports: [CommonModule, RouterModule, DataTableComponent],
+    imports: [RouterModule, DataTableComponent],
     template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Servis Talepleri Yönetimi</h2>
-        <button *ngIf="permissionService.hasPermission('SERVICE_REQUEST_CREATE')" (click)="openCreatePage()" class="primary-btn">
-          + Yeni Talep Oluştur
-        </button>
+        @if (permissionService.hasPermission('SERVICE_REQUEST_CREATE')) {
+          <button (click)="openCreatePage()" class="primary-btn">
+            + Yeni Talep Oluştur
+          </button>
+        }
       </div>
-
+    
       <!-- Filtreler -->
       <div class="filters-bar" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
         <label><strong>Şube Filtresi:</strong></label>
         <select [value]="branchFilter" (change)="onBranchFilterChange($any($event.target).value)" class="form-control" style="width: 250px; padding: 0.4rem 0.75rem; border-radius: 0.5rem; border: 1px solid #c9d7da; background-color: white; color: #0f1a1c;">
           <option value="">-- Tüm Şubeler --</option>
-          <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+          @for (b of branches; track b) {
+            <option [value]="b.id">{{ b.name }}</option>
+          }
         </select>
       </div>
-
+    
       <div class="table-container">
         <app-data-table
           [data]="requestsWithBranch"
@@ -42,7 +46,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./request-list.component.scss']
 })
 export class RequestListComponent implements OnInit {

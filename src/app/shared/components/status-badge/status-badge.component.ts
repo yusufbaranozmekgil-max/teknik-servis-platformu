@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   WORK_ORDER_STATUS_LABELS,
   SERVICE_REQUEST_STATUS_LABELS,
@@ -38,7 +38,7 @@ const LEGACY_LABELS: Record<string, string> = {
 
 @Component({
     selector: 'app-status-badge',
-    imports: [CommonModule],
+    imports: [],
     template: `
     <span class="badge" [class]="statusClass">
       {{ statusLabel }}

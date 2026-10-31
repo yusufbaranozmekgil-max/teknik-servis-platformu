@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { VehicleService } from '../../../../core/services/vehicle.service';
@@ -18,7 +18,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
 
 @Component({
     selector: 'app-vehicle-edit',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -27,142 +27,139 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
           <h2>Saha Aracı Düzenle</h2>
         </div>
       </div>
-
-      <div class="card-content" *ngIf="vehicle">
-        <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
-          <div class="form-grid">
-            <app-form-field
-              label="Plaka Numarası"
-              [control]="$any(vehicleForm.get('plateNumber'))"
-              [required]="true"
-              [readonly]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Araç Tipi"
-              type="select"
-              [control]="$any(vehicleForm.get('vehicleType'))"
-              [required]="true"
-            >
-              <option value="Minivan">Minivan (Küçük Boy)</option>
-              <option value="Panelvan">Panelvan (Orta Boy)</option>
-              <option value="Kamyonet">Kamyonet (Büyük Boy)</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Marka"
-              [control]="$any(vehicleForm.get('brand'))"
-              [maxLength]="FIELD_LIMITS.brand"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="letters"
-            ></app-form-field>
-
-            <app-form-field
-              label="Model"
-              [control]="$any(vehicleForm.get('model'))"
-              [maxLength]="FIELD_LIMITS.model"
-              [required]="true"
-              [showCounter]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Bağlı Şube"
-              type="select"
-              [control]="$any(vehicleForm.get('branchId'))"
-              [required]="true"
-            >
-              <option value="" disabled>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Atanmış Sürücü / Teknisyen"
-              type="select"
-              [control]="$any(vehicleForm.get('assignedTechnicianId'))"
-            >
-              <option [value]="null">Atama Yapma (Boşta)</option>
-              <option *ngFor="let t of technicians" [value]="t.id">{{ t.fullName }} ({{ getBranchName(t.branchId) }})</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Taşıma Kapasitesi (kg)"
-              type="number"
-              [control]="$any(vehicleForm.get('payloadCapacityKg'))"
-              [min]="NUMERIC_LIMITS.vehicleCapacity.min"
-              [max]="NUMERIC_LIMITS.vehicleCapacity.max"
-              [maxLength]="5"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Mevcut Yakıt Seviyesi (%)"
-              type="number"
-              [control]="$any(vehicleForm.get('fuelLevel'))"
-              [min]="NUMERIC_LIMITS.fuelLevel.min"
-              [max]="NUMERIC_LIMITS.fuelLevel.max"
-              [maxLength]="3"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Durum"
-              type="select"
-              [control]="$any(vehicleForm.get('status'))"
-              [required]="true"
-            >
-              <option value="AVAILABLE">Müsait</option>
-              <option value="ACTIVE">Görevde</option>
-              <option value="MAINTENANCE">Bakımda</option>
-              <option value="OUT_OF_SERVICE">Pasif</option>
-            </app-form-field>
-
-            <div class="form-group">
-              <label>Son Bakım Tarihi <span style="color:#dc2626">*</span></label>
-              <app-smart-date-input
-                formControlName="lastMaintenanceDate"
-                [minDate]="DATE_LIMITS.PAST_MIN"
-                [maxDate]="todayISO()"
-                [minYear]="2000"
-                [maxYear]="2099"
-              ></app-smart-date-input>
-              <small class="hint-text" style="color:#5f6c6e;font-size:0.75rem">Gün/Ay/Yıl (örn. 15/06/2025). 30 Şubat gibi geçersiz tarih otomatik düzeltilir.</small>
+    
+      @if (vehicle) {
+        <div class="card-content">
+          <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+              <app-form-field
+                label="Plaka Numarası"
+                [control]="$any(vehicleForm.get('plateNumber'))"
+                [required]="true"
+                [readonly]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Araç Tipi"
+                type="select"
+                [control]="$any(vehicleForm.get('vehicleType'))"
+                [required]="true"
+                >
+                <option value="Minivan">Minivan (Küçük Boy)</option>
+                <option value="Panelvan">Panelvan (Orta Boy)</option>
+                <option value="Kamyonet">Kamyonet (Büyük Boy)</option>
+              </app-form-field>
+              <app-form-field
+                label="Marka"
+                [control]="$any(vehicleForm.get('brand'))"
+                [maxLength]="FIELD_LIMITS.brand"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="letters"
+              ></app-form-field>
+              <app-form-field
+                label="Model"
+                [control]="$any(vehicleForm.get('model'))"
+                [maxLength]="FIELD_LIMITS.model"
+                [required]="true"
+                [showCounter]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Bağlı Şube"
+                type="select"
+                [control]="$any(vehicleForm.get('branchId'))"
+                [required]="true"
+                >
+                <option value="" disabled>Şube Seçin</option>
+                @for (b of branches; track b) {
+                  <option [value]="b.id">{{ b.name }}</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Atanmış Sürücü / Teknisyen"
+                type="select"
+                [control]="$any(vehicleForm.get('assignedTechnicianId'))"
+                >
+                <option [value]="null">Atama Yapma (Boşta)</option>
+                @for (t of technicians; track t) {
+                  <option [value]="t.id">{{ t.fullName }} ({{ getBranchName(t.branchId) }})</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Taşıma Kapasitesi (kg)"
+                type="number"
+                [control]="$any(vehicleForm.get('payloadCapacityKg'))"
+                [min]="NUMERIC_LIMITS.vehicleCapacity.min"
+                [max]="NUMERIC_LIMITS.vehicleCapacity.max"
+                [maxLength]="5"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Mevcut Yakıt Seviyesi (%)"
+                type="number"
+                [control]="$any(vehicleForm.get('fuelLevel'))"
+                [min]="NUMERIC_LIMITS.fuelLevel.min"
+                [max]="NUMERIC_LIMITS.fuelLevel.max"
+                [maxLength]="3"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Durum"
+                type="select"
+                [control]="$any(vehicleForm.get('status'))"
+                [required]="true"
+                >
+                <option value="AVAILABLE">Müsait</option>
+                <option value="ACTIVE">Görevde</option>
+                <option value="MAINTENANCE">Bakımda</option>
+                <option value="OUT_OF_SERVICE">Pasif</option>
+              </app-form-field>
+              <div class="form-group">
+                <label>Son Bakım Tarihi <span style="color:#dc2626">*</span></label>
+                <app-smart-date-input
+                  formControlName="lastMaintenanceDate"
+                  [minDate]="DATE_LIMITS.PAST_MIN"
+                  [maxDate]="todayISO()"
+                  [minYear]="2000"
+                  [maxYear]="2099"
+                ></app-smart-date-input>
+                <small class="hint-text" style="color:#5f6c6e;font-size:0.75rem">Gün/Ay/Yıl (örn. 15/06/2025). 30 Şubat gibi geçersiz tarih otomatik düzeltilir.</small>
+              </div>
             </div>
-          </div>
-
-          <div class="form-group full-width" style="margin-top: 1rem;">
-            <label for="equipmentsInput">Araç İçi Ekipman Seti / Demirbaşlar (Virgülle ayırarak yazın)</label>
-            <input id="equipmentsInput" type="text" [value]="equipmentsJoined" />
-            <span class="hint-text">Örn: Merdiven, Jeneratör, Alet Çantası, Matkap</span>
-          </div>
-
-          <div class="form-group check-group" style="margin-top: 1.25rem;">
-            <label class="switch-label">
-              <input type="checkbox" formControlName="isActive" />
-              <span class="switch-text">Aktif Kullanımda</span>
-            </label>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert" style="margin-top: 1rem;">
-            {{ errorMessage }}
-          </div>
-
-          <div class="form-actions">
-            <button type="button" routerLink="/araclar" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="vehicleForm.invalid || loading" class="save-btn">
-              {{ loading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="error-alert" *ngIf="!vehicle && !errorMessage">
-        Araç yükleniyor veya bulunamadı...
-      </div>
+            <div class="form-group full-width" style="margin-top: 1rem;">
+              <label for="equipmentsInput">Araç İçi Ekipman Seti / Demirbaşlar (Virgülle ayırarak yazın)</label>
+              <input id="equipmentsInput" type="text" [value]="equipmentsJoined" />
+              <span class="hint-text">Örn: Merdiven, Jeneratör, Alet Çantası, Matkap</span>
+            </div>
+            <div class="form-group check-group" style="margin-top: 1.25rem;">
+              <label class="switch-label">
+                <input type="checkbox" formControlName="isActive" />
+                <span class="switch-text">Aktif Kullanımda</span>
+              </label>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert" style="margin-top: 1rem;">
+                {{ errorMessage }}
+              </div>
+            }
+            <div class="form-actions">
+              <button type="button" routerLink="/araclar" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="vehicleForm.invalid || loading" class="save-btn">
+                {{ loading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    
+      @if (!vehicle && !errorMessage) {
+        <div class="error-alert">
+          Araç yükleniyor veya bulunamadı...
+        </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./vehicle-edit.component.scss']
 })
 export class VehicleEditPage implements OnInit, ComponentCanDeactivate {

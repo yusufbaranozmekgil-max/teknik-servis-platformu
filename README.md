@@ -26,7 +26,7 @@ Giriş ekranındaki demo kullanıcılarından birini seçmek yeterli (ortak şif
 
 ## Teknolojiler
 
-Angular 17 (standalone bileşenler, Signals, Reactive Forms, lazy loading) · TypeScript · SCSS · Chart.js · Jasmine + Karma · GitHub Actions · Vercel
+Angular 21 (standalone bileşenler, Signals, Reactive Forms, lazy loading) · TypeScript · SCSS · Chart.js · Jasmine + Karma · GitHub Actions · Vercel
 
 ## Mimari
 

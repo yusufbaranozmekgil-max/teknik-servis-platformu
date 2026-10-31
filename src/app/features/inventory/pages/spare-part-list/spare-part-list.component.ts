@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { InventoryService } from '../../../../core/services/inventory.service';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -14,7 +14,7 @@ import { TooltipDirective } from '../../../../shared/directives/tooltip.directiv
 
 @Component({
     selector: 'app-spare-part-list',
-    imports: [CommonModule, RouterModule, DataTableComponent, PermissionVisibilityDirective, TooltipDirective],
+    imports: [RouterModule, DataTableComponent, PermissionVisibilityDirective, TooltipDirective],
     template: `
     <div class="crud-container">
       <div class="header-section">

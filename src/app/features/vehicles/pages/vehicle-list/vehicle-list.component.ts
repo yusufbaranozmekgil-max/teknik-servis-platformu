@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterModule } from '@angular/router';
 import { VehicleService } from '../../../../core/services/vehicle.service';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -14,20 +14,22 @@ import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
     selector: 'app-vehicle-list',
-    imports: [CommonModule, RouterModule, DataTableComponent],
+    imports: [RouterModule, DataTableComponent],
     template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Saha Araçları Yönetimi</h2>
-        <button *ngIf="permissionService.hasPermission('VEHICLE_CREATE')" (click)="openCreatePage()" class="primary-btn">
-          + Yeni Araç Ekle
-        </button>
+        @if (permissionService.hasPermission('VEHICLE_CREATE')) {
+          <button (click)="openCreatePage()" class="primary-btn">
+            + Yeni Araç Ekle
+          </button>
+        }
       </div>
-
+    
       <div class="table-container">
-        <app-data-table 
-          [data]="vehiclesWithDetails" 
-          [columns]="columns" 
+        <app-data-table
+          [data]="vehiclesWithDetails"
+          [columns]="columns"
           [requiredEditPermission]="'VEHICLE_UPDATE'"
           [requiredDeletePermission]="'VEHICLE_DELETE'"
           (editClick)="onEdit($event)"
@@ -36,7 +38,7 @@ import { ToastService } from '../../../../core/services/toast.service';
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./vehicle-list.component.scss']
 })
 export class VehicleListComponent implements OnInit {

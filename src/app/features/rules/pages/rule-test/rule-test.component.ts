@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { RuleEngineService } from '../../../../core/services/rule-engine.service';
 import { PermissionService } from '../../../../core/services/permission.service';
@@ -8,7 +8,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
 
 @Component({
     selector: 'app-rule-test',
-    imports: [CommonModule, RouterModule],
+    imports: [RouterModule],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -20,12 +20,12 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
           <a routerLink="/kurallar" class="btn-back">← Kurallara Dön</a>
         </div>
       </div>
-
+    
       <div class="sandbox-container card">
         <div class="sandbox-form">
           <h3>Test Senaryosu Parametreleri</h3>
           <p class="section-desc">Aşağıdaki alanları değiştirerek kural motorunun atamaları nasıl blokladığını veya onay gerektirdiğini gözlemleyin.</p>
-
+    
           <div class="form-grid">
             <div class="form-group">
               <label>Test Talep Önceliği</label>
@@ -35,22 +35,22 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
                 <option value="CRITICAL">Kritik</option>
               </select>
             </div>
-
+    
             <div class="form-group">
               <label>Test İş Emri Maliyeti (TL)</label>
               <input type="number" [value]="mockCost" (input)="onCostInput($any($event.target))" class="form-control" />
             </div>
-
+    
             <div class="form-group">
               <label>Araç Son Bakımından Beri Geçen Gün</label>
               <input type="number" [value]="mockMaintenanceDays" (input)="onMaintenanceInput($any($event.target))" class="form-control" />
             </div>
-
+    
             <div class="form-group">
               <label>Araç Yakıt Seviyesi (%)</label>
               <input type="number" [value]="mockFuelLevel" (input)="onFuelInput($any($event.target))" class="form-control" />
             </div>
-
+    
             <div class="form-group">
               <label>Yedek Parça Stok Durumu</label>
               <select [value]="mockStockCritical ? '1' : '0'" (change)="mockStockCritical = $any($event.target).value === '1'" class="form-control">
@@ -58,7 +58,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
                 <option value="1">Kritik (stok 2 / eşik 5)</option>
               </select>
             </div>
-
+    
             <div class="form-group">
               <label>SLA Durumu</label>
               <select [value]="mockSlaState" (change)="mockSlaState = $any($event.target).value" class="form-control">
@@ -67,7 +67,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
                 <option value="OVERDUE">Gecikmiş (süre aşıldı)</option>
               </select>
             </div>
-
+    
             <div class="form-group">
               <label>Teknisyen Durumu</label>
               <select [value]="mockTechnicianState" (change)="mockTechnicianState = $any($event.target).value" class="form-control">
@@ -76,7 +76,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
                 <option value="INACTIVE">Pasif</option>
               </select>
             </div>
-
+    
             <div class="form-group">
               <label>Şube Günlük Kapasitesi</label>
               <select [value]="mockBranchFull ? '1' : '0'" (change)="mockBranchFull = $any($event.target).value === '1'" class="form-control">
@@ -84,7 +84,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
                 <option value="1">Dolu (10 / 10)</option>
               </select>
             </div>
-
+    
             <div class="form-group">
               <label>Garanti / Müşteri Onayı</label>
               <select [value]="mockWarranty" (change)="mockWarranty = $any($event.target).value" class="form-control">
@@ -94,51 +94,62 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
               </select>
             </div>
           </div>
-
+    
           <button (click)="runSimulation()" class="simulate-btn">Simülasyon Değerlendirmesini Başlat</button>
         </div>
-
-        <div class="sandbox-results" *ngIf="simulationRan">
-          <h3>Simülasyon Değerlendirme Sonuçları</h3>
-
-          <div class="alert alert-info" *ngIf="simResults.length === 0">
-            Girilen parametrelere göre tetiklenen aktif kural bulunmadı. İşlem engelsiz devam eder.
-          </div>
-
-          <div *ngIf="simResults.length > 0">
-            <div class="winner-box">
-              <h5>Uygulanan / Kazanan Kural</h5>
-              <div class="rule-result-item winner">
-                <p class="rule-title">{{ simResults[0].rule.name }}</p>
-                <p class="rule-details">
-                  Öncelik Seviyesi: {{ simResults[0].rule.priority }} | İşlem Durumu:
-                  <span class="badge" [class.blocked]="!simResults[0].allowed" [class.allowed]="simResults[0].allowed">
-                    {{ simResults[0].allowed ? 'Geçiş Serbest' : 'ENGELLEDİ / ONAY GEREK' }}
-                  </span>
-                </p>
-                <p class="rule-reason" *ngIf="simResults[0].reason">
-                  <strong>Gerekçe:</strong> {{ simResults[0].reason }}
-                </p>
+    
+        @if (simulationRan) {
+          <div class="sandbox-results">
+            <h3>Simülasyon Değerlendirme Sonuçları</h3>
+            @if (simResults.length === 0) {
+              <div class="alert alert-info">
+                Girilen parametrelere göre tetiklenen aktif kural bulunmadı. İşlem engelsiz devam eder.
               </div>
-            </div>
-
-            <div class="losers-box" *ngIf="getLoserRules().length > 0">
-              <h5>Elenebilecek / Diğer Tetiklenen Kurallar</h5>
-              <div *ngFor="let r of getLoserRules()" class="rule-result-item loser">
-                <p class="rule-title">{{ r.rule.name }}</p>
-                <p class="rule-details">
-                  Öncelik Seviyesi: {{ r.rule.priority }} (Daha düşük öncelik olduğundan ezildi)
-                </p>
-                <p class="rule-reason" *ngIf="r.reason">
-                  <strong>Gerekçe:</strong> {{ r.reason }}
-                </p>
+            }
+            @if (simResults.length > 0) {
+              <div>
+                <div class="winner-box">
+                  <h5>Uygulanan / Kazanan Kural</h5>
+                  <div class="rule-result-item winner">
+                    <p class="rule-title">{{ simResults[0].rule.name }}</p>
+                    <p class="rule-details">
+                      Öncelik Seviyesi: {{ simResults[0].rule.priority }} | İşlem Durumu:
+                      <span class="badge" [class.blocked]="!simResults[0].allowed" [class.allowed]="simResults[0].allowed">
+                        {{ simResults[0].allowed ? 'Geçiş Serbest' : 'ENGELLEDİ / ONAY GEREK' }}
+                      </span>
+                    </p>
+                    @if (simResults[0].reason) {
+                      <p class="rule-reason">
+                        <strong>Gerekçe:</strong> {{ simResults[0].reason }}
+                      </p>
+                    }
+                  </div>
+                </div>
+                @if (getLoserRules().length > 0) {
+                  <div class="losers-box">
+                    <h5>Elenebilecek / Diğer Tetiklenen Kurallar</h5>
+                    @for (r of getLoserRules(); track r) {
+                      <div class="rule-result-item loser">
+                        <p class="rule-title">{{ r.rule.name }}</p>
+                        <p class="rule-details">
+                          Öncelik Seviyesi: {{ r.rule.priority }} (Daha düşük öncelik olduğundan ezildi)
+                        </p>
+                        @if (r.reason) {
+                          <p class="rule-reason">
+                            <strong>Gerekçe:</strong> {{ r.reason }}
+                          </p>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
               </div>
-            </div>
+            }
           </div>
-        </div>
+        }
       </div>
     </div>
-  `,
+    `,
     styles: [`
     .page-container {
       padding: 1.5rem;

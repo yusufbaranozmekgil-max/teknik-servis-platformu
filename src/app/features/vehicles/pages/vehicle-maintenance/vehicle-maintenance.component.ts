@@ -16,68 +16,72 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
           <h2>Araç Bakım ve Durum Yönetimi</h2>
         </div>
       </div>
-
-      <div class="card-content" *ngIf="vehicle">
-        <div class="vehicle-header">
-          <span class="plate-badge">{{ vehicle.plateNumber }}</span>
-          <h3>{{ vehicle.brand }} {{ vehicle.model }}</h3>
-          <span class="status-pill" [class.maintenance]="vehicle.status === 'MAINTENANCE'" [class.available]="vehicle.status === 'AVAILABLE'">
-            {{ vehicle.status | statusLabel:'vehicle' }}
-          </span>
-        </div>
-
-        <div class="info-details">
-          <div class="info-row">
-            <strong>Son Bakım Tarihi:</strong> 
-            <span>{{ vehicle.lastMaintenanceDate | date:'dd.MM.yyyy HH:mm' }}</span>
-          </div>
-          <div class="info-row">
-            <strong>Kalan Bakım Süresi:</strong> 
-            <span [class.text-danger]="isMaintenanceOverdue()">
-              {{ getMaintenanceDeadlineText() }}
+    
+      @if (vehicle) {
+        <div class="card-content">
+          <div class="vehicle-header">
+            <span class="plate-badge">{{ vehicle.plateNumber }}</span>
+            <h3>{{ vehicle.brand }} {{ vehicle.model }}</h3>
+            <span class="status-pill" [class.maintenance]="vehicle.status === 'MAINTENANCE'" [class.available]="vehicle.status === 'AVAILABLE'">
+              {{ vehicle.status | statusLabel:'vehicle' }}
             </span>
           </div>
-          <div class="info-row">
-            <strong>Mevcut Yakıt Seviyesi:</strong> 
-            <span [class.text-danger]="vehicle.fuelLevel < 30">%{{ vehicle.fuelLevel }}</span>
+          <div class="info-details">
+            <div class="info-row">
+              <strong>Son Bakım Tarihi:</strong>
+              <span>{{ vehicle.lastMaintenanceDate | date:'dd.MM.yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-row">
+              <strong>Kalan Bakım Süresi:</strong>
+              <span [class.text-danger]="isMaintenanceOverdue()">
+                {{ getMaintenanceDeadlineText() }}
+              </span>
+            </div>
+            <div class="info-row">
+              <strong>Mevcut Yakıt Seviyesi:</strong>
+              <span [class.text-danger]="vehicle.fuelLevel < 30">%{{ vehicle.fuelLevel }}</span>
+            </div>
+            <div class="info-row">
+              <strong>Ekipman Seti:</strong>
+              <span>{{ vehicle.equipments.join(', ') || 'Ekipman bulunmuyor' }}</span>
+            </div>
           </div>
-          <div class="info-row">
-            <strong>Ekipman Seti:</strong> 
-            <span>{{ vehicle.equipments.join(', ') || 'Ekipman bulunmuyor' }}</span>
-          </div>
+          @if (vehicle.isActive) {
+            <div class="maintenance-actions">
+              <h4>Bakım İşlemleri</h4>
+              <div class="buttons-grid">
+                @if (vehicle.status !== 'MAINTENANCE') {
+                  <button
+                    (click)="putInMaintenance()"
+                    class="maintenance-btn"
+                    >
+                    Aracı Bakıma Al (Bloke Et)
+                  </button>
+                }
+                <button
+                  (click)="completeMaintenance()"
+                  class="complete-btn"
+                  >
+                  Bakımı Tamamlandı Olarak İşle (Tarihi Güncelle)
+                </button>
+              </div>
+            </div>
+          }
+          @if (errorMessage) {
+            <div class="error-alert" style="margin-top: 1rem;">
+              {{ errorMessage }}
+            </div>
+          }
         </div>
-
-        <div class="maintenance-actions" *ngIf="vehicle.isActive">
-          <h4>Bakım İşlemleri</h4>
-          
-          <div class="buttons-grid">
-            <button 
-              *ngIf="vehicle.status !== 'MAINTENANCE'" 
-              (click)="putInMaintenance()" 
-              class="maintenance-btn"
-            >
-              Aracı Bakıma Al (Bloke Et)
-            </button>
-
-            <button 
-              (click)="completeMaintenance()" 
-              class="complete-btn"
-            >
-              Bakımı Tamamlandı Olarak İşle (Tarihi Güncelle)
-            </button>
-          </div>
+      }
+    
+      @if (!vehicle && !errorMessage) {
+        <div class="error-alert">
+          Araç yükleniyor veya bulunamadı...
         </div>
-
-        <div class="error-alert" *ngIf="errorMessage" style="margin-top: 1rem;">
-          {{ errorMessage }}
-        </div>
-      </div>
-
-      <div class="error-alert" *ngIf="!vehicle && !errorMessage">
-        Araç yükleniyor veya bulunamadı...
-      </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./vehicle-maintenance.component.scss']
 })
 export class VehicleMaintenancePage implements OnInit {

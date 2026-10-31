@@ -15,7 +15,7 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
         <h2>Bildirim Merkezi</h2>
         <p class="subtitle">Platform genelindeki önemli gelişmeleri, atamaları, stok alarmlarını ve SLA uyarılarını takip edin.</p>
       </div>
-
+    
       <!-- İşlem Çubuğu -->
       <div class="action-bar card">
         <div class="left-actions">
@@ -30,41 +30,47 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
           </select>
         </div>
       </div>
-
+    
       <!-- Bildirim Listesi -->
       <div class="notifications-list">
-        <div 
-          *ngFor="let n of filteredNotifications" 
-          class="notification-card card" 
-          [class.unread]="!n.isRead"
-          [class.info]="n.severity === 'INFO'"
-          [class.warning]="n.severity === 'WARNING'"
-          [class.error]="n.severity === 'ERROR'"
-        >
-          <div class="card-indicator"></div>
-          <div class="card-content">
-            <div class="card-header">
-              <span class="badge severity-badge">{{ n.severity | statusLabel:'severity' }}</span>
-              <span class="badge type-badge">{{ n.type | statusLabel:'notification' }}</span>
-              <span class="date-text">{{ n.createdAt | date:'dd.MM.yyyy HH:mm:ss' }}</span>
-            </div>
-            <h3 class="notif-title">{{ n.title }}</h3>
-            <p class="notif-message">{{ n.message }}</p>
-            
-            <div class="card-actions">
-              <button *ngIf="n.link" (click)="openDetail(n)" class="btn btn-primary btn-sm">Detaya Git</button>
-              <button *ngIf="!n.isRead" (click)="markAsRead(n.id)" class="btn btn-secondary btn-sm">Okundu İşaretle</button>
-              <button (click)="deleteNotif(n.id)" class="btn btn-danger btn-sm">Sil</button>
+        @for (n of filteredNotifications; track n) {
+          <div
+            class="notification-card card"
+            [class.unread]="!n.isRead"
+            [class.info]="n.severity === 'INFO'"
+            [class.warning]="n.severity === 'WARNING'"
+            [class.error]="n.severity === 'ERROR'"
+            >
+            <div class="card-indicator"></div>
+            <div class="card-content">
+              <div class="card-header">
+                <span class="badge severity-badge">{{ n.severity | statusLabel:'severity' }}</span>
+                <span class="badge type-badge">{{ n.type | statusLabel:'notification' }}</span>
+                <span class="date-text">{{ n.createdAt | date:'dd.MM.yyyy HH:mm:ss' }}</span>
+              </div>
+              <h3 class="notif-title">{{ n.title }}</h3>
+              <p class="notif-message">{{ n.message }}</p>
+              <div class="card-actions">
+                @if (n.link) {
+                  <button (click)="openDetail(n)" class="btn btn-primary btn-sm">Detaya Git</button>
+                }
+                @if (!n.isRead) {
+                  <button (click)="markAsRead(n.id)" class="btn btn-secondary btn-sm">Okundu İşaretle</button>
+                }
+                <button (click)="deleteNotif(n.id)" class="btn btn-danger btn-sm">Sil</button>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="no-notifications card" *ngIf="filteredNotifications.length === 0">
-          <p>Herhangi bir bildirim bulunmuyor.</p>
-        </div>
+        }
+    
+        @if (filteredNotifications.length === 0) {
+          <div class="no-notifications card">
+            <p>Herhangi bir bildirim bulunmuyor.</p>
+          </div>
+        }
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./notification-center.component.scss']
 })
 export class NotificationCenterComponent implements OnInit {

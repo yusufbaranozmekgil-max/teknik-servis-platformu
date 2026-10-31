@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { InventoryService } from '../../../../core/services/inventory.service';
@@ -16,7 +16,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
 
 @Component({
     selector: 'app-spare-part-edit',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -25,127 +25,126 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
           <h2>Yedek Parça Düzenle</h2>
         </div>
       </div>
-
-      <div class="card-content" *ngIf="part">
-        <form [formGroup]="partForm" (ngSubmit)="onSubmit()">
-          <div class="form-grid">
-            <app-form-field
-              label="Parça Kodu"
-              [control]="$any(partForm.get('code'))"
-              [required]="true"
-              placeholder="Örn: PRT-1234"
-              [type]="'text'"
-              [maxLength]="FIELD_LIMITS.partCode"
-            ></app-form-field>
-
-            <app-form-field
-              label="Parça Adı"
-              [control]="$any(partForm.get('name'))"
-              [maxLength]="FIELD_LIMITS.partName"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: 12V Fan Motoru"
-            ></app-form-field>
-
-            <app-form-field
-              label="Kategori"
-              type="select"
-              [control]="$any(partForm.get('category'))"
-              [required]="true"
-            >
-              <option *ngFor="let cat of categoryOptions" [value]="cat">{{ getCategoryLabel(cat) }}</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Bulunduğu Şube"
-              type="select"
-              [control]="$any(partForm.get('branchId'))"
-              [required]="true"
-            >
-              <option value="" disabled>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Uyumlu Cihaz / Marka"
-              [control]="$any(partForm.get('compatibleDevices'))"
-              [maxLength]="FIELD_LIMITS.compatibleDevice"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Bosch / Siemens Bulaşık Makinesi"
-            ></app-form-field>
-
-            <app-form-field
-              label="Ölçü Birimi"
-              type="select"
-              [control]="$any(partForm.get('unit'))"
-              [required]="true"
-            >
-              <option value="PCS">Adet (PCS)</option>
-              <option value="METERS">Metre (Meters)</option>
-              <option value="KG">Kilogram (KG)</option>
-              <option value="LITERS">Litre (Liters)</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Fiziksel Stok Miktarı"
-              type="number"
-              [control]="$any(partForm.get('stockQuantity'))"
-              [min]="NUMERIC_LIMITS.stockQuantity.min"
-              [max]="NUMERIC_LIMITS.stockQuantity.max"
-              [maxLength]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Minimum Kritik Stok Eşiği"
-              type="number"
-              [control]="$any(partForm.get('minStockThreshold'))"
-              [min]="NUMERIC_LIMITS.minimumStockLevel.min"
-              [max]="NUMERIC_LIMITS.minimumStockLevel.max"
-              [maxLength]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Birim Maliyet (TL)"
-              type="number"
-              [control]="$any(partForm.get('unitPrice'))"
-              [min]="NUMERIC_LIMITS.unitCost.min"
-              [max]="NUMERIC_LIMITS.unitCost.max"
-              [maxLength]="9"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-          </div>
-
-          <div class="form-group check-group">
-            <label class="switch-label">
-              <input type="checkbox" formControlName="isActive" />
-              <span class="switch-text">Aktif Kullanımda</span>
-            </label>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">
-            {{ errorMessage }}
-          </div>
-
-          <div class="form-actions">
-            <button type="button" routerLink="/stok" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="partForm.invalid || loading" class="save-btn">
-              {{ loading ? 'Kaydediliyor...' : 'Parçayı Güncelle' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="error-alert" *ngIf="!part && !errorMessage">
-        Yedek parça yükleniyor veya bulunamadı...
-      </div>
+    
+      @if (part) {
+        <div class="card-content">
+          <form [formGroup]="partForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+              <app-form-field
+                label="Parça Kodu"
+                [control]="$any(partForm.get('code'))"
+                [required]="true"
+                placeholder="Örn: PRT-1234"
+                [type]="'text'"
+                [maxLength]="FIELD_LIMITS.partCode"
+              ></app-form-field>
+              <app-form-field
+                label="Parça Adı"
+                [control]="$any(partForm.get('name'))"
+                [maxLength]="FIELD_LIMITS.partName"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: 12V Fan Motoru"
+              ></app-form-field>
+              <app-form-field
+                label="Kategori"
+                type="select"
+                [control]="$any(partForm.get('category'))"
+                [required]="true"
+                >
+                @for (cat of categoryOptions; track cat) {
+                  <option [value]="cat">{{ getCategoryLabel(cat) }}</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Bulunduğu Şube"
+                type="select"
+                [control]="$any(partForm.get('branchId'))"
+                [required]="true"
+                >
+                <option value="" disabled>Şube Seçin</option>
+                @for (b of branches; track b) {
+                  <option [value]="b.id">{{ b.name }}</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Uyumlu Cihaz / Marka"
+                [control]="$any(partForm.get('compatibleDevices'))"
+                [maxLength]="FIELD_LIMITS.compatibleDevice"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Bosch / Siemens Bulaşık Makinesi"
+              ></app-form-field>
+              <app-form-field
+                label="Ölçü Birimi"
+                type="select"
+                [control]="$any(partForm.get('unit'))"
+                [required]="true"
+                >
+                <option value="PCS">Adet (PCS)</option>
+                <option value="METERS">Metre (Meters)</option>
+                <option value="KG">Kilogram (KG)</option>
+                <option value="LITERS">Litre (Liters)</option>
+              </app-form-field>
+              <app-form-field
+                label="Fiziksel Stok Miktarı"
+                type="number"
+                [control]="$any(partForm.get('stockQuantity'))"
+                [min]="NUMERIC_LIMITS.stockQuantity.min"
+                [max]="NUMERIC_LIMITS.stockQuantity.max"
+                [maxLength]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Minimum Kritik Stok Eşiği"
+                type="number"
+                [control]="$any(partForm.get('minStockThreshold'))"
+                [min]="NUMERIC_LIMITS.minimumStockLevel.min"
+                [max]="NUMERIC_LIMITS.minimumStockLevel.max"
+                [maxLength]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Birim Maliyet (TL)"
+                type="number"
+                [control]="$any(partForm.get('unitPrice'))"
+                [min]="NUMERIC_LIMITS.unitCost.min"
+                [max]="NUMERIC_LIMITS.unitCost.max"
+                [maxLength]="9"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+            </div>
+            <div class="form-group check-group">
+              <label class="switch-label">
+                <input type="checkbox" formControlName="isActive" />
+                <span class="switch-text">Aktif Kullanımda</span>
+              </label>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">
+                {{ errorMessage }}
+              </div>
+            }
+            <div class="form-actions">
+              <button type="button" routerLink="/stok" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="partForm.invalid || loading" class="save-btn">
+                {{ loading ? 'Kaydediliyor...' : 'Parçayı Güncelle' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    
+      @if (!part && !errorMessage) {
+        <div class="error-alert">
+          Yedek parça yükleniyor veya bulunamadı...
+        </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./spare-part-edit.component.scss']
 })
 export class SparePartEditPage implements OnInit, ComponentCanDeactivate {

@@ -20,7 +20,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
           <h2>Şube Stok Dağılım ve Değer Analizi</h2>
         </div>
       </div>
-
+    
       <!-- Branch Selector & Stats -->
       <div class="card-content filters-card">
         <form [formGroup]="filterForm" class="filter-form">
@@ -28,41 +28,45 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
             <label for="branchSelect">Analiz Edilecek Şube</label>
             <select id="branchSelect" formControlName="branchId" (change)="onBranchChange()">
               <option value="ALL">Tüm Şubeler</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+              @for (b of branches; track b) {
+                <option [value]="b.id">{{ b.name }}</option>
+              }
             </select>
           </div>
         </form>
-
-        <div class="stats-overview" *ngIf="selectedStats">
-          <div class="stat-card">
-            <span class="lbl">Toplam Çeşit</span>
-            <span class="val">{{ selectedStats.totalUniqueParts }}</span>
+    
+        @if (selectedStats) {
+          <div class="stats-overview">
+            <div class="stat-card">
+              <span class="lbl">Toplam Çeşit</span>
+              <span class="val">{{ selectedStats.totalUniqueParts }}</span>
+            </div>
+            <div class="stat-card">
+              <span class="lbl">Fiziksel Stok Adedi</span>
+              <span class="val">{{ selectedStats.totalQuantity }}</span>
+            </div>
+            <div class="stat-card">
+              <span class="lbl">Toplam Rezerve Stok</span>
+              <span class="val">{{ selectedStats.totalReserved }}</span>
+            </div>
+            <div class="stat-card valuation-card">
+              <span class="lbl">Toplam Envanter Değeri</span>
+              <span class="val">{{ selectedStats.totalValuation | currency:'TRY':'symbol-narrow' }}</span>
+            </div>
           </div>
-          <div class="stat-card">
-            <span class="lbl">Fiziksel Stok Adedi</span>
-            <span class="val">{{ selectedStats.totalQuantity }}</span>
-          </div>
-          <div class="stat-card">
-            <span class="lbl">Toplam Rezerve Stok</span>
-            <span class="val">{{ selectedStats.totalReserved }}</span>
-          </div>
-          <div class="stat-card valuation-card">
-            <span class="lbl">Toplam Envanter Değeri</span>
-            <span class="val">{{ selectedStats.totalValuation | currency:'TRY':'symbol-narrow' }}</span>
-          </div>
-        </div>
+        }
       </div>
-
+    
       <!-- Parts list in selected branch -->
       <div class="table-container">
         <h3>Şube Stok Detay Listesi</h3>
-        <app-data-table 
-          [data]="filteredParts" 
+        <app-data-table
+          [data]="filteredParts"
           [columns]="columns"
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./branch-stock.component.scss']
 })
 export class BranchStockPage implements OnInit {

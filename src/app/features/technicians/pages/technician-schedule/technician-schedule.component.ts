@@ -22,98 +22,105 @@ import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pi
           <h2>Teknisyen Programı ve Takvimi</h2>
         </div>
       </div>
-
-      <div class="tech-profile-card" *ngIf="technician">
-        <div class="avatar-area">
-          <span class="avatar-placeholder">{{ technician.fullName.charAt(0) }}</span>
-        </div>
-        <div class="profile-info">
-          <h3>{{ technician.fullName }}</h3>
-          <p>{{ technician.level | techLevelLabel }} | Bölge: {{ technician.region }}</p>
-        </div>
-      </div>
-
-      <div class="schedule-container" *ngIf="technician">
-        <div class="schedule-header">
-          <h3>Atanmış İş Emirleri (Zaman Sıralı)</h3>
-
-          <div class="filters">
-            <select [value]="statusFilter()" (change)="setStatus($any($event.target).value)" class="filter-select">
-              <option value="">Tüm Durumlar</option>
-              <option value="OPENED">Açıldı</option>
-              <option value="PLANNED">Planlandı</option>
-              <option value="ON_THE_WAY">Yolda</option>
-              <option value="ON_SITE">Sahada</option>
-              <option value="COMPLETED">Tamamlandı</option>
-              <option value="PARTIALLY_COMPLETED">Kısmi Tamamlandı</option>
-              <option value="FAILED">Başarısız</option>
-              <option value="CANCELLED">İptal Edildi</option>
-            </select>
-
-            <app-smart-date-input
-              [value]="dateFromFilter()"
-              (valueChange)="setDateFrom($event || '')"
-              title="Başlangıç tarihi"
-            ></app-smart-date-input>
-            <app-smart-date-input
-              [value]="dateToFilter()"
-              (valueChange)="setDateTo($event || '')"
-              title="Bitiş tarihi"
-            ></app-smart-date-input>
-
+    
+      @if (technician) {
+        <div class="tech-profile-card">
+          <div class="avatar-area">
+            <span class="avatar-placeholder">{{ technician.fullName.charAt(0) }}</span>
+          </div>
+          <div class="profile-info">
+            <h3>{{ technician.fullName }}</h3>
+            <p>{{ technician.level | techLevelLabel }} | Bölge: {{ technician.region }}</p>
           </div>
         </div>
-
-        <div class="timeline" *ngIf="paginated().length > 0; else emptyState">
-          <div class="timeline-item" *ngFor="let order of paginated(); trackBy: trackById">
-            <div class="timeline-time">
-              <span class="date">{{ order.plannedStart | date:'dd.MM.yyyy' }}</span>
-              <span class="hours">{{ order.plannedStart | date:'HH:mm' }} - {{ order.plannedEnd | date:'HH:mm' }}</span>
+      }
+    
+      @if (technician) {
+        <div class="schedule-container">
+          <div class="schedule-header">
+            <h3>Atanmış İş Emirleri (Zaman Sıralı)</h3>
+            <div class="filters">
+              <select [value]="statusFilter()" (change)="setStatus($any($event.target).value)" class="filter-select">
+                <option value="">Tüm Durumlar</option>
+                <option value="OPENED">Açıldı</option>
+                <option value="PLANNED">Planlandı</option>
+                <option value="ON_THE_WAY">Yolda</option>
+                <option value="ON_SITE">Sahada</option>
+                <option value="COMPLETED">Tamamlandı</option>
+                <option value="PARTIALLY_COMPLETED">Kısmi Tamamlandı</option>
+                <option value="FAILED">Başarısız</option>
+                <option value="CANCELLED">İptal Edildi</option>
+              </select>
+              <app-smart-date-input
+                [value]="dateFromFilter()"
+                (valueChange)="setDateFrom($event || '')"
+                title="Başlangıç tarihi"
+              ></app-smart-date-input>
+              <app-smart-date-input
+                [value]="dateToFilter()"
+                (valueChange)="setDateTo($event || '')"
+                title="Bitiş tarihi"
+              ></app-smart-date-input>
             </div>
-
-            <div class="timeline-badge" [class.badge-completed]="order.status === 'COMPLETED'" [class.badge-failed]="order.status === 'FAILED'">
-              ●
+          </div>
+          @if (paginated().length > 0) {
+            <div class="timeline">
+              @for (order of paginated(); track trackById($index, order)) {
+                <div class="timeline-item">
+                  <div class="timeline-time">
+                    <span class="date">{{ order.plannedStart | date:'dd.MM.yyyy' }}</span>
+                    <span class="hours">{{ order.plannedStart | date:'HH:mm' }} - {{ order.plannedEnd | date:'HH:mm' }}</span>
+                  </div>
+                  <div class="timeline-badge" [class.badge-completed]="order.status === 'COMPLETED'" [class.badge-failed]="order.status === 'FAILED'">
+                    ●
+                  </div>
+                  <div class="timeline-content">
+                    <div class="order-header">
+                      <span class="order-code">{{ order.code }}</span>
+                      <app-status-badge [status]="order.status"></app-status-badge>
+                    </div>
+                    @if (order.notes) {
+                      <p class="order-notes">{{ order.notes }}</p>
+                    }
+                    <div class="order-meta">
+                      <span>Tahmini Maliyet: {{ order.estimatedCost | currency:'TRY':'symbol-narrow' }}</span>
+                      @if (order.actualCost > 0) {
+                        <span>Gerçekleşen: {{ order.actualCost | currency:'TRY':'symbol-narrow' }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
-
-            <div class="timeline-content">
-              <div class="order-header">
-                <span class="order-code">{{ order.code }}</span>
-                <app-status-badge [status]="order.status"></app-status-badge>
+          } @else {
+            <div class="empty-schedule">
+              <div class="icon"></div>
+              <p>Bu kriterlere uyan iş emri bulunmuyor.</p>
+            </div>
+          }
+          @if (filtered().length > 0) {
+            <div class="pagination-bar">
+              <span class="pagination-info">
+                Toplam <strong>{{ filtered().length }}</strong> kayıttan
+                {{ filtered().length === 0 ? 0 : (startIndex() + 1) }}–{{ endIndex() }} arası gösteriliyor
+              </span>
+              <div class="pagination-buttons">
+                <button [disabled]="page() === 1" (click)="setPage(page() - 1)">Önceki</button>
+                <span class="page-number">Sayfa {{ page() }} / {{ totalPages() || 1 }}</span>
+                <button [disabled]="page() >= totalPages()" (click)="setPage(page() + 1)">Sonraki</button>
               </div>
-              <p class="order-notes" *ngIf="order.notes">{{ order.notes }}</p>
-              <div class="order-meta">
-                <span>Tahmini Maliyet: {{ order.estimatedCost | currency:'TRY':'symbol-narrow' }}</span>
-                <span *ngIf="order.actualCost > 0">Gerçekleşen: {{ order.actualCost | currency:'TRY':'symbol-narrow' }}</span>
-              </div>
             </div>
-          </div>
+          }
         </div>
-
-        <div class="pagination-bar" *ngIf="filtered().length > 0">
-          <span class="pagination-info">
-            Toplam <strong>{{ filtered().length }}</strong> kayıttan
-            {{ filtered().length === 0 ? 0 : (startIndex() + 1) }}–{{ endIndex() }} arası gösteriliyor
-          </span>
-          <div class="pagination-buttons">
-            <button [disabled]="page() === 1" (click)="setPage(page() - 1)">Önceki</button>
-            <span class="page-number">Sayfa {{ page() }} / {{ totalPages() || 1 }}</span>
-            <button [disabled]="page() >= totalPages()" (click)="setPage(page() + 1)">Sonraki</button>
-          </div>
+      }
+    
+      @if (errorMessage) {
+        <div class="error-alert">
+          {{ errorMessage }}
         </div>
-
-        <ng-template #emptyState>
-          <div class="empty-schedule">
-            <div class="icon"></div>
-            <p>Bu kriterlere uyan iş emri bulunmuyor.</p>
-          </div>
-        </ng-template>
-      </div>
-
-      <div class="error-alert" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./technician-schedule.component.scss']
 })
 export class TechnicianSchedulePage implements OnInit {

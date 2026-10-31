@@ -24,15 +24,19 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_
         <h2>İş Emirleri Yönetimi</h2>
         <p class="subtitle">Sistemdeki tüm iş emirlerini izleyin ve durum geçişlerini state-machine kurallarına uygun olarak yönetin.</p>
       </div>
-
+    
       <!-- Hata/Başarı Mesajları -->
-      <div class="alert alert-danger" *ngIf="errorMessage">
-        <strong>Hata:</strong> {{ errorMessage }}
-      </div>
-      <div class="alert alert-success" *ngIf="successMessage">
-        <strong>Başarılı:</strong> {{ successMessage }}
-      </div>
-
+      @if (errorMessage) {
+        <div class="alert alert-danger">
+          <strong>Hata:</strong> {{ errorMessage }}
+        </div>
+      }
+      @if (successMessage) {
+        <div class="alert alert-success">
+          <strong>Başarılı:</strong> {{ successMessage }}
+        </div>
+      }
+    
       <!-- Filtreler ve Tablo -->
       <div class="card">
         <div class="table-actions">
@@ -50,21 +54,23 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_
               <option value="CANCELLED">İptal Edildi</option>
             </select>
           </div>
-
+    
           <div class="filter-group">
             <label>Şube Filtresi</label>
             <select [value]="branchFilter" (change)="branchFilter = $any($event.target).value; applyFilters()" class="form-control">
               <option value="">Tümü</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+              @for (b of branches; track b) {
+                <option [value]="b.id">{{ b.name }}</option>
+              }
             </select>
           </div>
-
+    
           <div class="filter-group">
             <label>Global Arama</label>
             <input type="text" [value]="searchQuery" (input)="searchQuery = $any($event.target).value; applyFilters()"
-                   placeholder="Kod, şube, teknisyen, araç, durum..." maxlength="40" class="form-control" />
+              placeholder="Kod, şube, teknisyen, araç, durum..." maxlength="40" class="form-control" />
           </div>
-
+    
           <div class="filter-group">
             <label>Planlanan Tarih Aralığı</label>
             <div class="date-range-row">
@@ -74,230 +80,303 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_
             </div>
           </div>
         </div>
-
+    
         <div class="table-container">
           <table class="data-table">
             <thead>
               <tr>
-                <th class="sortable" (click)="sort('code')">Kod <span class="sort-icon" *ngIf="sortKey==='code'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('branch')">Şube <span class="sort-icon" *ngIf="sortKey==='branch'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('technician')">Teknisyen <span class="sort-icon" *ngIf="sortKey==='technician'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('vehicle')">Araç <span class="sort-icon" *ngIf="sortKey==='vehicle'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('plannedStart')">Zaman Dilimi <span class="sort-icon" *ngIf="sortKey==='plannedStart'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('status')">Durum <span class="sort-icon" *ngIf="sortKey==='status'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('code')">Kod @if (sortKey==='code') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('branch')">Şube @if (sortKey==='branch') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('technician')">Teknisyen @if (sortKey==='technician') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('vehicle')">Araç @if (sortKey==='vehicle') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('plannedStart')">Zaman Dilimi @if (sortKey==='plannedStart') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('status')">Durum @if (sortKey==='status') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
                 <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let wo of paginatedWorkOrders; trackBy: trackByWo">
-                <td class="font-bold">{{ wo.code }}</td>
-                <td>{{ getBranchName(wo.branchId) }}</td>
-                <td>{{ getTechnicianName(wo.technicianId) }}</td>
-                <td>{{ getVehiclePlate(wo.vehicleId) }}</td>
-                <td>
-                  <div *ngIf="wo.plannedStart">
-                    {{ wo.plannedStart | date:'dd.MM HH:mm' }} - {{ wo.plannedEnd | date:'HH:mm' }}
-                  </div>
-                  <div *ngIf="!wo.plannedStart" class="text-muted">Planlanmadı</div>
-                </td>
-                <td>
-                  <app-status-badge [status]="wo.status"></app-status-badge>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <!-- OPENED actions -->
-                    <ng-container *ngIf="wo.status === 'OPENED'">
-                      <!-- Kural 2: 50.000 TL üzeri işler önce şube sorumlusu onayı ister -->
-                      <button *ngIf="needsApproval(wo) && canApprove()"
-                              (click)="onApprove(wo)"
-                              class="btn btn-success btn-sm">Onayla</button>
-                      <span *ngIf="needsApproval(wo) && !canApprove()" class="badge badge-warning-soft">Onay Bekliyor</span>
-                      <span *ngIf="wo.estimatedCost > 50000 && wo.managerApproved" class="badge badge-success-soft">Onaylandı</span>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_PLAN')" routerLink="/planlama" class="btn btn-primary btn-sm">Planla</button>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_CANCEL')" (click)="openCancelModal(wo)" class="btn btn-danger btn-sm">İptal Et</button>
-                    </ng-container>
-
-                    <!-- PLANNED actions -->
-                    <ng-container *ngIf="wo.status === 'PLANNED'">
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')" (click)="onRouteStart(wo.id)" class="btn btn-info btn-sm">Yola Çık</button>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_CANCEL')" (click)="openCancelModal(wo)" class="btn btn-danger btn-sm">İptal Et</button>
-                    </ng-container>
-
-                    <!-- ON_THE_WAY actions -->
-                    <ng-container *ngIf="wo.status === 'ON_THE_WAY'">
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')" (click)="onSiteArrive(wo.id)" class="btn btn-success btn-sm">Sahaya Ulaştı</button>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')" (click)="openFailModal(wo)" class="btn btn-warning btn-sm">Başarısız Yap</button>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_CANCEL')" (click)="openCancelModal(wo)" class="btn btn-danger btn-sm">İptal Et</button>
-                    </ng-container>
-
-                    <!-- ON_SITE actions -->
-                    <ng-container *ngIf="wo.status === 'ON_SITE'">
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_COMPLETE')" (click)="openCompleteModal(wo, 'COMPLETED')" class="btn btn-success btn-sm">Tamamla</button>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_COMPLETE')" (click)="openCompleteModal(wo, 'PARTIALLY_COMPLETED')" class="btn btn-warning btn-sm">Kısmi Tamamla</button>
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')" (click)="openFailModal(wo)" class="btn btn-danger btn-sm">Başarısız Yap</button>
-                    </ng-container>
-
-                    <ng-container *ngIf="isFinalStatus(wo.status) && canReopen(wo)">
-                      <button *ngIf="permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')" (click)="openReopenModal(wo)" class="btn btn-warning btn-sm" title="Yanlışlık varsa son 24 saat içinde geri alabilirsiniz"> Geri Al</button>
-                    </ng-container>
-                    <span *ngIf="isFinalStatus(wo.status) && !canReopen(wo)" class="text-muted final-state-label" [class.failed]="wo.status === 'FAILED'" [class.cancelled]="wo.status === 'CANCELLED'">
-                      {{ finalStateLabel(wo.status) }}
-                    </span>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="filteredWorkOrders.length === 0">
-                <td colspan="7" class="text-center text-muted">İş emri bulunamadı.</td>
-              </tr>
+              @for (wo of paginatedWorkOrders; track trackByWo($index, wo)) {
+                <tr>
+                  <td class="font-bold">{{ wo.code }}</td>
+                  <td>{{ getBranchName(wo.branchId) }}</td>
+                  <td>{{ getTechnicianName(wo.technicianId) }}</td>
+                  <td>{{ getVehiclePlate(wo.vehicleId) }}</td>
+                  <td>
+                    @if (wo.plannedStart) {
+                      <div>
+                        {{ wo.plannedStart | date:'dd.MM HH:mm' }} - {{ wo.plannedEnd | date:'HH:mm' }}
+                      </div>
+                    }
+                    @if (!wo.plannedStart) {
+                      <div class="text-muted">Planlanmadı</div>
+                    }
+                  </td>
+                  <td>
+                    <app-status-badge [status]="wo.status"></app-status-badge>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <!-- OPENED actions -->
+                      @if (wo.status === 'OPENED') {
+                        <!-- Kural 2: 50.000 TL üzeri işler önce şube sorumlusu onayı ister -->
+                        @if (needsApproval(wo) && canApprove()) {
+                          <button
+                            (click)="onApprove(wo)"
+                          class="btn btn-success btn-sm">Onayla</button>
+                        }
+                        @if (needsApproval(wo) && !canApprove()) {
+                          <span class="badge badge-warning-soft">Onay Bekliyor</span>
+                        }
+                        @if (wo.estimatedCost > 50000 && wo.managerApproved) {
+                          <span class="badge badge-success-soft">Onaylandı</span>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_PLAN')) {
+                          <button routerLink="/planlama" class="btn btn-primary btn-sm">Planla</button>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_CANCEL')) {
+                          <button (click)="openCancelModal(wo)" class="btn btn-danger btn-sm">İptal Et</button>
+                        }
+                      }
+                      <!-- PLANNED actions -->
+                      @if (wo.status === 'PLANNED') {
+                        @if (permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')) {
+                          <button (click)="onRouteStart(wo.id)" class="btn btn-info btn-sm">Yola Çık</button>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_CANCEL')) {
+                          <button (click)="openCancelModal(wo)" class="btn btn-danger btn-sm">İptal Et</button>
+                        }
+                      }
+                      <!-- ON_THE_WAY actions -->
+                      @if (wo.status === 'ON_THE_WAY') {
+                        @if (permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')) {
+                          <button (click)="onSiteArrive(wo.id)" class="btn btn-success btn-sm">Sahaya Ulaştı</button>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')) {
+                          <button (click)="openFailModal(wo)" class="btn btn-warning btn-sm">Başarısız Yap</button>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_CANCEL')) {
+                          <button (click)="openCancelModal(wo)" class="btn btn-danger btn-sm">İptal Et</button>
+                        }
+                      }
+                      <!-- ON_SITE actions -->
+                      @if (wo.status === 'ON_SITE') {
+                        @if (permissionService.hasPermission('WORK_ORDER_COMPLETE')) {
+                          <button (click)="openCompleteModal(wo, 'COMPLETED')" class="btn btn-success btn-sm">Tamamla</button>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_COMPLETE')) {
+                          <button (click)="openCompleteModal(wo, 'PARTIALLY_COMPLETED')" class="btn btn-warning btn-sm">Kısmi Tamamla</button>
+                        }
+                        @if (permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')) {
+                          <button (click)="openFailModal(wo)" class="btn btn-danger btn-sm">Başarısız Yap</button>
+                        }
+                      }
+                      @if (isFinalStatus(wo.status) && canReopen(wo)) {
+                        @if (permissionService.hasPermission('WORK_ORDER_UPDATE_STATUS')) {
+                          <button (click)="openReopenModal(wo)" class="btn btn-warning btn-sm" title="Yanlışlık varsa son 24 saat içinde geri alabilirsiniz"> Geri Al</button>
+                        }
+                      }
+                      @if (isFinalStatus(wo.status) && !canReopen(wo)) {
+                        <span class="text-muted final-state-label" [class.failed]="wo.status === 'FAILED'" [class.cancelled]="wo.status === 'CANCELLED'">
+                          {{ finalStateLabel(wo.status) }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+              @if (filteredWorkOrders.length === 0) {
+                <tr>
+                  <td colspan="7" class="text-center text-muted">İş emri bulunamadı.</td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-
+    
         <!-- Pagination -->
-        <div class="pagination-bar" *ngIf="filteredWorkOrders.length > 0">
-          <span class="pagination-info">
-            Toplam <strong>{{ filteredWorkOrders.length }}</strong> kayıttan
-            {{ startIndex + 1 }}–{{ endIndex }} arası gösteriliyor
-          </span>
-          <div class="pagination-controls">
-            <label class="page-size">
-              Sayfa boyutu:
-              <select (change)="changePageSize(+$any($event.target).value)">
-                <option *ngFor="let s of pageSizeOptions" [value]="s" [selected]="s === pageSize">{{ s }}</option>
-              </select>
-            </label>
-            <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">Önceki</button>
-            <span class="page-num">{{ currentPage }} / {{ totalPages || 1 }}</span>
-            <button [disabled]="currentPage >= totalPages" (click)="setPage(currentPage + 1)">Sonraki</button>
+        @if (filteredWorkOrders.length > 0) {
+          <div class="pagination-bar">
+            <span class="pagination-info">
+              Toplam <strong>{{ filteredWorkOrders.length }}</strong> kayıttan
+              {{ startIndex + 1 }}–{{ endIndex }} arası gösteriliyor
+            </span>
+            <div class="pagination-controls">
+              <label class="page-size">
+                Sayfa boyutu:
+                <select (change)="changePageSize(+$any($event.target).value)">
+                  @for (s of pageSizeOptions; track s) {
+                    <option [value]="s" [selected]="s === pageSize">{{ s }}</option>
+                  }
+                </select>
+              </label>
+              <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">Önceki</button>
+              <span class="page-num">{{ currentPage }} / {{ totalPages || 1 }}</span>
+              <button [disabled]="currentPage >= totalPages" (click)="setPage(currentPage + 1)">Sonraki</button>
+            </div>
           </div>
-        </div>
+        }
         <div style="display:none">
         </div>
       </div>
-
+    
       <!-- MODALLAR -->
-      
+    
       <!-- İptal Modalı -->
-      <div class="modal-backdrop" *ngIf="activeModal === 'cancel'">
-        <div class="modal-box">
-          <h3>İş Emrini İptal Et</h3>
-          <p><strong>{{ selectedWo?.code }}</strong> nolu iş emrini iptal etmek istediğinize emin misiniz?</p>
-          <div class="form-group">
-            <div class="label-wrapper">
-              <label>İptal Nedeni</label>
-              <span class="char-counter">{{ cancelReason.length }} / 200</span>
+      @if (activeModal === 'cancel') {
+        <div class="modal-backdrop">
+          <div class="modal-box">
+            <h3>İş Emrini İptal Et</h3>
+            <p><strong>{{ selectedWo?.code }}</strong> nolu iş emrini iptal etmek istediğinize emin misiniz?</p>
+            <div class="form-group">
+              <div class="label-wrapper">
+                <label>İptal Nedeni</label>
+                <span class="char-counter">{{ cancelReason.length }} / 200</span>
+              </div>
+              <input type="text" [value]="cancelReason" (input)="cancelReason = $any($event.target).value" maxLength="200" placeholder="İptal edilme sebebi giriniz" class="form-control" />
             </div>
-            <input type="text" [value]="cancelReason" (input)="cancelReason = $any($event.target).value" maxLength="200" placeholder="İptal edilme sebebi giriniz" class="form-control" />
-          </div>
-          <div class="modal-actions">
-            <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
-            <button [disabled]="!cancelReason || !cancelReason.trim()" (click)="submitCancel()" class="btn btn-danger">İptal Et</button>
+            <div class="modal-actions">
+              <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
+              <button [disabled]="!cancelReason || !cancelReason.trim()" (click)="submitCancel()" class="btn btn-danger">İptal Et</button>
+            </div>
           </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Başarısız Modalı -->
-      <div class="modal-backdrop" *ngIf="activeModal === 'fail'">
-        <div class="modal-box">
-          <h3>İş Emrini Başarısız İşaretle</h3>
-          <p><strong>{{ selectedWo?.code }}</strong> nolu iş emrini başarısız olarak kapatıyorsunuz.</p>
-          <div class="form-group">
-            <label>Başarısızlık Nedeni</label>
-            <select [value]="failReasonCode" (change)="failReasonCode = $any($event.target).value" class="form-control">
-              <option value="">-- Neden seçiniz --</option>
-              <option *ngFor="let opt of FAILURE_REASON_OPTIONS" [value]="opt.code">{{ opt.label }}</option>
-            </select>
-          </div>
-          <div class="form-group" *ngIf="failReasonCode === 'OTHER'">
-            <div class="label-wrapper">
-              <label>Açıklama</label>
-              <span class="char-counter">{{ failReason.length }} / 200</span>
+      @if (activeModal === 'fail') {
+        <div class="modal-backdrop">
+          <div class="modal-box">
+            <h3>İş Emrini Başarısız İşaretle</h3>
+            <p><strong>{{ selectedWo?.code }}</strong> nolu iş emrini başarısız olarak kapatıyorsunuz.</p>
+            <div class="form-group">
+              <label>Başarısızlık Nedeni</label>
+              <select [value]="failReasonCode" (change)="failReasonCode = $any($event.target).value" class="form-control">
+                <option value="">-- Neden seçiniz --</option>
+                @for (opt of FAILURE_REASON_OPTIONS; track opt) {
+                  <option [value]="opt.code">{{ opt.label }}</option>
+                }
+              </select>
             </div>
-            <input type="text" [value]="failReason" (input)="failReason = $any($event.target).value" maxLength="200" placeholder="Başarısızlık sebebini açıklayın" class="form-control" />
-          </div>
-          <div class="modal-actions">
-            <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
-            <button [disabled]="!isFailReasonValid()" (click)="submitFail()" class="btn btn-danger">Kaydet</button>
+            @if (failReasonCode === 'OTHER') {
+              <div class="form-group">
+                <div class="label-wrapper">
+                  <label>Açıklama</label>
+                  <span class="char-counter">{{ failReason.length }} / 200</span>
+                </div>
+                <input type="text" [value]="failReason" (input)="failReason = $any($event.target).value" maxLength="200" placeholder="Başarısızlık sebebini açıklayın" class="form-control" />
+              </div>
+            }
+            <div class="modal-actions">
+              <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
+              <button [disabled]="!isFailReasonValid()" (click)="submitFail()" class="btn btn-danger">Kaydet</button>
+            </div>
           </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Geri Al Modalı -->
-      <div class="modal-backdrop" *ngIf="activeModal === 'reopen'">
-        <div class="modal-box">
-          <h3>İş Emrini Geri Al</h3>
-          <div class="reopen-warning">
-            <p><strong>Dikkat:</strong> Bu iş emrini geri almak istediğinize emin misiniz?</p>
-            <ul>
-              <li *ngIf="selectedWo?.status === 'CANCELLED'">
-                <strong>{{ selectedWo?.code }}</strong> nolu iş emri tekrar <strong>Açıldı</strong> durumuna alınacak ve yeniden planlanması gerekecek.
-              </li>
-              <li *ngIf="selectedWo?.status !== 'CANCELLED'">
-                <strong>{{ selectedWo?.code }}</strong> nolu iş emri tekrar <strong>Planlandı</strong> durumuna alınacak.
-              </li>
-              <li *ngIf="selectedWo?.status === 'COMPLETED' || selectedWo?.status === 'PARTIALLY_COMPLETED'">
-                Kullanılan parçalar <strong>stoğa iade</strong> edilecek.
-              </li>
-              <li *ngIf="selectedWo?.status === 'CANCELLED'">
-                İptal sırasında stoktan zaten serbest bırakılmış parçalar etkilenmeyecek (rezervasyon yeniden yapmalısınız).
-              </li>
-              <li>Bu işlem audit log'a yazılacak ve şube sorumlusu bilgilendirilecek.</li>
-              <li><strong>Sadece son 24 saat içinde</strong> kapatılmış iş emirleri için geçerlidir.</li>
-            </ul>
-          </div>
-          <div class="form-group">
-            <div class="label-wrapper">
-              <label>Geri Alma Nedeni</label>
-              <span class="char-counter">{{ reopenReason.length }} / 200</span>
+      @if (activeModal === 'reopen') {
+        <div class="modal-backdrop">
+          <div class="modal-box">
+            <h3>İş Emrini Geri Al</h3>
+            <div class="reopen-warning">
+              <p><strong>Dikkat:</strong> Bu iş emrini geri almak istediğinize emin misiniz?</p>
+              <ul>
+                @if (selectedWo?.status === 'CANCELLED') {
+                  <li>
+                    <strong>{{ selectedWo?.code }}</strong> nolu iş emri tekrar <strong>Açıldı</strong> durumuna alınacak ve yeniden planlanması gerekecek.
+                  </li>
+                }
+                @if (selectedWo?.status !== 'CANCELLED') {
+                  <li>
+                    <strong>{{ selectedWo?.code }}</strong> nolu iş emri tekrar <strong>Planlandı</strong> durumuna alınacak.
+                  </li>
+                }
+                @if (selectedWo?.status === 'COMPLETED' || selectedWo?.status === 'PARTIALLY_COMPLETED') {
+                  <li>
+                    Kullanılan parçalar <strong>stoğa iade</strong> edilecek.
+                  </li>
+                }
+                @if (selectedWo?.status === 'CANCELLED') {
+                  <li>
+                    İptal sırasında stoktan zaten serbest bırakılmış parçalar etkilenmeyecek (rezervasyon yeniden yapmalısınız).
+                  </li>
+                }
+                <li>Bu işlem audit log'a yazılacak ve şube sorumlusu bilgilendirilecek.</li>
+                <li><strong>Sadece son 24 saat içinde</strong> kapatılmış iş emirleri için geçerlidir.</li>
+              </ul>
             </div>
-            <input type="text" [value]="reopenReason" (input)="reopenReason = $any($event.target).value" maxLength="200" placeholder="Örn: Yanlış müşteriye atanmış" class="form-control" />
-          </div>
-          <div class="modal-actions">
-            <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
-            <button [disabled]="!reopenReason || !reopenReason.trim()" (click)="submitReopen()" class="btn btn-warning">Evet, Geri Al</button>
+            <div class="form-group">
+              <div class="label-wrapper">
+                <label>Geri Alma Nedeni</label>
+                <span class="char-counter">{{ reopenReason.length }} / 200</span>
+              </div>
+              <input type="text" [value]="reopenReason" (input)="reopenReason = $any($event.target).value" maxLength="200" placeholder="Örn: Yanlış müşteriye atanmış" class="form-control" />
+            </div>
+            <div class="modal-actions">
+              <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
+              <button [disabled]="!reopenReason || !reopenReason.trim()" (click)="submitReopen()" class="btn btn-warning">Evet, Geri Al</button>
+            </div>
           </div>
         </div>
-      </div>
-
+      }
+    
       <!-- Kapatma/Tamamlama Modalı (Yedek Parça Seçimiyle) -->
-      <div class="modal-backdrop" *ngIf="activeModal === 'complete' || activeModal === 'partially_complete'">
-        <div class="modal-box complete-modal">
-          <h3>{{ activeModal === 'complete' ? 'İş Emrini Tamamla' : 'Kısmi Tamamlama' }}</h3>
-          <p><strong>{{ selectedWo?.code }}</strong> için kullanılan yedek parçaları belirtin.</p>
-          
-          <div class="parts-allocation-section">
-            <h5>Rezerve Edilen Parçalar</h5>
-            <div *ngFor="let item of selectedWoReservedParts" class="part-allocation-row">
-              <div class="part-info">
-                <strong>{{ getPartName(item.partId) }}</strong><br/>
-                <span class="sub-label">Rezerve Edilen: {{ item.quantity }}</span>
-              </div>
-              <div class="part-input">
-                <label>Kullanılan Miktar</label>
-                <input type="number" [value]="usedPartsQuantities[item.partId]" (input)="usedPartsQuantities[item.partId] = $any($event.target).valueAsNumber || 0" min="0" [max]="item.quantity" class="form-control qty-input" />
-              </div>
+      @if (activeModal === 'complete' || activeModal === 'partially_complete') {
+        <div class="modal-backdrop">
+          <div class="modal-box complete-modal">
+            <h3>{{ activeModal === 'complete' ? 'İş Emrini Tamamla' : 'Kısmi Tamamlama' }}</h3>
+            <p><strong>{{ selectedWo?.code }}</strong> için kullanılan yedek parçaları belirtin.</p>
+            <div class="parts-allocation-section">
+              <h5>Rezerve Edilen Parçalar</h5>
+              @for (item of selectedWoReservedParts; track item) {
+                <div class="part-allocation-row">
+                  <div class="part-info">
+                    <strong>{{ getPartName(item.partId) }}</strong><br/>
+                    <span class="sub-label">Rezerve Edilen: {{ item.quantity }}</span>
+                  </div>
+                  <div class="part-input">
+                    <label>Kullanılan Miktar</label>
+                    <input type="number" [value]="usedPartsQuantities[item.partId]" (input)="usedPartsQuantities[item.partId] = $any($event.target).valueAsNumber || 0" min="0" [max]="item.quantity" class="form-control qty-input" />
+                  </div>
+                </div>
+              }
+              @if (selectedWoReservedParts.length === 0) {
+                <p class="text-muted">Bu iş emri için parça rezerve edilmemiş.</p>
+              }
             </div>
-            <p class="text-muted" *ngIf="selectedWoReservedParts.length === 0">Bu iş emri için parça rezerve edilmemiş.</p>
-          </div>
-
-          <!-- Kısmi Tamamlama için Takip Notu -->
-          <div class="form-group" *ngIf="activeModal === 'partially_complete'">
-            <div class="label-wrapper">
-              <label>Takip/Follow-up Talebi Notu</label>
-              <span class="char-counter">{{ followUpNote.length }} / 300</span>
+            <!-- Kısmi Tamamlama için Takip Notu -->
+            @if (activeModal === 'partially_complete') {
+              <div class="form-group">
+                <div class="label-wrapper">
+                  <label>Takip/Follow-up Talebi Notu</label>
+                  <span class="char-counter">{{ followUpNote.length }} / 300</span>
+                </div>
+                <textarea [value]="followUpNote" (input)="followUpNote = $any($event.target).value" maxLength="300" placeholder="Kısmi tamamlanma gerekçesini ve sonraki adım detaylarını yazın..." class="form-control"></textarea>
+              </div>
+            }
+            <div class="modal-actions">
+              <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
+              <button [disabled]="activeModal === 'partially_complete' && (!followUpNote || !followUpNote.trim())" (click)="submitComplete()" class="btn btn-success">Kaydet ve Kapat</button>
             </div>
-            <textarea [value]="followUpNote" (input)="followUpNote = $any($event.target).value" maxLength="300" placeholder="Kısmi tamamlanma gerekçesini ve sonraki adım detaylarını yazın..." class="form-control"></textarea>
-          </div>
-
-          <div class="modal-actions">
-            <button (click)="closeModal()" class="btn btn-secondary">Vazgeç</button>
-            <button [disabled]="activeModal === 'partially_complete' && (!followUpNote || !followUpNote.trim())" (click)="submitComplete()" class="btn btn-success">Kaydet ve Kapat</button>
           </div>
         </div>
-      </div>
-
+      }
+    
     </div>
-  `,
+    `,
     styleUrls: ['./work-order-list.component.scss']
 })
 export class WorkOrderListComponent implements OnInit {

@@ -25,7 +25,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
           <h2>Yeni Servis Talebi Ekle</h2>
         </div>
       </div>
-
+    
       <div class="card-content">
         <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
@@ -38,7 +38,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               inputFilter="letters"
               placeholder="Örn: Ayşe Yılmaz"
             ></app-form-field>
-
+    
             <app-form-field
               label="Müşteri Telefon"
               [control]="$any(requestForm.get('customerPhone'))"
@@ -48,7 +48,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               inputFilter="digits"
               placeholder="Örn: 05321234567"
             ></app-form-field>
-
+    
             <app-form-field
               label="Müşteri Adresi"
               [control]="$any(requestForm.get('customerAddress'))"
@@ -57,7 +57,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               [showCounter]="true"
               placeholder="Mahalle, sokak, kapı no, daire, ilçe / il"
             ></app-form-field>
-
+    
             <app-form-field
               label="Müşteri Bölgesi"
               [control]="$any(requestForm.get('customerRegion'))"
@@ -66,17 +66,19 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               [showCounter]="true"
               placeholder="Örn: Anadolu Yakası, Çankaya"
             ></app-form-field>
-
+    
             <app-form-field
               label="Hizmet Alacak Şube"
               type="select"
               [control]="$any(requestForm.get('branchId'))"
               [required]="true"
-            >
+              >
               <option value="" disabled>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+              @for (b of branches; track b) {
+                <option [value]="b.id">{{ b.name }}</option>
+              }
             </app-form-field>
-
+    
             <app-form-field
               label="Cihaz Marka / Model"
               [control]="$any(requestForm.get('deviceBrandModel'))"
@@ -85,7 +87,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               [showCounter]="true"
               placeholder="Örn: Arçelik No-Frost Kombi"
             ></app-form-field>
-
+    
             <app-form-field
               label="Hizmet Kategorisi"
               [control]="$any(requestForm.get('serviceCategory'))"
@@ -95,13 +97,13 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               inputFilter="letters"
               placeholder="Örn: Isıtma Grubu veya Beyaz Eşya"
             ></app-form-field>
-
+    
             <app-form-field
               label="Gerekli Teknisyen Yetkinliği"
               type="select"
               [control]="$any(requestForm.get('requiredSkill'))"
               [required]="true"
-            >
+              >
               <option value="WHITE_GOODS">Beyaz Eşya</option>
               <option value="HVAC">Klima / Soğutma</option>
               <option value="ELECTRIC">Elektrik Tesisatı</option>
@@ -109,19 +111,19 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               <option value="PLUMBING">Sıhhi Tesisat</option>
               <option value="BOILER_HEATING">Kombi / Isıtma</option>
             </app-form-field>
-
+    
             <app-form-field
               label="Öncelik Seviyesi"
               type="select"
               [control]="$any(requestForm.get('priority'))"
               [required]="true"
               (change)="updateSlaPreview()"
-            >
+              >
               <option value="STANDARD">Standart (48 Saat SLA)</option>
               <option value="URGENT">Acil (12 Saat SLA)</option>
               <option value="CRITICAL">Kritik (4 Saat SLA)</option>
             </app-form-field>
-
+    
             <div class="form-group sla-preview-group">
               <label>SLA Hedef Bitiş Süresi</label>
               <div class="sla-preview-box">
@@ -129,7 +131,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               </div>
             </div>
           </div>
-
+    
           <div class="form-group full-width" style="margin-top: 1rem;">
             <app-form-field
               label="Arıza / Hizmet Başlığı"
@@ -140,7 +142,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               placeholder="Örn: Cihaz elektrik almıyor veya su akıtıyor"
             ></app-form-field>
           </div>
-
+    
           <div class="form-group full-width" style="margin-top: 1rem;">
             <app-form-field
               label="Arıza Açıklaması / Detaylar"
@@ -152,7 +154,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               placeholder="Lütfen arızayı detaylı tarif edin..."
             ></app-form-field>
           </div>
-
+    
           <div class="form-row check-row" style="margin-top: 1.25rem;">
             <div class="form-group check-group">
               <label class="switch-label">
@@ -160,7 +162,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
                 <span class="switch-text">Garanti Kapsamında</span>
               </label>
             </div>
-
+    
             <div class="form-group check-group">
               <label class="switch-label">
                 <input type="checkbox" formControlName="hasCustomerApproval" />
@@ -168,11 +170,13 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
               </label>
             </div>
           </div>
-
-          <div *ngIf="errorMessage" class="error-alert" style="margin-top: 1rem;">
-            {{ errorMessage }}
-          </div>
-
+    
+          @if (errorMessage) {
+            <div class="error-alert" style="margin-top: 1rem;">
+              {{ errorMessage }}
+            </div>
+          }
+    
           <div class="form-actions">
             <button type="button" routerLink="/servis-talepleri" class="cancel-btn">Vazgeç</button>
             <button type="submit" [disabled]="requestForm.invalid || loading" class="save-btn">
@@ -182,7 +186,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
         </form>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./request-create.component.scss']
 })
 export class RequestCreatePage implements OnInit, ComponentCanDeactivate {

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { TechnicianService } from '../../../../core/services/technician.service';
@@ -17,7 +17,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, todayISO } from '../../../../core/constan
 
 @Component({
     selector: 'app-technician-edit',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -26,203 +26,205 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, todayISO } from '../../../../core/constan
           <h2>Teknisyen Düzenle</h2>
         </div>
       </div>
-
-      <div class="card-content" *ngIf="technician">
-        <form [formGroup]="techForm" (ngSubmit)="onSubmit()">
-          <div class="form-grid">
-            <app-form-field
-              label="Ad Soyad"
-              [control]="$any(techForm.get('fullName'))"
-              [maxLength]="FIELD_LIMITS.fullName"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="letters"
-              placeholder="Örn: Ahmet Yılmaz"
-            ></app-form-field>
-
-            <app-form-field
-              label="Telefon"
-              [control]="$any(techForm.get('phone'))"
-              [maxLength]="FIELD_LIMITS.phone"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="digits"
-              placeholder="Örn: 05551234567"
-            ></app-form-field>
-
-            <app-form-field
-              label="E-posta"
-              [control]="$any(techForm.get('email'))"
-              [maxLength]="FIELD_LIMITS.email"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: ahmet@operasyon.com"
-            ></app-form-field>
-
-            <app-form-field
-              label="Bağlı Şube"
-              type="select"
-              [control]="$any(techForm.get('branchId'))"
-              [required]="true"
-            >
-              <option value="" disabled>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Çalıştığı Bölge (İlçe/Semt)"
-              [control]="$any(techForm.get('region'))"
-              [maxLength]="FIELD_LIMITS.regionCode"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="letters"
-              placeholder="Örn: Çankaya veya Kadıköy"
-            ></app-form-field>
-
-            <app-form-field
-              label="Kıdem Seviyesi"
-              type="select"
-              [control]="$any(techForm.get('level'))"
-              [required]="true"
-            >
-              <option value="JUNIOR">Çırak</option>
-              <option value="MID">Kalfa</option>
-              <option value="SENIOR">Usta</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Mesai Başlangıcı"
-              type="time"
-              [control]="$any(techForm.get('workingHoursStart'))"
-              placeholder="08:30"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Mesai Bitişi"
-              type="time"
-              [control]="$any(techForm.get('workingHoursEnd'))"
-              placeholder="17:30"
-              [required]="true"
-            ></app-form-field>
-
-            <div class="error-alert" style="grid-column:1/-1" *ngIf="techForm.errors?.['workingHoursRange'] && (techForm.get('workingHoursStart')?.touched || techForm.get('workingHoursEnd')?.touched)">
-              Mesai bitişi başlangıç saatinden sonra olmalıdır.
+    
+      @if (technician) {
+        <div class="card-content">
+          <form [formGroup]="techForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+              <app-form-field
+                label="Ad Soyad"
+                [control]="$any(techForm.get('fullName'))"
+                [maxLength]="FIELD_LIMITS.fullName"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="letters"
+                placeholder="Örn: Ahmet Yılmaz"
+              ></app-form-field>
+              <app-form-field
+                label="Telefon"
+                [control]="$any(techForm.get('phone'))"
+                [maxLength]="FIELD_LIMITS.phone"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="digits"
+                placeholder="Örn: 05551234567"
+              ></app-form-field>
+              <app-form-field
+                label="E-posta"
+                [control]="$any(techForm.get('email'))"
+                [maxLength]="FIELD_LIMITS.email"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: ahmet@operasyon.com"
+              ></app-form-field>
+              <app-form-field
+                label="Bağlı Şube"
+                type="select"
+                [control]="$any(techForm.get('branchId'))"
+                [required]="true"
+                >
+                <option value="" disabled>Şube Seçin</option>
+                @for (b of branches; track b) {
+                  <option [value]="b.id">{{ b.name }}</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Çalıştığı Bölge (İlçe/Semt)"
+                [control]="$any(techForm.get('region'))"
+                [maxLength]="FIELD_LIMITS.regionCode"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="letters"
+                placeholder="Örn: Çankaya veya Kadıköy"
+              ></app-form-field>
+              <app-form-field
+                label="Kıdem Seviyesi"
+                type="select"
+                [control]="$any(techForm.get('level'))"
+                [required]="true"
+                >
+                <option value="JUNIOR">Çırak</option>
+                <option value="MID">Kalfa</option>
+                <option value="SENIOR">Usta</option>
+              </app-form-field>
+              <app-form-field
+                label="Mesai Başlangıcı"
+                type="time"
+                [control]="$any(techForm.get('workingHoursStart'))"
+                placeholder="08:30"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Mesai Bitişi"
+                type="time"
+                [control]="$any(techForm.get('workingHoursEnd'))"
+                placeholder="17:30"
+                [required]="true"
+              ></app-form-field>
+              @if (techForm.errors?.['workingHoursRange'] && (techForm.get('workingHoursStart')?.touched || techForm.get('workingHoursEnd')?.touched)) {
+                <div class="error-alert" style="grid-column:1/-1">
+                  Mesai bitişi başlangıç saatinden sonra olmalıdır.
+                </div>
+              }
+              <app-form-field
+                label="Performans Puanı (0 - 100)"
+                type="number"
+                [control]="$any(techForm.get('performanceScore'))"
+                [min]="NUMERIC_LIMITS.performanceScore.min"
+                [max]="NUMERIC_LIMITS.performanceScore.max"
+                [maxLength]="3"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Tamamladığı İş Sayısı"
+                type="number"
+                [control]="$any(techForm.get('completedJobsCount'))"
+                [min]="NUMERIC_LIMITS.completedJobCount.min"
+                [max]="NUMERIC_LIMITS.completedJobCount.max"
+                [maxLength]="10"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Günlük Maksimum İş Kapasitesi"
+                type="number"
+                [control]="$any(techForm.get('dailyCapacity'))"
+                [min]="1"
+                [max]="12"
+                [maxLength]="10"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
             </div>
-
-            <app-form-field
-              label="Performans Puanı (0 - 100)"
-              type="number"
-              [control]="$any(techForm.get('performanceScore'))"
-              [min]="NUMERIC_LIMITS.performanceScore.min"
-              [max]="NUMERIC_LIMITS.performanceScore.max"
-              [maxLength]="3"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Tamamladığı İş Sayısı"
-              type="number"
-              [control]="$any(techForm.get('completedJobsCount'))"
-              [min]="NUMERIC_LIMITS.completedJobCount.min"
-              [max]="NUMERIC_LIMITS.completedJobCount.max"
-              [maxLength]="10"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Günlük Maksimum İş Kapasitesi"
-              type="number"
-              [control]="$any(techForm.get('dailyCapacity'))"
-              [min]="1"
-              [max]="12"
-              [maxLength]="10"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-          </div>
-
-          <div class="form-group full-width">
-            <label>Yetkinlikler / Uzmanlık Alanları (En az bir adet seçiniz)</label>
-            <div class="skills-grid">
-              <div *ngFor="let s of skillOptions" class="skill-row" [class.selected]="isSkillSelected(s)">
-                <label class="skill-check">
-                  <input type="checkbox" [checked]="isSkillSelected(s)" (change)="onSkillChange(s, $any($event.target).checked)" />
-                  <span>{{ getSkillLabel(s) }}</span>
-                </label>
-                <select class="skill-level"
-                        *ngIf="isSkillSelected(s)"
+            <div class="form-group full-width">
+              <label>Yetkinlikler / Uzmanlık Alanları (En az bir adet seçiniz)</label>
+              <div class="skills-grid">
+                @for (s of skillOptions; track s) {
+                  <div class="skill-row" [class.selected]="isSkillSelected(s)">
+                    <label class="skill-check">
+                      <input type="checkbox" [checked]="isSkillSelected(s)" (change)="onSkillChange(s, $any($event.target).checked)" />
+                      <span>{{ getSkillLabel(s) }}</span>
+                    </label>
+                    @if (isSkillSelected(s)) {
+                      <select class="skill-level"
                         (change)="onSkillLevelChange(s, $any($event.target).value)">
-                  <option *ngFor="let lvl of levelOptions" [value]="lvl" [selected]="(skillLevels[s] || 'BEGINNER') === lvl">
-                    {{ levelLabel(lvl) }}
-                  </option>
-                </select>
+                        @for (lvl of levelOptions; track lvl) {
+                          <option [value]="lvl" [selected]="(skillLevels[s] || 'BEGINNER') === lvl">
+                            {{ levelLabel(lvl) }}
+                          </option>
+                        }
+                      </select>
+                    }
+                  </div>
+                }
+              </div>
+              @if (skillsError) {
+                <div class="error-text">
+                  {{ skillsError }}
+                </div>
+              }
+            </div>
+            <div class="form-row">
+              <div class="form-group check-group">
+                <label class="switch-label">
+                  <input type="checkbox" formControlName="isActive" />
+                  <span class="switch-text">Aktif Teknisyen</span>
+                </label>
+              </div>
+              <div class="form-group check-group">
+                <label class="switch-label">
+                  <input type="checkbox" formControlName="isOnLeave" />
+                  <span class="switch-text">İzinli</span>
+                </label>
               </div>
             </div>
-            <div class="error-text" *ngIf="skillsError">
-              {{ skillsError }}
+            @if (techForm.get('isOnLeave')?.value) {
+              <div class="form-grid leave-dates-row" style="margin-top: 1rem;">
+                <div class="form-group">
+                  <label>İzin Başlangıç Tarihi</label>
+                  <app-smart-date-input
+                    formControlName="leaveStart"
+                    [minDate]="todayISO()"
+                    [maxDate]="'2099-12-31'"
+                    [minYear]="2025"
+                    [maxYear]="2099"
+                  ></app-smart-date-input>
+                </div>
+                <div class="form-group">
+                  <label>İzin Bitiş Tarihi</label>
+                  <app-smart-date-input
+                    formControlName="leaveEnd"
+                    [minDate]="todayISO()"
+                    [maxDate]="'2099-12-31'"
+                    [minYear]="2025"
+                    [maxYear]="2099"
+                  ></app-smart-date-input>
+                </div>
+              </div>
+            }
+            @if (errorMessage) {
+              <div class="error-alert" style="margin-top: 1rem;">
+                {{ errorMessage }}
+              </div>
+            }
+            <div class="form-actions">
+              <button type="button" routerLink="/teknisyenler" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="techForm.invalid || loading" class="save-btn">
+                {{ loading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet' }}
+              </button>
             </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group check-group">
-              <label class="switch-label">
-                <input type="checkbox" formControlName="isActive" />
-                <span class="switch-text">Aktif Teknisyen</span>
-              </label>
-            </div>
-
-            <div class="form-group check-group">
-              <label class="switch-label">
-                <input type="checkbox" formControlName="isOnLeave" />
-                <span class="switch-text">İzinli</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="form-grid leave-dates-row" *ngIf="techForm.get('isOnLeave')?.value" style="margin-top: 1rem;">
-            <div class="form-group">
-              <label>İzin Başlangıç Tarihi</label>
-              <app-smart-date-input
-                formControlName="leaveStart"
-                [minDate]="todayISO()"
-                [maxDate]="'2099-12-31'"
-                [minYear]="2025"
-                [maxYear]="2099"
-              ></app-smart-date-input>
-            </div>
-            <div class="form-group">
-              <label>İzin Bitiş Tarihi</label>
-              <app-smart-date-input
-                formControlName="leaveEnd"
-                [minDate]="todayISO()"
-                [maxDate]="'2099-12-31'"
-                [minYear]="2025"
-                [maxYear]="2099"
-              ></app-smart-date-input>
-            </div>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert" style="margin-top: 1rem;">
-            {{ errorMessage }}
-          </div>
-
-          <div class="form-actions">
-            <button type="button" routerLink="/teknisyenler" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="techForm.invalid || loading" class="save-btn">
-              {{ loading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="error-alert" *ngIf="!technician && !errorMessage">
-        Teknisyen bulunamadı veya yükleniyor...
-      </div>
+          </form>
+        </div>
+      }
+    
+      @if (!technician && !errorMessage) {
+        <div class="error-alert">
+          Teknisyen bulunamadı veya yükleniyor...
+        </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./technician-edit.component.scss']
 })
 export class TechnicianEditPage implements OnInit, ComponentCanDeactivate {

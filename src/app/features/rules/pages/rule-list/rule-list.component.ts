@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { RuleEngineService } from '../../../../core/services/rule-engine.service';
 import { StorageService } from '../../../../core/storage/storage.service';
@@ -15,7 +15,7 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
 
 @Component({
     selector: 'app-rule-list',
-    imports: [CommonModule, RouterModule, RoleVisibilityDirective],
+    imports: [RouterModule, RoleVisibilityDirective],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -25,12 +25,12 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
             <p class="subtitle">Platform genelindeki otomatik atama engellerini, onay süreçlerini ve SLA önceliklendirmelerini yönetin.</p>
           </div>
           <button *appRoleVisibility="['SYSTEM_ADMIN', 'OPERATION_MANAGER']"
-                  routerLink="/kurallar/yeni"
-                  class="simulate-btn"
-                  style="padding:0.5rem 1rem;">+ Yeni Kural</button>
+            routerLink="/kurallar/yeni"
+            class="simulate-btn"
+          style="padding:0.5rem 1rem;">+ Yeni Kural</button>
         </div>
       </div>
-
+    
       <div class="rules-grid">
         <!-- Sol Bölüm: Kural Listesi -->
         <div class="card list-card">
@@ -43,7 +43,7 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
                 (input)="onSearchInput($any($event.target))"
                 placeholder="Kural ara..."
                 maxlength="30"
-              />
+                />
               <span class="counter">{{ searchTerm.length }} / 30</span>
             </div>
           </div>
@@ -59,57 +59,65 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let r of paginatedRules" [class.inactive-row]="!r.isActive">
-                  <td>
-                    <div class="rule-name-box">
-                      <span class="font-bold">{{ r.name }}</span>
-                      <span class="desc-text">{{ r.description }}</span>
-                    </div>
-                  </td>
-                  <td><span class="trigger-badge">{{ translateTrigger(r.trigger) }}</span></td>
-                  <td>
-                    <span class="priority-badge" [class.p1]="r.priority === 1" [class.p2]="r.priority === 2" [class.p3]="r.priority >= 3">
-                      Öncelik: {{ r.priority }}
-                    </span>
-                  </td>
-                  <td>
-                    <label class="switch">
-                      <input type="checkbox" [checked]="r.isActive" (change)="toggleRule(r)" [disabled]="!permissionService.hasPermission('RULE_MANAGE')" />
-                      <span class="slider round"></span>
-                    </label>
-                  </td>
-                  <td>
-                    <a *ngIf="permissionService.hasPermission('RULE_MANAGE')"
-                       [routerLink]="['/kurallar/duzenle', r.id]"
-                       class="trigger-badge" style="cursor:pointer;text-decoration:none;">Düzenle</a>
-                  </td>
-                </tr>
-                <tr *ngIf="filteredRules.length === 0">
-                  <td colspan="5" class="empty-state">Eşleşen kural bulunamadı.</td>
-                </tr>
+                @for (r of paginatedRules; track r) {
+                  <tr [class.inactive-row]="!r.isActive">
+                    <td>
+                      <div class="rule-name-box">
+                        <span class="font-bold">{{ r.name }}</span>
+                        <span class="desc-text">{{ r.description }}</span>
+                      </div>
+                    </td>
+                    <td><span class="trigger-badge">{{ translateTrigger(r.trigger) }}</span></td>
+                    <td>
+                      <span class="priority-badge" [class.p1]="r.priority === 1" [class.p2]="r.priority === 2" [class.p3]="r.priority >= 3">
+                        Öncelik: {{ r.priority }}
+                      </span>
+                    </td>
+                    <td>
+                      <label class="switch">
+                        <input type="checkbox" [checked]="r.isActive" (change)="toggleRule(r)" [disabled]="!permissionService.hasPermission('RULE_MANAGE')" />
+                        <span class="slider round"></span>
+                      </label>
+                    </td>
+                    <td>
+                      @if (permissionService.hasPermission('RULE_MANAGE')) {
+                        <a
+                          [routerLink]="['/kurallar/duzenle', r.id]"
+                        class="trigger-badge" style="cursor:pointer;text-decoration:none;">Düzenle</a>
+                      }
+                    </td>
+                  </tr>
+                }
+                @if (filteredRules.length === 0) {
+                  <tr>
+                    <td colspan="5" class="empty-state">Eşleşen kural bulunamadı.</td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
           <!-- Pagination (sayfa boyutu 5 sabit) -->
-          <div class="rules-pagination" *ngIf="filteredRules.length > 0">
-            <span class="page-info">
-              Toplam <strong>{{ filteredRules.length }}</strong> kayıt — {{ startIdx + 1 }}–{{ endIdx }} arası
-            </span>
-            <div class="page-controls">
-              <button [disabled]="page === 1" (click)="setPage(1)" title="İlk">«</button>
-              <button [disabled]="page === 1" (click)="setPage(page - 1)" title="Önceki">‹</button>
-              <span class="page-num">{{ page }} / {{ totalPages || 1 }}</span>
-              <button [disabled]="page >= totalPages" (click)="setPage(page + 1)" title="Sonraki">›</button>
-              <button [disabled]="page >= totalPages" (click)="setPage(totalPages)" title="Son">»</button>
+          @if (filteredRules.length > 0) {
+            <div class="rules-pagination">
+              <span class="page-info">
+                Toplam <strong>{{ filteredRules.length }}</strong> kayıt — {{ startIdx + 1 }}–{{ endIdx }} arası
+              </span>
+              <div class="page-controls">
+                <button [disabled]="page === 1" (click)="setPage(1)" title="İlk">«</button>
+                <button [disabled]="page === 1" (click)="setPage(page - 1)" title="Önceki">‹</button>
+                <span class="page-num">{{ page }} / {{ totalPages || 1 }}</span>
+                <button [disabled]="page >= totalPages" (click)="setPage(page + 1)" title="Sonraki">›</button>
+                <button [disabled]="page >= totalPages" (click)="setPage(totalPages)" title="Son">»</button>
+              </div>
             </div>
-          </div>
+          }
         </div>
-
+    
         <!-- Sağ Bölüm: Simülatör ve Test Paneli -->
         <div class="card simulator-card">
           <h3>Çakışma ve Kurallar Simülatörü</h3>
           <p class="section-desc">Aşağıdaki alanları değiştirerek kural motorunun çelişen durumları nasıl deterministik olarak (öncelik sırasına göre) çözdüğünü test edin.</p>
-
+    
           <div class="sim-form">
             <div class="form-group">
               <label>Talep Önceliği</label>
@@ -119,52 +127,60 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
                 <option value="CRITICAL">Kritik (Kural 1 ve 5'i tetikler)</option>
               </select>
             </div>
-
+    
             <div class="form-group">
               <div class="label-row">
                 <label>İş Emri Tahmini Maliyeti (TL)</label>
                 <span class="counter">{{ String(mockCost).length }} / 8</span>
               </div>
               <input type="number" [value]="mockCost"
-                     (keydown)="blockNumberKeys($event)"
-                     (input)="onNumberInput($any($event.target), 'mockCost', 8)"
-                     min="0" max="10000000" maxlength="8" class="form-control" />
-              <small class="help-text" *ngIf="mockCost > 50000">Kural 2 tetiklenecek (> 50.000 TL Şube Onayı)</small>
+                (keydown)="blockNumberKeys($event)"
+                (input)="onNumberInput($any($event.target), 'mockCost', 8)"
+                min="0" max="10000000" maxlength="8" class="form-control" />
+              @if (mockCost > 50000) {
+                <small class="help-text">Kural 2 tetiklenecek (> 50.000 TL Şube Onayı)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <div class="label-row">
                 <label>Araç Son Bakımından Beri Geçen Gün</label>
                 <span class="counter">{{ String(mockMaintenanceDays).length }} / 4</span>
               </div>
               <input type="number" [value]="mockMaintenanceDays"
-                     (keydown)="blockNumberKeys($event)"
-                     (input)="onNumberInput($any($event.target), 'mockMaintenanceDays', 4)"
-                     min="0" max="10000" maxlength="4" class="form-control" />
-              <small class="help-text" *ngIf="mockMaintenanceDays > 180">Kural 6 tetiklenecek (Bakım Gecikmesi Engeli)</small>
+                (keydown)="blockNumberKeys($event)"
+                (input)="onNumberInput($any($event.target), 'mockMaintenanceDays', 4)"
+                min="0" max="10000" maxlength="4" class="form-control" />
+              @if (mockMaintenanceDays > 180) {
+                <small class="help-text">Kural 6 tetiklenecek (Bakım Gecikmesi Engeli)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <div class="label-row">
                 <label>Araç Yakıt Seviyesi (%)</label>
                 <span class="counter">{{ String(mockFuelLevel).length }} / 3</span>
               </div>
               <input type="number" [value]="mockFuelLevel"
-                     (keydown)="blockNumberKeys($event)"
-                     (input)="onNumberInput($any($event.target), 'mockFuelLevel', 3)"
-                     min="0" max="100" maxlength="3" class="form-control" />
-              <small class="help-text" *ngIf="mockFuelLevel < 30">Kural 7 tetiklenecek (Düşük Yakıt Engeli)</small>
+                (keydown)="blockNumberKeys($event)"
+                (input)="onNumberInput($any($event.target), 'mockFuelLevel', 3)"
+                min="0" max="100" maxlength="3" class="form-control" />
+              @if (mockFuelLevel < 30) {
+                <small class="help-text">Kural 7 tetiklenecek (Düşük Yakıt Engeli)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <label>Yedek Parça Stok Durumu</label>
               <select [value]="mockStockCritical ? '1' : '0'" (change)="mockStockCritical = $any($event.target).value === '1'; runSimulation()" class="form-control">
                 <option value="0">Yeterli (stok 50 / eşik 5)</option>
                 <option value="1">Kritik (stok 2 / eşik 5)</option>
               </select>
-              <small class="help-text" *ngIf="mockStockCritical">Kural 3 tetiklenecek (Kritik Stok Uyarısı)</small>
+              @if (mockStockCritical) {
+                <small class="help-text">Kural 3 tetiklenecek (Kritik Stok Uyarısı)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <label>SLA Durumu</label>
               <select [value]="mockSlaState" (change)="mockSlaState = $any($event.target).value; runSimulation()" class="form-control">
@@ -172,10 +188,14 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
                 <option value="APPROACHING">Yaklaşıyor (2 saatten az)</option>
                 <option value="OVERDUE">Gecikmiş (süre aşıldı)</option>
               </select>
-              <small class="help-text" *ngIf="mockSlaState === 'OVERDUE'">Kural 4 tetiklenecek (SLA Gecikmesi)</small>
-              <small class="help-text" *ngIf="mockSlaState === 'APPROACHING'">Kural 5 tetiklenecek (SLA Yaklaşıyor)</small>
+              @if (mockSlaState === 'OVERDUE') {
+                <small class="help-text">Kural 4 tetiklenecek (SLA Gecikmesi)</small>
+              }
+              @if (mockSlaState === 'APPROACHING') {
+                <small class="help-text">Kural 5 tetiklenecek (SLA Yaklaşıyor)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <label>Teknisyen Durumu</label>
               <select [value]="mockTechnicianState" (change)="mockTechnicianState = $any($event.target).value; runSimulation()" class="form-control">
@@ -183,18 +203,22 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
                 <option value="ON_LEAVE">İzinli</option>
                 <option value="INACTIVE">Pasif</option>
               </select>
-              <small class="help-text" *ngIf="mockTechnicianState !== 'ACTIVE'">Kural 8 tetiklenecek (İzinli/Pasif Teknisyen Engeli)</small>
+              @if (mockTechnicianState !== 'ACTIVE') {
+                <small class="help-text">Kural 8 tetiklenecek (İzinli/Pasif Teknisyen Engeli)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <label>Şube Günlük Kapasitesi</label>
               <select [value]="mockBranchFull ? '1' : '0'" (change)="mockBranchFull = $any($event.target).value === '1'; runSimulation()" class="form-control">
                 <option value="0">Uygun (2 / 10)</option>
                 <option value="1">Dolu (10 / 10)</option>
               </select>
-              <small class="help-text" *ngIf="mockBranchFull">Kural 9 tetiklenecek (Şube Kapasite Doldu)</small>
+              @if (mockBranchFull) {
+                <small class="help-text">Kural 9 tetiklenecek (Şube Kapasite Doldu)</small>
+              }
             </div>
-
+    
             <div class="form-group">
               <label>Garanti / Müşteri Onayı</label>
               <select [value]="mockWarranty" (change)="mockWarranty = $any($event.target).value; runSimulation()" class="form-control">
@@ -202,51 +226,60 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
                 <option value="PAID_APPROVED">Garanti dışı, onaylı</option>
                 <option value="WARRANTY">Garanti kapsamında</option>
               </select>
-              <small class="help-text" *ngIf="mockWarranty === 'PAID_NO_APPROVAL'">Kural 10 tetiklenecek (Onaysız Parça Çıkış Engeli)</small>
+              @if (mockWarranty === 'PAID_NO_APPROVAL') {
+                <small class="help-text">Kural 10 tetiklenecek (Onaysız Parça Çıkış Engeli)</small>
+              }
             </div>
-
+    
             <button (click)="runSimulation()" class="simulate-btn">Simülasyonu Çalıştır</button>
           </div>
-
+    
           <!-- Simülasyon Sonuçları -->
-          <div class="sim-results" *ngIf="simulationRan">
-            <h4>Değerlendirme Sonuçları</h4>
-            
-            <div class="alert alert-info" *ngIf="simResults.length === 0">
-              Girilen parametrelere göre tetiklenen kural bulunmadı. İşlem engelsiz devam eder.
-            </div>
-
-            <div *ngIf="simResults.length > 0">
-              <div class="winner-box">
-                <h5>Uygulanan / Kazanan Kural</h5>
-                <div class="rule-result-item winner">
-                  <p class="rule-title">{{ simResults[0].rule.name }}</p>
-                  <p class="rule-details">
-                    Öncelik Seviyesi: {{ simResults[0].rule.priority }} | Durum: 
-                    <span class="badge" [class.blocked]="!simResults[0].allowed" [class.allowed]="simResults[0].allowed">
-                      {{ simResults[0].allowed ? 'Geçerli / Uyarı' : 'ENGELLEME (BLOCKED)' }}
-                    </span>
-                  </p>
-                  <p class="rule-reason"><strong>Gerekçe:</strong> {{ simResults[0].reason }}</p>
+          @if (simulationRan) {
+            <div class="sim-results">
+              <h4>Değerlendirme Sonuçları</h4>
+              @if (simResults.length === 0) {
+                <div class="alert alert-info">
+                  Girilen parametrelere göre tetiklenen kural bulunmadı. İşlem engelsiz devam eder.
                 </div>
-              </div>
-
-              <!-- Overridden rules (losers) -->
-              <div class="losers-box" *ngIf="allSimTriggered.length > 1">
-                <h5>Çakışma Nedeniyle Devre Dışı Kalan (Ezilen) Kurallar</h5>
-                <div *ngFor="let item of getLoserRules()" class="rule-result-item loser">
-                  <p class="rule-title">{{ item.rule.name }}</p>
-                  <p class="rule-details">Öncelik: {{ item.rule.priority }} | Durum: Ezildi (Overridden)</p>
-                  <p class="rule-reason"><strong>Çözüm Gerekçesi:</strong> Bu kuralın öncelik numarası kazanan kuraldan daha düşüktür veya kazanan kural sisteme daha önce eklenmiştir.</p>
+              }
+              @if (simResults.length > 0) {
+                <div>
+                  <div class="winner-box">
+                    <h5>Uygulanan / Kazanan Kural</h5>
+                    <div class="rule-result-item winner">
+                      <p class="rule-title">{{ simResults[0].rule.name }}</p>
+                      <p class="rule-details">
+                        Öncelik Seviyesi: {{ simResults[0].rule.priority }} | Durum:
+                        <span class="badge" [class.blocked]="!simResults[0].allowed" [class.allowed]="simResults[0].allowed">
+                          {{ simResults[0].allowed ? 'Geçerli / Uyarı' : 'ENGELLEME (BLOCKED)' }}
+                        </span>
+                      </p>
+                      <p class="rule-reason"><strong>Gerekçe:</strong> {{ simResults[0].reason }}</p>
+                    </div>
+                  </div>
+                  <!-- Overridden rules (losers) -->
+                  @if (allSimTriggered.length > 1) {
+                    <div class="losers-box">
+                      <h5>Çakışma Nedeniyle Devre Dışı Kalan (Ezilen) Kurallar</h5>
+                      @for (item of getLoserRules(); track item) {
+                        <div class="rule-result-item loser">
+                          <p class="rule-title">{{ item.rule.name }}</p>
+                          <p class="rule-details">Öncelik: {{ item.rule.priority }} | Durum: Ezildi (Overridden)</p>
+                          <p class="rule-reason"><strong>Çözüm Gerekçesi:</strong> Bu kuralın öncelik numarası kazanan kuraldan daha düşüktür veya kazanan kural sisteme daha önce eklenmiştir.</p>
+                        </div>
+                      }
+                    </div>
+                  }
                 </div>
-              </div>
+              }
             </div>
-          </div>
-
+          }
+    
         </div>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./rule-list.component.scss']
 })
 export class RuleListComponent implements OnInit {

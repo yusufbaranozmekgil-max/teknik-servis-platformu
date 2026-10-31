@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { StockMovementService } from '../../../../core/services/stock-movement.service';
@@ -18,7 +18,7 @@ type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
 
 @Component({
     selector: 'app-stock-movement',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, DataTableComponent, FormFieldComponent],
+    imports: [ReactiveFormsModule, RouterModule, DataTableComponent, FormFieldComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -27,222 +27,233 @@ type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
           <h2>Stok Hareketleri Giriş/Çıkış Takibi</h2>
         </div>
       </div>
-
+    
       <!-- Mod seçici (hareket tipi) -->
-      <div class="mode-bar" *ngIf="permissionService.hasPermission('STOCK_MOVEMENT_CREATE')">
-        <button
-          *ngFor="let m of modes"
-          class="mode-chip"
-          [class.active]="activeMode === m.key"
-          (click)="selectMode(m.key)"
-        >
-          {{ m.label }}
-        </button>
-      </div>
-
+      @if (permissionService.hasPermission('STOCK_MOVEMENT_CREATE')) {
+        <div class="mode-bar">
+          @for (m of modes; track m) {
+            <button
+              class="mode-chip"
+              [class.active]="activeMode === m.key"
+              (click)="selectMode(m.key)"
+              >
+              {{ m.label }}
+            </button>
+          }
+        </div>
+      }
+    
       <!-- Standart Giriş / Çıkış Formu -->
-      <div class="card-content form-card animate-slide" *ngIf="showForm && activeMode === 'STANDARD'">
-        <h3>Standart Stok Hareketi (Giriş / Çıkış)</h3>
-        <form [formGroup]="movementForm" (ngSubmit)="onSubmitStandard()">
-          <div class="form-grid">
-            <app-form-field
-              label="Yedek Parça"
-              type="select"
-              [control]="$any(movementForm.get('partId'))"
-              [required]="true"
-            >
-              <option value="" disabled selected>Parça Seçin</option>
-              <option *ngFor="let p of parts" [value]="p.id">{{ p.name }} ({{ p.code }}) - Şube: {{ getBranchName(p.branchId) }}</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Hareket Yönü"
-              type="select"
-              [control]="$any(movementForm.get('type'))"
-              [required]="true"
-            >
-              <option value="IN">Giriş - Stok Ekle</option>
-              <option value="OUT">Çıkış - Stok Düş</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Miktar"
-              type="number"
-              [control]="$any(movementForm.get('quantity'))"
-              [min]="NUMERIC_LIMITS.movementQuantity.min"
-              [max]="NUMERIC_LIMITS.movementQuantity.max"
-              [maxLength]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Açıklama / Fatura / Gerekçe"
-              [control]="$any(movementForm.get('description'))"
-              [maxLength]="FIELD_LIMITS.stockMovementNote"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: X tedarikçisinden alım"
-            ></app-form-field>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
-
-          <div class="form-actions">
-            <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="movementForm.invalid" class="save-btn">Hareketi İşle</button>
-          </div>
-        </form>
-      </div>
-
+      @if (showForm && activeMode === 'STANDARD') {
+        <div class="card-content form-card animate-slide">
+          <h3>Standart Stok Hareketi (Giriş / Çıkış)</h3>
+          <form [formGroup]="movementForm" (ngSubmit)="onSubmitStandard()">
+            <div class="form-grid">
+              <app-form-field
+                label="Yedek Parça"
+                type="select"
+                [control]="$any(movementForm.get('partId'))"
+                [required]="true"
+                >
+                <option value="" disabled selected>Parça Seçin</option>
+                @for (p of parts; track p) {
+                  <option [value]="p.id">{{ p.name }} ({{ p.code }}) - Şube: {{ getBranchName(p.branchId) }}</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Hareket Yönü"
+                type="select"
+                [control]="$any(movementForm.get('type'))"
+                [required]="true"
+                >
+                <option value="IN">Giriş - Stok Ekle</option>
+                <option value="OUT">Çıkış - Stok Düş</option>
+              </app-form-field>
+              <app-form-field
+                label="Miktar"
+                type="number"
+                [control]="$any(movementForm.get('quantity'))"
+                [min]="NUMERIC_LIMITS.movementQuantity.min"
+                [max]="NUMERIC_LIMITS.movementQuantity.max"
+                [maxLength]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Açıklama / Fatura / Gerekçe"
+                [control]="$any(movementForm.get('description'))"
+                [maxLength]="FIELD_LIMITS.stockMovementNote"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: X tedarikçisinden alım"
+              ></app-form-field>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">{{ errorMessage }}</div>
+            }
+            <div class="form-actions">
+              <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="movementForm.invalid" class="save-btn">Hareketi İşle</button>
+            </div>
+          </form>
+        </div>
+      }
+    
       <!-- Transfer Formu -->
-      <div class="card-content form-card animate-slide" *ngIf="showForm && activeMode === 'TRANSFER'">
-        <h3>Şubeler Arası Transfer</h3>
-        <p class="form-hint">Bir parçayı kaynak şubeden hedef şubeye taşır. Hedef şubede bu parça yoksa aynı kodla otomatik açılır.</p>
-        <form [formGroup]="transferForm" (ngSubmit)="onSubmitTransfer()">
-          <div class="form-grid">
-            <app-form-field
-              label="Kaynak Parça"
-              type="select"
-              [control]="$any(transferForm.get('sourcePartId'))"
-              [required]="true"
-            >
-              <option value="" disabled selected>Parça Seçin</option>
-              <option *ngFor="let p of parts" [value]="p.id">{{ p.name }} ({{ p.code }}) - {{ getBranchName(p.branchId) }} (Stok: {{ p.stockQuantity }})</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Hedef Şube"
-              type="select"
-              [control]="$any(transferForm.get('targetBranchId'))"
-              [required]="true"
-            >
-              <option value="" disabled selected>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }} ({{ b.city }})</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Transfer Miktarı"
-              type="number"
-              [control]="$any(transferForm.get('quantity'))"
-              [min]="NUMERIC_LIMITS.movementQuantity.min"
-              [max]="NUMERIC_LIMITS.movementQuantity.max"
-              [maxLength]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Gerekçe / Açıklama"
-              [control]="$any(transferForm.get('description'))"
-              [maxLength]="FIELD_LIMITS.stockMovementNote"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Kadıköy şubesi stoğu için takviye"
-            ></app-form-field>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
-
-          <div class="form-actions">
-            <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="transferForm.invalid" class="save-btn">Transferi Onayla</button>
-          </div>
-        </form>
-      </div>
-
+      @if (showForm && activeMode === 'TRANSFER') {
+        <div class="card-content form-card animate-slide">
+          <h3>Şubeler Arası Transfer</h3>
+          <p class="form-hint">Bir parçayı kaynak şubeden hedef şubeye taşır. Hedef şubede bu parça yoksa aynı kodla otomatik açılır.</p>
+          <form [formGroup]="transferForm" (ngSubmit)="onSubmitTransfer()">
+            <div class="form-grid">
+              <app-form-field
+                label="Kaynak Parça"
+                type="select"
+                [control]="$any(transferForm.get('sourcePartId'))"
+                [required]="true"
+                >
+                <option value="" disabled selected>Parça Seçin</option>
+                @for (p of parts; track p) {
+                  <option [value]="p.id">{{ p.name }} ({{ p.code }}) - {{ getBranchName(p.branchId) }} (Stok: {{ p.stockQuantity }})</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Hedef Şube"
+                type="select"
+                [control]="$any(transferForm.get('targetBranchId'))"
+                [required]="true"
+                >
+                <option value="" disabled selected>Şube Seçin</option>
+                @for (b of branches; track b) {
+                  <option [value]="b.id">{{ b.name }} ({{ b.city }})</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Transfer Miktarı"
+                type="number"
+                [control]="$any(transferForm.get('quantity'))"
+                [min]="NUMERIC_LIMITS.movementQuantity.min"
+                [max]="NUMERIC_LIMITS.movementQuantity.max"
+                [maxLength]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Gerekçe / Açıklama"
+                [control]="$any(transferForm.get('description'))"
+                [maxLength]="FIELD_LIMITS.stockMovementNote"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Kadıköy şubesi stoğu için takviye"
+              ></app-form-field>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">{{ errorMessage }}</div>
+            }
+            <div class="form-actions">
+              <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="transferForm.invalid" class="save-btn">Transferi Onayla</button>
+            </div>
+          </form>
+        </div>
+      }
+    
       <!-- Fire Formu -->
-      <div class="card-content form-card animate-slide" *ngIf="showForm && activeMode === 'FIRE'">
-        <h3>Fire / Hasar Kaydı</h3>
-        <p class="form-hint">Hasarlı, kullanılamaz veya kayıp olarak işaretlenecek parça miktarı stoktan düşülür.</p>
-        <form [formGroup]="fireForm" (ngSubmit)="onSubmitFire()">
-          <div class="form-grid">
-            <app-form-field
-              label="Yedek Parça"
-              type="select"
-              [control]="$any(fireForm.get('partId'))"
-              [required]="true"
-            >
-              <option value="" disabled selected>Parça Seçin</option>
-              <option *ngFor="let p of parts" [value]="p.id">{{ p.name }} ({{ p.code }}) - Şube: {{ getBranchName(p.branchId) }} (Stok: {{ p.stockQuantity }})</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Fire Miktarı"
-              type="number"
-              [control]="$any(fireForm.get('quantity'))"
-              [min]="NUMERIC_LIMITS.movementQuantity.min"
-              [max]="NUMERIC_LIMITS.movementQuantity.max"
-              [maxLength]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Hasar / Fire Nedeni"
-              [control]="$any(fireForm.get('description'))"
-              [maxLength]="FIELD_LIMITS.stockMovementNote"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Nakliye sırasında hasar gördü"
-            ></app-form-field>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
-
-          <div class="form-actions">
-            <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="fireForm.invalid" class="save-btn warning">Fire Kaydını Onayla</button>
-          </div>
-        </form>
-      </div>
-
+      @if (showForm && activeMode === 'FIRE') {
+        <div class="card-content form-card animate-slide">
+          <h3>Fire / Hasar Kaydı</h3>
+          <p class="form-hint">Hasarlı, kullanılamaz veya kayıp olarak işaretlenecek parça miktarı stoktan düşülür.</p>
+          <form [formGroup]="fireForm" (ngSubmit)="onSubmitFire()">
+            <div class="form-grid">
+              <app-form-field
+                label="Yedek Parça"
+                type="select"
+                [control]="$any(fireForm.get('partId'))"
+                [required]="true"
+                >
+                <option value="" disabled selected>Parça Seçin</option>
+                @for (p of parts; track p) {
+                  <option [value]="p.id">{{ p.name }} ({{ p.code }}) - Şube: {{ getBranchName(p.branchId) }} (Stok: {{ p.stockQuantity }})</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Fire Miktarı"
+                type="number"
+                [control]="$any(fireForm.get('quantity'))"
+                [min]="NUMERIC_LIMITS.movementQuantity.min"
+                [max]="NUMERIC_LIMITS.movementQuantity.max"
+                [maxLength]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Hasar / Fire Nedeni"
+                [control]="$any(fireForm.get('description'))"
+                [maxLength]="FIELD_LIMITS.stockMovementNote"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Nakliye sırasında hasar gördü"
+              ></app-form-field>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">{{ errorMessage }}</div>
+            }
+            <div class="form-actions">
+              <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="fireForm.invalid" class="save-btn warning">Fire Kaydını Onayla</button>
+            </div>
+          </form>
+        </div>
+      }
+    
       <!-- Sayım Düzeltmesi Formu -->
-      <div class="card-content form-card animate-slide" *ngIf="showForm && activeMode === 'ADJUSTMENT'">
-        <h3>Sayım Düzeltmesi</h3>
-        <p class="form-hint">Fiziksel sayımla sistem stoğu arasındaki fark için stok değeri yeni mutlak değere ayarlanır.</p>
-        <form [formGroup]="adjustForm" (ngSubmit)="onSubmitAdjust()">
-          <div class="form-grid">
-            <app-form-field
-              label="Yedek Parça"
-              type="select"
-              [control]="$any(adjustForm.get('partId'))"
-              [required]="true"
-            >
-              <option value="" disabled selected>Parça Seçin</option>
-              <option *ngFor="let p of parts" [value]="p.id">{{ p.name }} ({{ p.code }}) - {{ getBranchName(p.branchId) }} (Mevcut: {{ p.stockQuantity }}, Rezerve: {{ p.reservedQuantity }})</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Yeni Sayım Değeri"
-              type="number"
-              [control]="$any(adjustForm.get('newQuantity'))"
-              [min]="0"
-              [max]="1000000"
-              [maxLength]="7"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Sayım Gerekçesi"
-              [control]="$any(adjustForm.get('description'))"
-              [maxLength]="FIELD_LIMITS.stockMovementNote"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Yıl sonu sayımı, raf kontrol farkı"
-            ></app-form-field>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
-
-          <div class="form-actions">
-            <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="adjustForm.invalid" class="save-btn">Sayımı Kaydet</button>
-          </div>
-        </form>
-      </div>
-
+      @if (showForm && activeMode === 'ADJUSTMENT') {
+        <div class="card-content form-card animate-slide">
+          <h3>Sayım Düzeltmesi</h3>
+          <p class="form-hint">Fiziksel sayımla sistem stoğu arasındaki fark için stok değeri yeni mutlak değere ayarlanır.</p>
+          <form [formGroup]="adjustForm" (ngSubmit)="onSubmitAdjust()">
+            <div class="form-grid">
+              <app-form-field
+                label="Yedek Parça"
+                type="select"
+                [control]="$any(adjustForm.get('partId'))"
+                [required]="true"
+                >
+                <option value="" disabled selected>Parça Seçin</option>
+                @for (p of parts; track p) {
+                  <option [value]="p.id">{{ p.name }} ({{ p.code }}) - {{ getBranchName(p.branchId) }} (Mevcut: {{ p.stockQuantity }}, Rezerve: {{ p.reservedQuantity }})</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Yeni Sayım Değeri"
+                type="number"
+                [control]="$any(adjustForm.get('newQuantity'))"
+                [min]="0"
+                [max]="1000000"
+                [maxLength]="7"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Sayım Gerekçesi"
+                [control]="$any(adjustForm.get('description'))"
+                [maxLength]="FIELD_LIMITS.stockMovementNote"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Yıl sonu sayımı, raf kontrol farkı"
+              ></app-form-field>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">{{ errorMessage }}</div>
+            }
+            <div class="form-actions">
+              <button type="button" (click)="closeForm()" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="adjustForm.invalid" class="save-btn">Sayımı Kaydet</button>
+            </div>
+          </form>
+        </div>
+      }
+    
       <!-- Movement History List -->
       <div class="table-container">
         <h3>Stok Hareket Geçmişi</h3>
@@ -252,7 +263,7 @@ type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./stock-movement.component.scss']
 })
 export class StockMovementPage implements OnInit {

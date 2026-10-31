@@ -1,6 +1,6 @@
 import { PermissionService } from '../../../../core/services/permission.service';
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { InventoryService } from '../../../../core/services/inventory.service';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -9,7 +9,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
 
 @Component({
     selector: 'app-critical-stock',
-    imports: [CommonModule, RouterModule, DataTableComponent],
+    imports: [RouterModule, DataTableComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -19,19 +19,21 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
           <p class="subtitle">Kullanılabilir miktarı, kritik eşik seviyesinin altına düşen parçalar listelenmektedir.</p>
         </div>
       </div>
-
-      <div class="alert-banner" *ngIf="criticalParts.length > 0">
-        Toplam <strong>{{ criticalParts.length }}</strong> kalem yedek parçada kritik stok eşiği aşılmıştır! Tedarik sürecinin başlatılması önerilir.
-      </div>
-
+    
+      @if (criticalParts.length > 0) {
+        <div class="alert-banner">
+          Toplam <strong>{{ criticalParts.length }}</strong> kalem yedek parçada kritik stok eşiği aşılmıştır! Tedarik sürecinin başlatılması önerilir.
+        </div>
+      }
+    
       <div class="table-container">
-        <app-data-table 
-          [data]="criticalParts" 
+        <app-data-table
+          [data]="criticalParts"
           [columns]="columns"
         ></app-data-table>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./critical-stock.component.scss']
 })
 export class CriticalStockPage implements OnInit {

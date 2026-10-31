@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -13,7 +13,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
 
 @Component({
     selector: 'app-branch-edit',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -22,163 +22,164 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
           <h2>Şube Düzenle</h2>
         </div>
       </div>
-
-      <div class="card-content" *ngIf="branch">
-        <form [formGroup]="branchForm" (ngSubmit)="onSubmit()">
-          <div class="form-grid">
-            <app-form-field
-              label="Bölge Kodu / Şube Kodu"
-              [control]="$any(branchForm.get('code'))"
-              [required]="true"
-              placeholder="Örn: SUBE-ANK-03"
-              [type]="'text'"
-              [maxLength]="FIELD_LIMITS.branchCode"
-            ></app-form-field>
-
-            <app-form-field
-              label="Şube Adı"
-              [control]="$any(branchForm.get('name'))"
-              [maxLength]="FIELD_LIMITS.branchName"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Ankara Çankaya Şubesi"
-            ></app-form-field>
-
-            <app-form-field
-              label="Şehir"
-              [control]="$any(branchForm.get('city'))"
-              [maxLength]="FIELD_LIMITS.city"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="letters"
-              placeholder="Örn: Ankara"
-            ></app-form-field>
-
-            <app-form-field
-              label="İlçe"
-              [control]="$any(branchForm.get('district'))"
-              [maxLength]="FIELD_LIMITS.district"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="letters"
-              placeholder="Örn: Çankaya"
-            ></app-form-field>
-
-            <app-form-field
-              label="Sorumlu Kişi"
-              [control]="$any(branchForm.get('contactPerson'))"
-              [maxLength]="FIELD_LIMITS.responsiblePerson"
-              [required]="true"
-              [showCounter]="true"
-              inputFilter="letters"
-              placeholder="Örn: Ahmet Yılmaz"
-            ></app-form-field>
-
-            <app-form-field
-              label="Günlük Teknisyen Kapasitesi"
-              type="number"
-              [control]="$any(branchForm.get('dailyCapacity'))"
-              [min]="NUMERIC_LIMITS.dailyCapacity.min"
-              [max]="NUMERIC_LIMITS.dailyCapacity.max"
-              [maxLength]="10"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Enlem"
-              type="number"
-              step="0.000001"
-              [control]="$any(branchForm.get('latitude'))"
-              [min]="NUMERIC_LIMITS.latitude.min"
-              [max]="NUMERIC_LIMITS.latitude.max"
-              [maxLength]="10"
-              [maxDecimals]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Boylam"
-              type="number"
-              step="0.000001"
-              [control]="$any(branchForm.get('longitude'))"
-              [min]="NUMERIC_LIMITS.longitude.min"
-              [max]="NUMERIC_LIMITS.longitude.max"
-              [maxLength]="10"
-              [maxDecimals]="6"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Mesai Başlangıcı"
-              type="time"
-              [control]="$any(branchForm.get('workingHoursStart'))"
-              placeholder="08:00"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Mesai Bitişi"
-              type="time"
-              [control]="$any(branchForm.get('workingHoursEnd'))"
-              placeholder="18:00"
-              [required]="true"
-            ></app-form-field>
-          </div>
-          <div class="error-alert" *ngIf="branchForm.errors?.['workingHoursRange'] && (branchForm.get('workingHoursStart')?.touched || branchForm.get('workingHoursEnd')?.touched)">
-            Mesai bitişi başlangıç saatinden sonra olmalıdır.
-          </div>
-
-          <div class="form-group full-width">
-            <label>Hizmet Verdiği Bölgeler / Mahalleler</label>
-            <div class="tag-input-container">
-              <input
-                #areaInput
-                type="text"
-                placeholder="Bölge adı yazıp Enter'a basın"
-                [attr.maxlength]="FIELD_LIMITS.serviceArea"
-                (keydown.enter)="addArea($event, areaInput)"
-              />
-              <button type="button" (click)="addAreaBtn(areaInput)" class="tag-add-btn">Ekle</button>
+    
+      @if (branch) {
+        <div class="card-content">
+          <form [formGroup]="branchForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+              <app-form-field
+                label="Bölge Kodu / Şube Kodu"
+                [control]="$any(branchForm.get('code'))"
+                [required]="true"
+                placeholder="Örn: SUBE-ANK-03"
+                [type]="'text'"
+                [maxLength]="FIELD_LIMITS.branchCode"
+              ></app-form-field>
+              <app-form-field
+                label="Şube Adı"
+                [control]="$any(branchForm.get('name'))"
+                [maxLength]="FIELD_LIMITS.branchName"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Ankara Çankaya Şubesi"
+              ></app-form-field>
+              <app-form-field
+                label="Şehir"
+                [control]="$any(branchForm.get('city'))"
+                [maxLength]="FIELD_LIMITS.city"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="letters"
+                placeholder="Örn: Ankara"
+              ></app-form-field>
+              <app-form-field
+                label="İlçe"
+                [control]="$any(branchForm.get('district'))"
+                [maxLength]="FIELD_LIMITS.district"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="letters"
+                placeholder="Örn: Çankaya"
+              ></app-form-field>
+              <app-form-field
+                label="Sorumlu Kişi"
+                [control]="$any(branchForm.get('contactPerson'))"
+                [maxLength]="FIELD_LIMITS.responsiblePerson"
+                [required]="true"
+                [showCounter]="true"
+                inputFilter="letters"
+                placeholder="Örn: Ahmet Yılmaz"
+              ></app-form-field>
+              <app-form-field
+                label="Günlük Teknisyen Kapasitesi"
+                type="number"
+                [control]="$any(branchForm.get('dailyCapacity'))"
+                [min]="NUMERIC_LIMITS.dailyCapacity.min"
+                [max]="NUMERIC_LIMITS.dailyCapacity.max"
+                [maxLength]="10"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Enlem"
+                type="number"
+                step="0.000001"
+                [control]="$any(branchForm.get('latitude'))"
+                [min]="NUMERIC_LIMITS.latitude.min"
+                [max]="NUMERIC_LIMITS.latitude.max"
+                [maxLength]="10"
+                [maxDecimals]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Boylam"
+                type="number"
+                step="0.000001"
+                [control]="$any(branchForm.get('longitude'))"
+                [min]="NUMERIC_LIMITS.longitude.min"
+                [max]="NUMERIC_LIMITS.longitude.max"
+                [maxLength]="10"
+                [maxDecimals]="6"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Mesai Başlangıcı"
+                type="time"
+                [control]="$any(branchForm.get('workingHoursStart'))"
+                placeholder="08:00"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Mesai Bitişi"
+                type="time"
+                [control]="$any(branchForm.get('workingHoursEnd'))"
+                placeholder="18:00"
+                [required]="true"
+              ></app-form-field>
             </div>
-            <div class="area-error" *ngIf="areaError">{{ areaError }}</div>
-            <div class="area-count">{{ serviceAreas.length }} / 20 bölge</div>
-            <div class="tags-list">
-              <span class="tag-chip" *ngFor="let area of serviceAreas; let i = index">
-                {{ area }}
-                <button type="button" (click)="removeArea(i)" class="tag-remove-btn">&times;</button>
-              </span>
-              <span class="no-tags" *ngIf="serviceAreas.length === 0">Henüz bölge eklenmedi.</span>
+            @if (branchForm.errors?.['workingHoursRange'] && (branchForm.get('workingHoursStart')?.touched || branchForm.get('workingHoursEnd')?.touched)) {
+              <div class="error-alert">
+                Mesai bitişi başlangıç saatinden sonra olmalıdır.
+              </div>
+            }
+            <div class="form-group full-width">
+              <label>Hizmet Verdiği Bölgeler / Mahalleler</label>
+              <div class="tag-input-container">
+                <input
+                  #areaInput
+                  type="text"
+                  placeholder="Bölge adı yazıp Enter'a basın"
+                  [attr.maxlength]="FIELD_LIMITS.serviceArea"
+                  (keydown.enter)="addArea($event, areaInput)"
+                  />
+                <button type="button" (click)="addAreaBtn(areaInput)" class="tag-add-btn">Ekle</button>
+              </div>
+              @if (areaError) {
+                <div class="area-error">{{ areaError }}</div>
+              }
+              <div class="area-count">{{ serviceAreas.length }} / 20 bölge</div>
+              <div class="tags-list">
+                @for (area of serviceAreas; track area; let i = $index) {
+                  <span class="tag-chip">
+                    {{ area }}
+                    <button type="button" (click)="removeArea(i)" class="tag-remove-btn">&times;</button>
+                  </span>
+                }
+                @if (serviceAreas.length === 0) {
+                  <span class="no-tags">Henüz bölge eklenmedi.</span>
+                }
+              </div>
             </div>
-          </div>
-
-          <div class="form-group check-group">
-            <label class="switch-label">
-              <input type="checkbox" formControlName="isActive" />
-              <span class="switch-text">Aktif Şube</span>
-            </label>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">
-            {{ errorMessage }}
-          </div>
-
-          <div class="form-actions">
-            <button type="button" routerLink="/subeler" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="branchForm.invalid || loading" class="save-btn">
-              {{ loading ? 'Kaydediliyor...' : 'Şubeyi Güncelle' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div class="error-alert" *ngIf="!branch && !errorMessage">
-        Şube bulunamadı veya yükleniyor...
-      </div>
+            <div class="form-group check-group">
+              <label class="switch-label">
+                <input type="checkbox" formControlName="isActive" />
+                <span class="switch-text">Aktif Şube</span>
+              </label>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">
+                {{ errorMessage }}
+              </div>
+            }
+            <div class="form-actions">
+              <button type="button" routerLink="/subeler" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="branchForm.invalid || loading" class="save-btn">
+                {{ loading ? 'Kaydediliyor...' : 'Şubeyi Güncelle' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    
+      @if (!branch && !errorMessage) {
+        <div class="error-alert">
+          Şube bulunamadı veya yükleniyor...
+        </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./branch-edit.component.scss']
 })
 export class BranchEditPage implements OnInit, ComponentCanDeactivate {

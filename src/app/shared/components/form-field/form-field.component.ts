@@ -1,48 +1,53 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-form-field',
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [ReactiveFormsModule],
     template: `
     <div class="form-group-wrapper">
-      <div class="label-wrapper" *ngIf="label">
-        <label [for]="id">
-          {{ label }} <span class="required-star" *ngIf="required">*</span>
+      @if (label) {
+        <div class="label-wrapper">
+          <label [for]="id">
+            {{ label }} @if (required) {
+            <span class="required-star">*</span>
+          }
         </label>
-        <span class="char-counter" 
-              *ngIf="showCounter && maxLength && control"
-              [class.warning-counter]="getValueLength() >= maxLength * 0.9"
-              [class.danger-counter]="getValueLength() >= maxLength">
-          {{ getValueLength() }} / {{ maxLength }}
-        </span>
+        @if (showCounter && maxLength && control) {
+          <span class="char-counter"
+            [class.warning-counter]="getValueLength() >= maxLength * 0.9"
+            [class.danger-counter]="getValueLength() >= maxLength">
+            {{ getValueLength() }} / {{ maxLength }}
+          </span>
+        }
       </div>
-      
-      <ng-container [ngSwitch]="type">
-        <!-- Textarea -->
+    }
+    
+    @switch (type) {
+      <!-- Textarea -->
+      @case ('textarea') {
         <textarea
-          *ngSwitchCase="'textarea'"
           [id]="id"
           [formControl]="control"
           [attr.maxlength]="maxLength"
           [placeholder]="placeholder"
           class="form-control textarea-field"
         ></textarea>
-        
-        <!-- Select -->
+      }
+      <!-- Select -->
+      @case ('select') {
         <select
-          *ngSwitchCase="'select'"
           [id]="id"
           [formControl]="control"
           class="form-control select-field"
-        >
+          >
           <ng-content></ng-content>
         </select>
-        
-        <!-- Default Input -->
+      }
+      <!-- Default Input -->
+      @default {
         <input
-          *ngSwitchDefault
           #defaultInput
           [id]="id"
           [type]="type"
@@ -58,73 +63,130 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
           (change)="onNativeChange($any($event.target))"
           (blur)="onNativeBlur($any($event.target))"
           class="form-control"
-        />
-      </ng-container>
-
-      <!-- Hata Mesajları -->
-      <div class="error-text" *ngIf="control && control.touched && control.errors">
-        <span *ngIf="control.errors['required']">
-          {{ label || 'Bu alan' }} zorunludur.
-        </span>
-        <span *ngIf="control.errors['whitespace']">
-          {{ label || 'Bu alan' }} sadece boşluklardan oluşamaz.
-        </span>
-        <span *ngIf="control.errors['maxlength']">
-          En fazla {{ maxLength }} karakter girilebilir.
-        </span>
-        <span *ngIf="control.errors['min'] || control.errors['minNumber']">
-          <ng-container *ngIf="label?.includes('Enlem')">Enlem -90 ile 90 arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="label?.includes('Boylam')">Boylam -180 ile 180 arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="label?.includes('Kapasite')">Günlük teknisyen kapasitesi 1 ile 10 arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="!label?.includes('Enlem') && !label?.includes('Boylam') && !label?.includes('Kapasite')">En az {{ min }} olmalıdır.</ng-container>
-        </span>
-        <span *ngIf="control.errors['max'] || control.errors['maxNumber']">
-          <ng-container *ngIf="label?.includes('Enlem')">Enlem -90 ile 90 arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="label?.includes('Boylam')">Boylam -180 ile 180 arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="label?.includes('Kapasite')">Günlük teknisyen kapasitesi 1 ile 10 arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="!label?.includes('Enlem') && !label?.includes('Boylam') && !label?.includes('Kapasite')">En fazla {{ max }} olmalıdır.</ng-container>
-        </span>
-        <span *ngIf="control.errors['numberRange']">
-          <ng-container *ngIf="label?.includes('Enlem')">Enlem {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="label?.includes('Boylam')">Boylam {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="label?.includes('Kapasite')">Günlük teknisyen kapasitesi {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.</ng-container>
-          <ng-container *ngIf="!label?.includes('Enlem') && !label?.includes('Boylam') && !label?.includes('Kapasite')">
-            Değer {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.
-          </ng-container>
-        </span>
-        <span *ngIf="control.errors['invalidPlate']">
-          Geçersiz plaka formatı (Örn: 34ABC123).
-        </span>
-        <span *ngIf="control.errors['invalidPhone']">
-          Geçersiz telefon formatı (Örn: 05551234567).
-        </span>
-        <span *ngIf="control.errors['invalidTime']">
-          Geçerli bir saat giriniz. Format HH:mm olmalıdır (00:00 – 23:59).
-        </span>
-        <span *ngIf="control.errors['invalidDate']">
-          Geçerli bir tarih giriniz (YYYY-AA-GG).
-        </span>
-        <span *ngIf="control.errors['dateOutOfRange']">
-          {{ control.errors['dateOutOfRange'].reason }}
-        </span>
-        <span *ngIf="control.errors['pastDate']">
-          Geçmiş tarih seçilemez.
-        </span>
-        <span *ngIf="control.errors['dateAfter']">
-          Geçersiz tarih aralığı.
-        </span>
-        <span *ngIf="control.errors['reservedGreaterThanStock']">
-          Rezerve miktarı fiziksel stok miktarını aşamaz.
-        </span>
-        <span *ngIf="control.errors['usedGreaterThanReserved']">
-          Kullanılan miktar rezerve edilen miktarı aşamaz.
-        </span>
-        <span *ngIf="control.errors['negativeValue']">
-          Sayısal değer negatif olamaz.
-        </span>
+          />
+      }
+    }
+    
+    <!-- Hata Mesajları -->
+    @if (control && control.touched && control.errors) {
+      <div class="error-text">
+        @if (control.errors['required']) {
+          <span>
+            {{ label || 'Bu alan' }} zorunludur.
+          </span>
+        }
+        @if (control.errors['whitespace']) {
+          <span>
+            {{ label || 'Bu alan' }} sadece boşluklardan oluşamaz.
+          </span>
+        }
+        @if (control.errors['maxlength']) {
+          <span>
+            En fazla {{ maxLength }} karakter girilebilir.
+          </span>
+        }
+        @if (control.errors['min'] || control.errors['minNumber']) {
+          <span>
+            @if (label?.includes('Enlem')) {
+              Enlem -90 ile 90 arasında olmalıdır.
+            }
+            @if (label?.includes('Boylam')) {
+              Boylam -180 ile 180 arasında olmalıdır.
+            }
+            @if (label?.includes('Kapasite')) {
+              Günlük teknisyen kapasitesi 1 ile 10 arasında olmalıdır.
+            }
+            @if (!label?.includes('Enlem') && !label?.includes('Boylam') && !label?.includes('Kapasite')) {
+              En az {{ min }} olmalıdır.
+            }
+          </span>
+        }
+        @if (control.errors['max'] || control.errors['maxNumber']) {
+          <span>
+            @if (label?.includes('Enlem')) {
+              Enlem -90 ile 90 arasında olmalıdır.
+            }
+            @if (label?.includes('Boylam')) {
+              Boylam -180 ile 180 arasında olmalıdır.
+            }
+            @if (label?.includes('Kapasite')) {
+              Günlük teknisyen kapasitesi 1 ile 10 arasında olmalıdır.
+            }
+            @if (!label?.includes('Enlem') && !label?.includes('Boylam') && !label?.includes('Kapasite')) {
+              En fazla {{ max }} olmalıdır.
+            }
+          </span>
+        }
+        @if (control.errors['numberRange']) {
+          <span>
+            @if (label?.includes('Enlem')) {
+              Enlem {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.
+            }
+            @if (label?.includes('Boylam')) {
+              Boylam {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.
+            }
+            @if (label?.includes('Kapasite')) {
+              Günlük teknisyen kapasitesi {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.
+            }
+            @if (!label?.includes('Enlem') && !label?.includes('Boylam') && !label?.includes('Kapasite')) {
+              Değer {{ control.errors['numberRange'].min }} ile {{ control.errors['numberRange'].max }} arasında olmalıdır.
+            }
+          </span>
+        }
+        @if (control.errors['invalidPlate']) {
+          <span>
+            Geçersiz plaka formatı (Örn: 34ABC123).
+          </span>
+        }
+        @if (control.errors['invalidPhone']) {
+          <span>
+            Geçersiz telefon formatı (Örn: 05551234567).
+          </span>
+        }
+        @if (control.errors['invalidTime']) {
+          <span>
+            Geçerli bir saat giriniz. Format HH:mm olmalıdır (00:00 – 23:59).
+          </span>
+        }
+        @if (control.errors['invalidDate']) {
+          <span>
+            Geçerli bir tarih giriniz (YYYY-AA-GG).
+          </span>
+        }
+        @if (control.errors['dateOutOfRange']) {
+          <span>
+            {{ control.errors['dateOutOfRange'].reason }}
+          </span>
+        }
+        @if (control.errors['pastDate']) {
+          <span>
+            Geçmiş tarih seçilemez.
+          </span>
+        }
+        @if (control.errors['dateAfter']) {
+          <span>
+            Geçersiz tarih aralığı.
+          </span>
+        }
+        @if (control.errors['reservedGreaterThanStock']) {
+          <span>
+            Rezerve miktarı fiziksel stok miktarını aşamaz.
+          </span>
+        }
+        @if (control.errors['usedGreaterThanReserved']) {
+          <span>
+            Kullanılan miktar rezerve edilen miktarı aşamaz.
+          </span>
+        }
+        @if (control.errors['negativeValue']) {
+          <span>
+            Sayısal değer negatif olamaz.
+          </span>
+        }
       </div>
+    }
     </div>
-  `,
+    `,
     styleUrls: ['./form-field.component.scss']
 })
 export class FormFieldComponent {

@@ -1,30 +1,39 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
     selector: 'app-toasts',
-    imports: [CommonModule],
+    imports: [],
     template: `
     <div class="toast-container">
-      <div 
-        *ngFor="let toast of toastService.toasts()" 
-        class="toast-box" 
-        [class]="toast.type"
-        (click)="toastService.remove(toast.id)"
-      >
-        <span class="icon">
-          <ng-container [ngSwitch]="toast.type">
-            <span *ngSwitchCase="'success'"></span>
-            <span *ngSwitchCase="'error'"></span>
-            <span *ngSwitchCase="'warning'"></span>
-            <span *ngSwitchCase="'info'"></span>
-          </ng-container>
-        </span>
-        <span class="message">{{ toast.message }}</span>
-      </div>
+      @for (toast of toastService.toasts(); track toast) {
+        <div
+          class="toast-box"
+          [class]="toast.type"
+          (click)="toastService.remove(toast.id)"
+          >
+          <span class="icon">
+            @switch (toast.type) {
+              @case ('success') {
+                <span></span>
+              }
+              @case ('error') {
+                <span></span>
+              }
+              @case ('warning') {
+                <span></span>
+              }
+              @case ('info') {
+                <span></span>
+              }
+            }
+          </span>
+          <span class="message">{{ toast.message }}</span>
+        </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./toasts.component.scss']
 })
 export class ToastsComponent {

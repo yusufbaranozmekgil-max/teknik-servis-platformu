@@ -24,13 +24,13 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
           <button (click)="exportLogs('json')" class="btn-export" [disabled]="filteredLogs.length === 0">JSON İndir</button>
         </div>
       </div>
-
+    
       <!-- Değiştirilemezlik bilgisi — kasıtlı tasarım -->
       <div class="immutable-banner">
         <strong>Denetim güvenliği:</strong> Bu kayıtlar izlenebilirlik gereği <u>silinemez ve düzenlenemez</u>.
         Güvenlik ihlali dahil tüm girdiler kalıcıdır; yalnızca görüntüleme, filtreleme ve dışa aktarma yapılabilir.
       </div>
-
+    
       <!-- Filtre Paneli -->
       <div class="card filter-card">
         <div class="filter-grid">
@@ -38,7 +38,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
             <label>Arama (Açıklama, Kullanıcı, ID)</label>
             <input type="text" [value]="searchQuery" (input)="searchQuery = $any($event.target).value; applyFilters()" placeholder="Arama yapın..." class="form-control" />
           </div>
-
+    
           <div class="form-group">
             <label>Varlık Türü (Entity)</label>
             <select [value]="entityFilter" (change)="entityFilter = $any($event.target).value; applyFilters()" class="form-control">
@@ -53,7 +53,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
               <option value="SYSTEM">Sistem</option>
             </select>
           </div>
-
+    
           <div class="form-group">
             <label>İşlem Türü (Action)</label>
             <select [value]="actionFilter" (change)="actionFilter = $any($event.target).value; applyFilters()" class="form-control">
@@ -67,7 +67,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
               <option value="IMPORT">İçe Aktarma</option>
             </select>
           </div>
-
+    
           <div class="form-group">
             <label>Kullanıcı Rolü</label>
             <select [value]="roleFilter" (change)="roleFilter = $any($event.target).value; applyFilters()" class="form-control">
@@ -78,162 +78,191 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
               <option value="TECHNICIAN">Teknisyen</option>
             </select>
           </div>
-
+    
           <div class="form-group">
             <label>Tarih Filtresi</label>
             <app-smart-date-input [value]="dateFilter" (valueChange)="dateFilter = $event || ''; applyFilters()"></app-smart-date-input>
           </div>
         </div>
       </div>
-
+    
       <!-- Log Tablosu -->
       <div class="card table-card">
         <div class="table-container">
           <table class="data-table">
             <thead>
               <tr>
-                <th class="sortable" (click)="sort('createdAt')">Tarih <span class="sort-icon" *ngIf="sortKey==='createdAt'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('username')">Kullanıcı <span class="sort-icon" *ngIf="sortKey==='username'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('userRole')">Rol <span class="sort-icon" *ngIf="sortKey==='userRole'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('actionType')">İşlem <span class="sort-icon" *ngIf="sortKey==='actionType'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
-                <th class="sortable" (click)="sort('entityType')">Varlık <span class="sort-icon" *ngIf="sortKey==='entityType'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('createdAt')">Tarih @if (sortKey==='createdAt') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('username')">Kullanıcı @if (sortKey==='username') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('userRole')">Rol @if (sortKey==='userRole') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('actionType')">İşlem @if (sortKey==='actionType') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
+                <th class="sortable" (click)="sort('entityType')">Varlık @if (sortKey==='entityType') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
                 <th>Açıklama</th>
-                <th class="sortable" (click)="sort('result')">Sonuç <span class="sort-icon" *ngIf="sortKey==='result'">{{ sortDirection==='asc'?'▲':'▼' }}</span></th>
+                <th class="sortable" (click)="sort('result')">Sonuç @if (sortKey==='result') {
+                  <span class="sort-icon">{{ sortDirection==='asc'?'▲':'▼' }}</span>
+                }</th>
                 <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let log of paginatedLogs" [class.failed-row]="log.result === 'FAILURE'">
-                <td>{{ log.createdAt | date:'dd.MM.yyyy HH:mm:ss' }}</td>
-                <td class="font-bold">{{ log.username }}</td>
-                <td><span class="role-badge">{{ log.userRole | roleLabel }}</span></td>
-                <td><span class="action-badge" [class]="log.actionType.toLowerCase()">{{ log.actionType | statusLabel:'action' }}</span></td>
-                <td>
-                  <div class="entity-cell">
-                    <span class="entity-badge">{{ log.entityType | statusLabel:'entity' }}</span>
-                    <span class="entity-name" *ngIf="entityDisplayName(log)">{{ entityDisplayName(log) }}</span>
-                  </div>
-                </td>
-                <td class="desc-cell">{{ humanizeDescription(log) }}</td>
-                <td>
-                  <span class="result-badge" [class]="(log.result || 'SUCCESS').toLowerCase()">{{ (log.result || 'SUCCESS') | statusLabel:'result' }}</span>
-                </td>
-                <td>
-                  <button (click)="openDetailModal(log)" class="view-btn">Farkı İncele</button>
-                </td>
-              </tr>
-              <tr *ngIf="filteredLogs.length === 0">
-                <td colspan="8" class="text-center text-muted">Arama kriterlerine uygun güncellenmiş kayıt bulunamadı.</td>
-              </tr>
+              @for (log of paginatedLogs; track log) {
+                <tr [class.failed-row]="log.result === 'FAILURE'">
+                  <td>{{ log.createdAt | date:'dd.MM.yyyy HH:mm:ss' }}</td>
+                  <td class="font-bold">{{ log.username }}</td>
+                  <td><span class="role-badge">{{ log.userRole | roleLabel }}</span></td>
+                  <td><span class="action-badge" [class]="log.actionType.toLowerCase()">{{ log.actionType | statusLabel:'action' }}</span></td>
+                  <td>
+                    <div class="entity-cell">
+                      <span class="entity-badge">{{ log.entityType | statusLabel:'entity' }}</span>
+                      @if (entityDisplayName(log)) {
+                        <span class="entity-name">{{ entityDisplayName(log) }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="desc-cell">{{ humanizeDescription(log) }}</td>
+                  <td>
+                    <span class="result-badge" [class]="(log.result || 'SUCCESS').toLowerCase()">{{ (log.result || 'SUCCESS') | statusLabel:'result' }}</span>
+                  </td>
+                  <td>
+                    <button (click)="openDetailModal(log)" class="view-btn">Farkı İncele</button>
+                  </td>
+                </tr>
+              }
+              @if (filteredLogs.length === 0) {
+                <tr>
+                  <td colspan="8" class="text-center text-muted">Arama kriterlerine uygun güncellenmiş kayıt bulunamadı.</td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
-
+    
         <!-- Pagination (sayfa boyutu 5 sabit) -->
-        <div class="audit-pagination" *ngIf="filteredLogs.length > 0">
-          <span class="page-info">
-            Toplam <strong>{{ filteredLogs.length }}</strong> kayıt — {{ startIdx + 1 }}–{{ endIdx }} arası
-          </span>
-          <div class="page-controls">
-            <button [disabled]="page === 1" (click)="setPage(1)" title="İlk">«</button>
-            <button [disabled]="page === 1" (click)="setPage(page - 1)" title="Önceki">‹</button>
-            <span class="page-num">{{ page }} / {{ totalPages || 1 }}</span>
-            <button [disabled]="page >= totalPages" (click)="setPage(page + 1)" title="Sonraki">›</button>
-            <button [disabled]="page >= totalPages" (click)="setPage(totalPages)" title="Son">»</button>
+        @if (filteredLogs.length > 0) {
+          <div class="audit-pagination">
+            <span class="page-info">
+              Toplam <strong>{{ filteredLogs.length }}</strong> kayıt — {{ startIdx + 1 }}–{{ endIdx }} arası
+            </span>
+            <div class="page-controls">
+              <button [disabled]="page === 1" (click)="setPage(1)" title="İlk">«</button>
+              <button [disabled]="page === 1" (click)="setPage(page - 1)" title="Önceki">‹</button>
+              <span class="page-num">{{ page }} / {{ totalPages || 1 }}</span>
+              <button [disabled]="page >= totalPages" (click)="setPage(page + 1)" title="Sonraki">›</button>
+              <button [disabled]="page >= totalPages" (click)="setPage(totalPages)" title="Son">»</button>
+            </div>
           </div>
-        </div>
+        }
       </div>
-
+    
       <!-- Detay Modal (Fark Görünümü ile) -->
-      <div class="modal-backdrop" *ngIf="isModalOpen && selectedLog">
-        <div class="modal-box">
-          <div class="modal-header">
-            <h3>İşlem Detayları ve Değişim Farkları</h3>
-            <button (click)="closeModal()" class="close-btn">&times;</button>
-          </div>
-          
-          <div class="modal-body">
-            <div class="meta-info-grid">
-              <p><strong>Log ID:</strong> {{ selectedLog.id }}</p>
-              <p><strong>Tarih:</strong> {{ selectedLog.createdAt | date:'dd.MM.yyyy HH:mm:ss' }}</p>
-              <p><strong>Kullanıcı (ID):</strong> {{ selectedLog.username }} ({{ selectedLog.userId }})</p>
-              <p><strong>Rol / IP Adresi:</strong> {{ selectedLog.userRole | roleLabel }} / {{ selectedLog.simulatedIp }}</p>
-              <p><strong>Etkilenen Kayıt:</strong> {{ selectedLog.entityType | statusLabel:'entity' }}{{ entityDisplayName(selectedLog) ? ' — ' + entityDisplayName(selectedLog) : '' }}</p>
-              <p><strong>İşlem Durumu:</strong>
+      @if (isModalOpen && selectedLog) {
+        <div class="modal-backdrop">
+          <div class="modal-box">
+            <div class="modal-header">
+              <h3>İşlem Detayları ve Değişim Farkları</h3>
+              <button (click)="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="meta-info-grid">
+                <p><strong>Log ID:</strong> {{ selectedLog.id }}</p>
+                <p><strong>Tarih:</strong> {{ selectedLog.createdAt | date:'dd.MM.yyyy HH:mm:ss' }}</p>
+                <p><strong>Kullanıcı (ID):</strong> {{ selectedLog.username }} ({{ selectedLog.userId }})</p>
+                <p><strong>Rol / IP Adresi:</strong> {{ selectedLog.userRole | roleLabel }} / {{ selectedLog.simulatedIp }}</p>
+                <p><strong>Etkilenen Kayıt:</strong> {{ selectedLog.entityType | statusLabel:'entity' }}{{ entityDisplayName(selectedLog) ? ' — ' + entityDisplayName(selectedLog) : '' }}</p>
+                <p><strong>İşlem Durumu:</strong>
                 <span class="result-badge" [class]="(selectedLog.result || 'SUCCESS').toLowerCase()">{{ (selectedLog.result || 'SUCCESS') | statusLabel:'result' }}</span>
               </p>
             </div>
-
             <!-- Ne oldu? — olayın sade dille anlatımı -->
             <div class="explain-box" [class.explain-danger]="selectedLog.actionType === 'SECURITY_VIOLATION'">
               <h4>Ne oldu?</h4>
-              <p *ngFor="let line of getExplanation(selectedLog)">{{ line }}</p>
+              @for (line of getExplanation(selectedLog); track line) {
+                <p>{{ line }}</p>
+              }
             </div>
-
-            <div class="alert alert-danger" *ngIf="selectedLog.result === 'FAILURE'">
-              <strong>Başarısızlık Gerekçesi:</strong> {{ selectedLog.failureReason || 'Belirtilmedi.' }}
-            </div>
-
+            @if (selectedLog.result === 'FAILURE') {
+              <div class="alert alert-danger">
+                <strong>Başarısızlık Gerekçesi:</strong> {{ selectedLog.failureReason || 'Belirtilmedi.' }}
+              </div>
+            }
             <div class="diff-section">
               <h4>Veri Değişim Detayı</h4>
-              <p class="summary-text" *ngIf="!['CREATE', 'DELETE', 'UPDATE', 'STATE_TRANSITION'].includes(selectedLog.actionType)">Bu işlemde saklanan bir veri değişikliği yok.</p>
-              
+              @if (!['CREATE', 'DELETE', 'UPDATE', 'STATE_TRANSITION'].includes(selectedLog.actionType)) {
+                <p class="summary-text">Bu işlemde saklanan bir veri değişikliği yok.</p>
+              }
               <!-- Case 1: Create (No oldValue) -->
-              <div *ngIf="selectedLog.actionType === 'CREATE'" class="diff-summary create">
-                <p class="summary-text">Nesne ilk kez oluşturuldu. Detaylar:</p>
-                <pre class="json-code">{{ parsePrettyJson(selectedLog.newValue) }}</pre>
-              </div>
-
+              @if (selectedLog.actionType === 'CREATE') {
+                <div class="diff-summary create">
+                  <p class="summary-text">Nesne ilk kez oluşturuldu. Detaylar:</p>
+                  <pre class="json-code">{{ parsePrettyJson(selectedLog.newValue) }}</pre>
+                </div>
+              }
               <!-- Case 2: Delete (No newValue) -->
-              <div *ngIf="selectedLog.actionType === 'DELETE'" class="diff-summary delete">
-                <p class="summary-text">Nesne veritabanından silindi. Son durum:</p>
-                <pre class="json-code">{{ parsePrettyJson(selectedLog.oldValue) }}</pre>
-              </div>
-
+              @if (selectedLog.actionType === 'DELETE') {
+                <div class="diff-summary delete">
+                  <p class="summary-text">Nesne veritabanından silindi. Son durum:</p>
+                  <pre class="json-code">{{ parsePrettyJson(selectedLog.oldValue) }}</pre>
+                </div>
+              }
               <!-- Case 3: Update / State Transition (Show key-by-key comparison) -->
-              <div *ngIf="(selectedLog.actionType === 'UPDATE' || selectedLog.actionType === 'STATE_TRANSITION') && getDiffList().length > 0">
-                <table class="diff-table">
-                  <thead>
-                    <tr>
-                      <th>Alan</th>
-                      <th>Eski Değer</th>
-                      <th>Yeni Değer</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of getDiffList()">
-                      <td class="diff-key">{{ translateFieldName(item.key) }}</td>
-                      <td class="diff-old">{{ stringifyDiffVal(item.old) }}</td>
-                      <td class="diff-new">{{ stringifyDiffVal(item.new) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
+              @if ((selectedLog.actionType === 'UPDATE' || selectedLog.actionType === 'STATE_TRANSITION') && getDiffList().length > 0) {
+                <div>
+                  <table class="diff-table">
+                    <thead>
+                      <tr>
+                        <th>Alan</th>
+                        <th>Eski Değer</th>
+                        <th>Yeni Değer</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (item of getDiffList(); track item) {
+                        <tr>
+                          <td class="diff-key">{{ translateFieldName(item.key) }}</td>
+                          <td class="diff-old">{{ stringifyDiffVal(item.old) }}</td>
+                          <td class="diff-new">{{ stringifyDiffVal(item.new) }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
               <!-- Case 4: No change or unparseable -->
-              <div *ngIf="(selectedLog.actionType === 'UPDATE' || selectedLog.actionType === 'STATE_TRANSITION') && getDiffList().length === 0" class="diff-summary info">
-                <p class="summary-text">Değişen özellik bulunamadı veya ham log değeri kaydedildi.</p>
-                <div class="raw-values-grid">
-                  <div>
-                    <h5>Eski Değer</h5>
-                    <pre class="raw-code">{{ selectedLog.oldValue || 'Boş' }}</pre>
-                  </div>
-                  <div>
-                    <h5>Yeni Değer</h5>
-                    <pre class="raw-code">{{ selectedLog.newValue || 'Boş' }}</pre>
+              @if ((selectedLog.actionType === 'UPDATE' || selectedLog.actionType === 'STATE_TRANSITION') && getDiffList().length === 0) {
+                <div class="diff-summary info">
+                  <p class="summary-text">Değişen özellik bulunamadı veya ham log değeri kaydedildi.</p>
+                  <div class="raw-values-grid">
+                    <div>
+                      <h5>Eski Değer</h5>
+                      <pre class="raw-code">{{ selectedLog.oldValue || 'Boş' }}</pre>
+                    </div>
+                    <div>
+                      <h5>Yeni Değer</h5>
+                      <pre class="raw-code">{{ selectedLog.newValue || 'Boş' }}</pre>
+                    </div>
                   </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
-          
           <div class="modal-footer">
             <button (click)="closeModal()" class="btn btn-secondary">Kapat</button>
           </div>
         </div>
       </div>
+    }
     </div>
-  `,
+    `,
     styleUrls: ['./audit-list.component.scss']
 })
 export class AuditListComponent implements OnInit {

@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { CommonModule } from '@angular/common';
+
 import { PermissionService } from '../../core/services/permission.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { AuthStateService } from '../../core/auth/auth-state.service';
@@ -26,65 +26,80 @@ interface MenuGroup {
 
 @Component({
     selector: 'app-main-layout',
-    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, RoleLabelPipe],
+    imports: [RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, RoleLabelPipe],
     template: `
     <div class="layout-container">
       <header class="app-header">
         <div class="header-left">
           <button class="sidebar-toggle" type="button" (click)="toggleSidebar()" [title]="collapsed() ? 'Menüyü aç' : 'Menüyü kapat'">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-              <path *ngIf="collapsed()" d="M4 7h16M4 12h16M4 17h16"/>
-              <path *ngIf="!collapsed()" d="M6 6l12 12M18 6L6 18"/>
+              @if (collapsed()) {
+                <path d="M4 7h16M4 12h16M4 17h16"/>
+              }
+              @if (!collapsed()) {
+                <path d="M6 6l12 12M18 6L6 18"/>
+              }
             </svg>
           </button>
           <div class="logo">Saha Operasyon Yönetimi</div>
         </div>
-        <div class="user-profile" *ngIf="authState.currentUser() as user">
-          <button (click)="toggleDarkMode()" class="dark-mode-toggle" [title]="isDarkMode() ? 'Açık Tema' : 'Karanlık Tema'">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <ng-container *ngIf="isDarkMode()">
-                <circle cx="12" cy="12" r="4"/>
-                <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>
-              </ng-container>
-              <path *ngIf="!isDarkMode()" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>
-            </svg>
-          </button>
-          <app-notification-bell></app-notification-bell>
-          <span class="user-info">{{ user.fullName }} ({{ user.role | roleLabel }})</span>
-          <button (click)="logout()" class="logout-btn">Çıkış Yap</button>
-        </div>
+        @if (authState.currentUser(); as user) {
+          <div class="user-profile">
+            <button (click)="toggleDarkMode()" class="dark-mode-toggle" [title]="isDarkMode() ? 'Açık Tema' : 'Karanlık Tema'">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                @if (isDarkMode()) {
+                  <ng-container>
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>
+                  </ng-container>
+                }
+                @if (!isDarkMode()) {
+                  <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>
+                }
+              </svg>
+            </button>
+            <app-notification-bell></app-notification-bell>
+            <span class="user-info">{{ user.fullName }} ({{ user.role | roleLabel }})</span>
+            <button (click)="logout()" class="logout-btn">Çıkış Yap</button>
+          </div>
+        }
       </header>
       <div class="layout-body">
         <!-- Mobile sidebar backdrop — tıklayınca menüyü kapat -->
-        <div class="sidebar-backdrop"
-             *ngIf="!collapsed() && isMobile()"
-             (click)="toggleSidebar()"
-             aria-hidden="true"></div>
+        @if (!collapsed() && isMobile()) {
+          <div class="sidebar-backdrop"
+            (click)="toggleSidebar()"
+          aria-hidden="true"></div>
+        }
         <aside class="sidebar" [class.collapsed]="collapsed()">
           <nav>
             <!-- Ana Panel (her zaman görünür, tek satır) -->
             <a routerLink="/panel" routerLinkActive="active-link" class="single-link" title="Ana Panel">
               <span class="label">Ana Panel</span>
             </a>
-
+    
             <!-- Gruplar -->
-            <ng-container *ngFor="let group of menuGroups">
-              <div class="group" *ngIf="visibleItems(group).length > 0">
-                <button class="group-header" type="button" (click)="toggle(group.id)" [title]="group.label">
-                  <span class="group-left">
-                    <span class="label">{{ group.label }}</span>
-                  </span>
-                  <span class="chevron" [class.open]="isOpen(group.id) || collapsed()">▾</span>
-                </button>
-                <ul class="group-items" [class.collapsed]="!isOpen(group.id) && !collapsed()">
-                  <li *ngFor="let item of visibleItems(group)">
-                    <a [routerLink]="item.route" routerLinkActive="active-link" [title]="item.label">
-                      <span class="label">{{ item.label }}</span>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </ng-container>
+            @for (group of menuGroups; track group) {
+              @if (visibleItems(group).length > 0) {
+                <div class="group">
+                  <button class="group-header" type="button" (click)="toggle(group.id)" [title]="group.label">
+                    <span class="group-left">
+                      <span class="label">{{ group.label }}</span>
+                    </span>
+                    <span class="chevron" [class.open]="isOpen(group.id) || collapsed()">▾</span>
+                  </button>
+                  <ul class="group-items" [class.collapsed]="!isOpen(group.id) && !collapsed()">
+                    @for (item of visibleItems(group); track item) {
+                      <li>
+                        <a [routerLink]="item.route" routerLinkActive="active-link" [title]="item.label">
+                          <span class="label">{{ item.label }}</span>
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            }
           </nav>
         </aside>
         <main class="main-content">
@@ -94,7 +109,7 @@ interface MenuGroup {
         </main>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./main-layout.component.scss']
 })
 export class MainLayoutComponent implements OnInit {

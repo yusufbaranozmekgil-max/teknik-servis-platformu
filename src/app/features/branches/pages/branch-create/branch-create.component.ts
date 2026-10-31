@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -11,7 +11,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
 
 @Component({
     selector: 'app-branch-create',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -20,7 +20,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
           <h2>Yeni Şube Ekle</h2>
         </div>
       </div>
-
+    
       <div class="card-content">
         <form [formGroup]="branchForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
@@ -32,7 +32,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               placeholder="Örn: SUBE-ANK-03"
             ></app-form-field>
-
+    
             <app-form-field
               label="Şube Adı"
               [control]="$any(branchForm.get('name'))"
@@ -41,7 +41,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               placeholder="Örn: Ankara Çankaya Şubesi"
             ></app-form-field>
-
+    
             <app-form-field
               label="Şehir"
               [control]="$any(branchForm.get('city'))"
@@ -51,7 +51,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               inputFilter="letters"
               placeholder="Örn: Ankara"
             ></app-form-field>
-
+    
             <app-form-field
               label="İlçe"
               [control]="$any(branchForm.get('district'))"
@@ -61,7 +61,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               inputFilter="letters"
               placeholder="Örn: Çankaya"
             ></app-form-field>
-
+    
             <app-form-field
               label="Sorumlu Kişi"
               [control]="$any(branchForm.get('contactPerson'))"
@@ -71,7 +71,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               inputFilter="letters"
               placeholder="Örn: Ahmet Yılmaz"
             ></app-form-field>
-
+    
             <app-form-field
               label="Günlük Teknisyen Kapasitesi"
               type="number"
@@ -82,7 +82,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Enlem"
               type="number"
@@ -95,7 +95,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Boylam"
               type="number"
@@ -108,7 +108,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Mesai Başlangıcı"
               type="time"
@@ -116,7 +116,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               placeholder="08:00"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Mesai Bitişi"
               type="time"
@@ -125,41 +125,49 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [required]="true"
             ></app-form-field>
           </div>
-          <div class="error-alert" *ngIf="branchForm.errors?.['workingHoursRange'] && (branchForm.get('workingHoursStart')?.touched || branchForm.get('workingHoursEnd')?.touched)">
-            Mesai bitişi başlangıç saatinden sonra olmalıdır.
-          </div>
-
+          @if (branchForm.errors?.['workingHoursRange'] && (branchForm.get('workingHoursStart')?.touched || branchForm.get('workingHoursEnd')?.touched)) {
+            <div class="error-alert">
+              Mesai bitişi başlangıç saatinden sonra olmalıdır.
+            </div>
+          }
+    
           <div class="form-group full-width">
             <label>Hizmet Verdiği Bölgeler / Mahalleler</label>
             <div class="tag-input-container">
-              <input 
-                #areaInput 
-                type="text" 
-                placeholder="Semt/Mahalle yazıp ekleyin" 
+              <input
+                #areaInput
+                type="text"
+                placeholder="Semt/Mahalle yazıp ekleyin"
                 [attr.maxlength]="FIELD_LIMITS.serviceArea"
-                (keydown.enter)="addArea($event, areaInput)" 
-              />
+                (keydown.enter)="addArea($event, areaInput)"
+                />
               <button type="button" (click)="addAreaBtn(areaInput)" class="tag-add-btn">Ekle</button>
             </div>
-            <div class="area-error" *ngIf="areaError">{{ areaError }}</div>
+            @if (areaError) {
+              <div class="area-error">{{ areaError }}</div>
+            }
             <div class="area-count">{{ serviceAreas.length }} / 20 bölge</div>
-
+    
             <div class="chips-container">
-              <span class="tag-chip" *ngFor="let area of serviceAreas; let i = index">
-                {{ area }}
-                <button type="button" (click)="removeArea(i)" class="tag-remove-btn">&times;</button>
-              </span>
-              <span class="no-tags" *ngIf="serviceAreas.length === 0">Eklenmiş bölge yok.</span>
+              @for (area of serviceAreas; track area; let i = $index) {
+                <span class="tag-chip">
+                  {{ area }}
+                  <button type="button" (click)="removeArea(i)" class="tag-remove-btn">&times;</button>
+                </span>
+              }
+              @if (serviceAreas.length === 0) {
+                <span class="no-tags">Eklenmiş bölge yok.</span>
+              }
             </div>
           </div>
-
+    
           <div class="form-group full-width check-group">
             <label class="switch-label">
               <input type="checkbox" formControlName="isActive" />
               <span class="switch-text">Şube Aktif</span>
             </label>
           </div>
-
+    
           <div class="form-actions">
             <button type="button" routerLink="/subeler" class="cancel-btn" [disabled]="loading">İptal</button>
             <button type="submit" class="save-btn" [disabled]="branchForm.invalid || loading">
@@ -169,7 +177,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
         </form>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./branch-create.component.scss']
 })
 export class BranchCreatePage {

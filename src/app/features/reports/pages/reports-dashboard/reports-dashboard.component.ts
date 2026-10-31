@@ -1,7 +1,7 @@
 import { toLocalDateISO } from '../../../../core/constants/form-limits.const';
 import { Chart, registerables } from 'chart.js';
 import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { StorageService } from '../../../../core/storage/storage.service';
 import { STORAGE_KEYS } from '../../../../core/storage/storage-keys';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
@@ -73,7 +73,7 @@ const SKILL_LABELS: Record<string, string> = {
 
 @Component({
     selector: 'app-reports-dashboard',
-    imports: [CommonModule, SmartDateInputComponent],
+    imports: [SmartDateInputComponent],
     template: `
     <div class="reports-container">
       <!-- Üst başlık + global KPI şeridi -->
@@ -97,158 +97,206 @@ const SKILL_LABELS: Record<string, string> = {
           </button>
         </div>
       </header>
-
+    
       <!-- Hero KPI şeridi — her zaman görünür organizasyon geneli özet -->
       <section class="hero-strip">
-        <div *ngFor="let kpi of heroKpis" class="hero-card" [attr.data-trend]="kpi.trend">
-          <div class="hero-label">{{ kpi.label }}</div>
-          <div class="hero-value">{{ kpi.value }}</div>
-          <div class="hero-hint">{{ kpi.hint }}</div>
-        </div>
+        @for (kpi of heroKpis; track kpi) {
+          <div class="hero-card" [attr.data-trend]="kpi.trend">
+            <div class="hero-label">{{ kpi.label }}</div>
+            <div class="hero-value">{{ kpi.value }}</div>
+            <div class="hero-hint">{{ kpi.hint }}</div>
+          </div>
+        }
       </section>
-
+    
       <!-- Rapor sekmeleri -->
       <nav class="report-tabs" aria-label="Rapor seçimi">
-        <button
-          *ngFor="let rep of reportOptions"
-          type="button"
-          class="report-tab"
-          [class.active]="selectedReportId === rep.id"
-          (click)="changeReport(rep.id)"
-          [title]="rep.description"
-        >
-          <span class="tab-name">{{ rep.shortName }}</span>
-        </button>
+        @for (rep of reportOptions; track rep) {
+          <button
+            type="button"
+            class="report-tab"
+            [class.active]="selectedReportId === rep.id"
+            (click)="changeReport(rep.id)"
+            [title]="rep.description"
+            >
+            <span class="tab-name">{{ rep.shortName }}</span>
+          </button>
+        }
       </nav>
-
+    
       <!-- Filtre paneli -->
-      <section class="filter-panel" *ngIf="currentReport">
-        <div class="filter-row">
-          <div class="filter-group">
-            <label>Şube</label>
-            <select [value]="filterBranchId" [disabled]="branchLocked" (change)="filterBranchId = $any($event.target).value; applyFilters()" class="select-input">
-              <option *ngIf="!branchLocked" value="">Tüm Şubeler</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }} — {{ b.city }}</option>
-            </select>
-            <small class="lock-hint" *ngIf="branchLocked">Yalnızca sorumlu olduğunuz şube ({{ lockedBranchName }}) gösterilir.</small>
-          </div>
-
-          <div class="filter-group filter-group--date">
-            <label>Tarih Aralığı</label>
-            <div class="date-inputs">
-              <div class="date-with-label">
-                <span class="date-mini-label">Başlangıç</span>
-                <app-smart-date-input [value]="filterStartDate" (valueChange)="filterStartDate = $event || ''; applyFilters()"></app-smart-date-input>
+      @if (currentReport) {
+        <section class="filter-panel">
+          <div class="filter-row">
+            <div class="filter-group">
+              <label>Şube</label>
+              <select [value]="filterBranchId" [disabled]="branchLocked" (change)="filterBranchId = $any($event.target).value; applyFilters()" class="select-input">
+                @if (!branchLocked) {
+                  <option value="">Tüm Şubeler</option>
+                }
+                @for (b of branches; track b) {
+                  <option [value]="b.id">{{ b.name }} — {{ b.city }}</option>
+                }
+              </select>
+              @if (branchLocked) {
+                <small class="lock-hint">Yalnızca sorumlu olduğunuz şube ({{ lockedBranchName }}) gösterilir.</small>
+              }
+            </div>
+            <div class="filter-group filter-group--date">
+              <label>Tarih Aralığı</label>
+              <div class="date-inputs">
+                <div class="date-with-label">
+                  <span class="date-mini-label">Başlangıç</span>
+                  <app-smart-date-input [value]="filterStartDate" (valueChange)="filterStartDate = $event || ''; applyFilters()"></app-smart-date-input>
+                </div>
+                <div class="date-with-label">
+                  <span class="date-mini-label">Bitiş</span>
+                  <app-smart-date-input [value]="filterEndDate" (valueChange)="filterEndDate = $event || ''; applyFilters()"></app-smart-date-input>
+                </div>
               </div>
-              <div class="date-with-label">
-                <span class="date-mini-label">Bitiş</span>
-                <app-smart-date-input [value]="filterEndDate" (valueChange)="filterEndDate = $event || ''; applyFilters()"></app-smart-date-input>
+            </div>
+            @if (statusFilterOptions.length > 0) {
+              <div class="filter-group">
+                <label>Durum</label>
+                <select [value]="filterStatus" (change)="filterStatus = $any($event.target).value; applyFilters()" class="select-input">
+                  <option value="">Tümü</option>
+                  @for (opt of statusFilterOptions; track opt) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+            }
+            <div class="filter-group preset-group">
+              <label>Hızlı Tarih</label>
+              <div class="preset-buttons">
+                <button class="preset-btn" type="button" (click)="setDatePreset('today')">Bugün</button>
+                <button class="preset-btn" type="button" (click)="setDatePreset('7')">Son 7 gün</button>
+                <button class="preset-btn" type="button" (click)="setDatePreset('30')">Son 30 gün</button>
+                <button class="preset-btn" type="button" (click)="setDatePreset('all')">Tümü</button>
               </div>
             </div>
           </div>
-
-          <div class="filter-group" *ngIf="statusFilterOptions.length > 0">
-            <label>Durum</label>
-            <select [value]="filterStatus" (change)="filterStatus = $any($event.target).value; applyFilters()" class="select-input">
-              <option value="">Tümü</option>
-              <option *ngFor="let opt of statusFilterOptions" [value]="opt.value">{{ opt.label }}</option>
-            </select>
-          </div>
-
-          <div class="filter-group preset-group">
-            <label>Hızlı Tarih</label>
-            <div class="preset-buttons">
-              <button class="preset-btn" type="button" (click)="setDatePreset('today')">Bugün</button>
-              <button class="preset-btn" type="button" (click)="setDatePreset('7')">Son 7 gün</button>
-              <button class="preset-btn" type="button" (click)="setDatePreset('30')">Son 30 gün</button>
-              <button class="preset-btn" type="button" (click)="setDatePreset('all')">Tümü</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
+        </section>
+      }
+    
       <!-- Rapor başlığı + tanım -->
-      <div class="report-info-card" *ngIf="currentReport">
-        <div class="info-body">
-          <h3>{{ currentReport.name }}</h3>
-          <p>{{ currentReport.description }}</p>
+      @if (currentReport) {
+        <div class="report-info-card">
+          <div class="info-body">
+            <h3>{{ currentReport.name }}</h3>
+            <p>{{ currentReport.description }}</p>
+          </div>
+          <div class="info-meta">
+            <span class="meta-chip">{{ tableData.length }} kayıt</span>
+            @if (filterBranchId) {
+              <span class="meta-chip">Şube filtresi etkin</span>
+            }
+            @if (filterStartDate || filterEndDate) {
+              <span class="meta-chip">Tarih filtresi etkin</span>
+            }
+            @if (filterStatus) {
+              <span class="meta-chip">Durum: {{ statusFilterLabel(filterStatus) }}</span>
+            }
+          </div>
         </div>
-        <div class="info-meta">
-          <span class="meta-chip">{{ tableData.length }} kayıt</span>
-          <span class="meta-chip" *ngIf="filterBranchId">Şube filtresi etkin</span>
-          <span class="meta-chip" *ngIf="filterStartDate || filterEndDate">Tarih filtresi etkin</span>
-          <span class="meta-chip" *ngIf="filterStatus">Durum: {{ statusFilterLabel(filterStatus) }}</span>
-        </div>
-      </div>
-
+      }
+    
       <!-- Rapora özel KPI strip -->
-      <div class="kpi-strip" *ngIf="summaryKpis.length > 0">
-        <div *ngFor="let k of summaryKpis" class="kpi-card" [class]="'kpi-' + (k.color || 'gray')">
-          <div class="kpi-label">{{ k.label }}</div>
-          <div class="kpi-value">{{ k.value }}</div>
+      @if (summaryKpis.length > 0) {
+        <div class="kpi-strip">
+          @for (k of summaryKpis; track k) {
+            <div class="kpi-card" [class]="'kpi-' + (k.color || 'gray')">
+              <div class="kpi-label">{{ k.label }}</div>
+              <div class="kpi-value">{{ k.value }}</div>
+            </div>
+          }
         </div>
-      </div>
-
+      }
+    
       <!-- Grafik + Tablo grid -->
       <div class="analytics-area">
         <div class="chart-card">
           <h3>Grafik Görünümü</h3>
           <div class="chart-wrapper">
             <canvas #chartCanvas></canvas>
-            <div *ngIf="tableData.length === 0" class="chart-empty">
-              Filtrelere uygun veri bulunamadı.
-            </div>
+            @if (tableData.length === 0) {
+              <div class="chart-empty">
+                Filtrelere uygun veri bulunamadı.
+              </div>
+            }
           </div>
         </div>
-
+    
         <div class="table-card">
           <h3>Detaylı Veri Tablosu</h3>
           <div class="table-wrapper">
             <table class="report-table">
               <thead>
                 <tr>
-                  <th *ngFor="let col of tableColumns">{{ col }}</th>
+                  @for (col of tableColumns; track col) {
+                    <th>{{ col }}</th>
+                  }
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let row of pagedRows">
-                  <td *ngFor="let col of tableKeys">
-                    <ng-container [ngSwitch]="col">
-                      <span *ngSwitchCase="'ratio'" class="font-bold">{{ row[col] }}%</span>
-                      <span *ngSwitchCase="'avgPerformance'">
-                        <span class="badge" [class.badge-green]="row[col] >= 85" [class.badge-blue]="row[col] >= 70 && row[col] < 85" [class.badge-orange]="row[col] < 70">{{ row[col] }} / 100</span>
-                      </span>
-                      <span *ngSwitchCase="'fuelLevel'" class="badge" [class.badge-orange]="row[col] < 30" [class.badge-green]="row[col] >= 30">%{{ row[col] }}</span>
-                      <span *ngSwitchCase="'statusLabel'" class="badge" [class.badge-green]="row.statusKey === 'COMPLETED' || row.statusKey === 'CLOSED' || row.statusKey === 'AVAILABLE' || row.statusKey === 'ACTIVE'" [class.badge-orange]="row.statusKey === 'PARTIALLY_COMPLETED' || row.statusKey === 'IN_PROGRESS' || row.statusKey === 'MAINTENANCE'" [class.badge-red]="row.statusKey === 'FAILED' || row.statusKey === 'CANCELLED' || row.statusKey === 'OUT_OF_SERVICE'">{{ row[col] }}</span>
-                      <span *ngSwitchCase="'difference'" class="badge badge-red">−{{ row[col] }}</span>
-                      <span *ngSwitchDefault>{{ row[col] }}</span>
-                    </ng-container>
-                  </td>
-                </tr>
-                <tr *ngIf="tableData.length === 0">
-                  <td [attr.colspan]="tableColumns.length" class="empty-row">Filtrelere uygun veri bulunamadı.</td>
-                </tr>
+                @for (row of pagedRows; track row) {
+                  <tr>
+                    @for (col of tableKeys; track col) {
+                      <td>
+                        @switch (col) {
+                          @case ('ratio') {
+                            <span class="font-bold">{{ row[col] }}%</span>
+                          }
+                          @case ('avgPerformance') {
+                            <span>
+                              <span class="badge" [class.badge-green]="row[col] >= 85" [class.badge-blue]="row[col] >= 70 && row[col] < 85" [class.badge-orange]="row[col] < 70">{{ row[col] }} / 100</span>
+                            </span>
+                          }
+                          @case ('fuelLevel') {
+                            <span class="badge" [class.badge-orange]="row[col] < 30" [class.badge-green]="row[col] >= 30">%{{ row[col] }}</span>
+                          }
+                          @case ('statusLabel') {
+                            <span class="badge" [class.badge-green]="row.statusKey === 'COMPLETED' || row.statusKey === 'CLOSED' || row.statusKey === 'AVAILABLE' || row.statusKey === 'ACTIVE'" [class.badge-orange]="row.statusKey === 'PARTIALLY_COMPLETED' || row.statusKey === 'IN_PROGRESS' || row.statusKey === 'MAINTENANCE'" [class.badge-red]="row.statusKey === 'FAILED' || row.statusKey === 'CANCELLED' || row.statusKey === 'OUT_OF_SERVICE'">{{ row[col] }}</span>
+                          }
+                          @case ('difference') {
+                            <span class="badge badge-red">−{{ row[col] }}</span>
+                          }
+                          @default {
+                            <span>{{ row[col] }}</span>
+                          }
+                        }
+                      </td>
+                    }
+                  </tr>
+                }
+                @if (tableData.length === 0) {
+                  <tr>
+                    <td [attr.colspan]="tableColumns.length" class="empty-row">Filtrelere uygun veri bulunamadı.</td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
-
+    
           <!-- Tablo sayfalama -->
-          <div class="table-pagination" *ngIf="tableData.length > pageSize">
-            <span class="page-info">
-              Toplam <strong>{{ tableData.length }}</strong> kayıt — {{ pageStart + 1 }}-{{ pageEnd }} arası
-            </span>
-            <div class="page-controls">
-              <button [disabled]="currentPage === 1" (click)="setPage(1)">«</button>
-              <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">‹</button>
-              <span class="page-num">{{ currentPage }} / {{ totalPages }}</span>
-              <button [disabled]="currentPage >= totalPages" (click)="setPage(currentPage + 1)">›</button>
-              <button [disabled]="currentPage >= totalPages" (click)="setPage(totalPages)">»</button>
+          @if (tableData.length > pageSize) {
+            <div class="table-pagination">
+              <span class="page-info">
+                Toplam <strong>{{ tableData.length }}</strong> kayıt — {{ pageStart + 1 }}-{{ pageEnd }} arası
+              </span>
+              <div class="page-controls">
+                <button [disabled]="currentPage === 1" (click)="setPage(1)">«</button>
+                <button [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)">‹</button>
+                <span class="page-num">{{ currentPage }} / {{ totalPages }}</span>
+                <button [disabled]="currentPage >= totalPages" (click)="setPage(currentPage + 1)">›</button>
+                <button [disabled]="currentPage >= totalPages" (click)="setPage(totalPages)">»</button>
+              </div>
             </div>
-          </div>
+          }
         </div>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./reports-dashboard.component.scss']
 })
 export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewInit {

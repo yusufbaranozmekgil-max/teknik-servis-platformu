@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { VehicleService } from '../../../../core/services/vehicle.service';
@@ -17,7 +17,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
 
 @Component({
     selector: 'app-vehicle-create',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -26,7 +26,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
           <h2>Yeni Araç Ekle</h2>
         </div>
       </div>
-
+    
       <div class="card-content">
         <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
@@ -38,19 +38,19 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
               [showCounter]="true"
               placeholder="Örn: 34ABC123"
             ></app-form-field>
-
+    
             <app-form-field
               label="Araç Tipi"
               type="select"
               [control]="$any(vehicleForm.get('vehicleType'))"
               [required]="true"
-            >
+              >
               <option value="Panelvan">Panelvan</option>
               <option value="Kamyonet">Kamyonet</option>
               <option value="Motosiklet">Motosiklet</option>
               <option value="Otomobil">Otomobil</option>
             </app-form-field>
-
+    
             <app-form-field
               label="Marka"
               [control]="$any(vehicleForm.get('brand'))"
@@ -60,7 +60,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
               inputFilter="letters"
               placeholder="Örn: Renault"
             ></app-form-field>
-
+    
             <app-form-field
               label="Model"
               [control]="$any(vehicleForm.get('model'))"
@@ -69,26 +69,30 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
               [showCounter]="true"
               placeholder="Örn: Kangoo"
             ></app-form-field>
-
+    
             <app-form-field
               label="Bağlı Şube"
               type="select"
               [control]="$any(vehicleForm.get('branchId'))"
               [required]="true"
-            >
+              >
               <option value="" disabled selected>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+              @for (b of branches; track b) {
+                <option [value]="b.id">{{ b.name }}</option>
+              }
             </app-form-field>
-
+    
             <app-form-field
               label="Atanmış Teknisyen (Sürücü)"
               type="select"
               [control]="$any(vehicleForm.get('assignedTechnicianId'))"
-            >
+              >
               <option [value]="null">Atama Yok</option>
-              <option *ngFor="let t of technicians" [value]="t.id">{{ t.fullName }}</option>
+              @for (t of technicians; track t) {
+                <option [value]="t.id">{{ t.fullName }}</option>
+              }
             </app-form-field>
-
+    
             <app-form-field
               label="Taşıma Kapasitesi (kg)"
               type="number"
@@ -99,7 +103,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Mevcut Yakıt Seviyesi (%)"
               type="number"
@@ -110,19 +114,19 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Durum"
               type="select"
               [control]="$any(vehicleForm.get('status'))"
               [required]="true"
-            >
+              >
               <option value="AVAILABLE">Müsait</option>
               <option value="ACTIVE">Görevde</option>
               <option value="MAINTENANCE">Bakımda</option>
               <option value="OUT_OF_SERVICE">Pasif</option>
             </app-form-field>
-
+    
             <div class="form-group">
               <label>Son Bakım Tarihi <span style="color:#dc2626">*</span></label>
               <app-smart-date-input
@@ -135,24 +139,26 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
               <small class="hint-text" style="color:#5f6c6e;font-size:0.75rem">Gün/Ay/Yıl (örn. 15/06/2025). 30 Şubat gibi geçersiz tarih otomatik düzeltilir.</small>
             </div>
           </div>
-
+    
           <div class="form-group full-width" style="margin-top: 1rem;">
             <label>Araç İçi Ekipman Seti / Demirbaşlar (Virgülle ayırarak yazın)</label>
             <input id="equipmentsInput" type="text" placeholder="Merdiven, Jeneratör, Alet Çantası, Matkap..." />
             <span class="hint-text">Ekipmanlar planlama kurallarında test edilir.</span>
           </div>
-
+    
           <div class="form-group check-group" style="margin-top: 1.25rem;">
             <label class="switch-label">
               <input type="checkbox" formControlName="isActive" />
               <span class="switch-text">Aktif Kullanımda</span>
             </label>
           </div>
-
-          <div *ngIf="errorMessage" class="error-alert">
-            {{ errorMessage }}
-          </div>
-
+    
+          @if (errorMessage) {
+            <div class="error-alert">
+              {{ errorMessage }}
+            </div>
+          }
+    
           <div class="form-actions">
             <button type="button" routerLink="/araclar" class="cancel-btn">Vazgeç</button>
             <button type="submit" [disabled]="vehicleForm.invalid || loading" class="save-btn">
@@ -162,7 +168,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
         </form>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./vehicle-create.component.scss']
 })
 export class VehicleCreatePage implements OnInit, ComponentCanDeactivate {

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RuleEngineService } from '../../../../core/services/rule-engine.service';
@@ -11,40 +11,44 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
 
 @Component({
     selector: 'app-rule-form',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule],
+    imports: [ReactiveFormsModule, RouterModule],
     template: `
     <div class="page-container">
       <div class="header">
         <h2>{{ isEdit ? 'Kuralı Düzenle' : 'Yeni Kural Oluştur' }}</h2>
         <p class="subtitle">Tetikleyici, koşul ve aksiyon bilgilerini girerek özel iş kuralı tanımlayın.</p>
       </div>
-
+    
       <form [formGroup]="form" (ngSubmit)="submit()" class="form-card">
         <div class="grid">
           <div class="form-group">
             <label>Kural Adı *</label>
             <input type="text" formControlName="name" maxlength="70" class="form-control" placeholder="Kısa, açıklayıcı bir ad"/>
-            <small class="err" *ngIf="form.controls['name'].touched && form.controls['name'].invalid">
-              Kural adı zorunludur (en fazla 70 karakter, sadece boşluk olamaz).
-            </small>
+            @if (form.controls['name'].touched && form.controls['name'].invalid) {
+              <small class="err">
+                Kural adı zorunludur (en fazla 70 karakter, sadece boşluk olamaz).
+              </small>
+            }
           </div>
-
+    
           <div class="form-group">
             <label>Öncelik (1 = en güçlü) *</label>
             <input type="number" formControlName="priority" min="1" max="999" maxlength="3"
-                   (keydown)="blockNumberKeys($event)"
-                   (input)="onPriorityInput($any($event.target))"
-                   class="form-control"/>
-            <small class="err" *ngIf="form.controls['priority'].touched && form.controls['priority'].invalid">
-              Öncelik 1 ile 999 arasında olmalı.
-            </small>
+              (keydown)="blockNumberKeys($event)"
+              (input)="onPriorityInput($any($event.target))"
+              class="form-control"/>
+            @if (form.controls['priority'].touched && form.controls['priority'].invalid) {
+              <small class="err">
+                Öncelik 1 ile 999 arasında olmalı.
+              </small>
+            }
           </div>
-
+    
           <div class="form-group full">
             <label>Açıklama *</label>
             <textarea formControlName="description" maxlength="250" rows="2" class="form-control"></textarea>
           </div>
-
+    
           <div class="form-group">
             <label>Tetikleyici *</label>
             <select formControlName="trigger" class="form-control">
@@ -54,52 +58,64 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
               <option value="SYSTEM_EVENT">Sistem Olayı</option>
             </select>
           </div>
-
-          <p class="form-group full" *ngIf="isSystemRule">Bu bir sistem kuralıdır; koşulu kodda tanımlıdır. Ad, açıklama, öncelik ve durum düzenlenebilir.</p>
-
-          <div class="form-group" *ngIf="!isSystemRule">
-            <label>Aksiyon Tipi *</label>
-            <select formControlName="actionType" class="form-control">
-              <option value="BLOCK_ASSIGNMENT">İşlemi Engelle</option>
-              <option value="REQUIRE_APPROVAL">Onay Gerektir</option>
-              <option value="TRIGGER_ALERT">Uyarı Üret</option>
-              <option value="AUTO_PRIORITIZE">Otomatik Önceliklendir</option>
-            </select>
-          </div>
-
-          <div class="form-group" *ngIf="!isSystemRule">
-            <label>Koşul Alanı (örn: request.priority) *</label>
-            <input type="text" formControlName="conditionField" maxlength="60" class="form-control" placeholder="request.priority"/>
-          </div>
-
-          <div class="form-group" *ngIf="!isSystemRule">
-            <label>Operatör *</label>
-            <select formControlName="operator" class="form-control">
-              <option value="EQUALS">Eşit (=)</option>
-              <option value="NOT_EQUALS">Eşit Değil (≠)</option>
-              <option value="GREATER_THAN">Büyük (&gt;)</option>
-              <option value="LESS_THAN">Küçük (&lt;)</option>
-              <option value="CONTAINS">İçerir</option>
-            </select>
-          </div>
-
-          <div class="form-group" *ngIf="!isSystemRule">
-            <label>Koşul Değeri *</label>
-            <input type="text" formControlName="conditionValue" maxlength="100" class="form-control"/>
-          </div>
-
-          <div class="form-group full" *ngIf="!isSystemRule">
-            <label>Aksiyon Değeri (opsiyonel)</label>
-            <input type="text" formControlName="actionValue" maxlength="250" class="form-control" placeholder="Bildirim metni / hedef değer"/>
-          </div>
-
+    
+          @if (isSystemRule) {
+            <p class="form-group full">Bu bir sistem kuralıdır; koşulu kodda tanımlıdır. Ad, açıklama, öncelik ve durum düzenlenebilir.</p>
+          }
+    
+          @if (!isSystemRule) {
+            <div class="form-group">
+              <label>Aksiyon Tipi *</label>
+              <select formControlName="actionType" class="form-control">
+                <option value="BLOCK_ASSIGNMENT">İşlemi Engelle</option>
+                <option value="REQUIRE_APPROVAL">Onay Gerektir</option>
+                <option value="TRIGGER_ALERT">Uyarı Üret</option>
+                <option value="AUTO_PRIORITIZE">Otomatik Önceliklendir</option>
+              </select>
+            </div>
+          }
+    
+          @if (!isSystemRule) {
+            <div class="form-group">
+              <label>Koşul Alanı (örn: request.priority) *</label>
+              <input type="text" formControlName="conditionField" maxlength="60" class="form-control" placeholder="request.priority"/>
+            </div>
+          }
+    
+          @if (!isSystemRule) {
+            <div class="form-group">
+              <label>Operatör *</label>
+              <select formControlName="operator" class="form-control">
+                <option value="EQUALS">Eşit (=)</option>
+                <option value="NOT_EQUALS">Eşit Değil (≠)</option>
+                <option value="GREATER_THAN">Büyük (&gt;)</option>
+                <option value="LESS_THAN">Küçük (&lt;)</option>
+                <option value="CONTAINS">İçerir</option>
+              </select>
+            </div>
+          }
+    
+          @if (!isSystemRule) {
+            <div class="form-group">
+              <label>Koşul Değeri *</label>
+              <input type="text" formControlName="conditionValue" maxlength="100" class="form-control"/>
+            </div>
+          }
+    
+          @if (!isSystemRule) {
+            <div class="form-group full">
+              <label>Aksiyon Değeri (opsiyonel)</label>
+              <input type="text" formControlName="actionValue" maxlength="250" class="form-control" placeholder="Bildirim metni / hedef değer"/>
+            </div>
+          }
+    
           <div class="form-group">
             <label class="check-label">
               <input type="checkbox" formControlName="isActive"/> Aktif
             </label>
           </div>
         </div>
-
+    
         <div class="actions">
           <button type="button" (click)="cancel()" class="btn btn-secondary">Vazgeç</button>
           <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
@@ -108,7 +124,7 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
         </div>
       </form>
     </div>
-  `,
+    `,
     styleUrls: ['./rule-form.component.scss']
 })
 export class RuleFormComponent implements OnInit {

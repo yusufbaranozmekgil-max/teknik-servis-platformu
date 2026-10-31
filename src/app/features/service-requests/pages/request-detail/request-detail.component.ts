@@ -29,78 +29,79 @@ const SKILL_LABELS: Record<string, string> = {
           <h2>Talep Detayı ve Analizi</h2>
         </div>
       </div>
-
-      <div class="card-content" *ngIf="request">
-        <div class="request-header">
-          <span class="code-badge">{{ request.code }}</span>
-          <h3>{{ request.title }}</h3>
-          <span class="status-pill" [class]="request.status.toLowerCase()">{{ request.status | statusLabel:'request' }}</span>
-        </div>
-
-        <!-- SLA Warning Card -->
-        <div class="sla-card" [ngClass]="getSlaStatusClass()">
-          
-          <div class="sla-details">
-            <strong>SLA Çözüm Hedefi:</strong>
-            <span>{{ request.slaDeadline | date:'dd.MM.yyyy HH:mm' }}</span>
-            <span class="sla-alert-text" *ngIf="slaService.isSlaOverdue(request.slaDeadline)">
-              (SLA Süresi Aşılmıştır!)
-            </span>
-            <span class="sla-alert-text" *ngIf="!slaService.isSlaOverdue(request.slaDeadline) && slaService.isSlaApproaching(request.slaDeadline)">
-              (SLA Süresinin Dolmasına 2 Saatten Az Kalmıştır!)
-            </span>
+    
+      @if (request) {
+        <div class="card-content">
+          <div class="request-header">
+            <span class="code-badge">{{ request.code }}</span>
+            <h3>{{ request.title }}</h3>
+            <span class="status-pill" [class]="request.status.toLowerCase()">{{ request.status | statusLabel:'request' }}</span>
+          </div>
+          <!-- SLA Warning Card -->
+          <div class="sla-card" [ngClass]="getSlaStatusClass()">
+            <div class="sla-details">
+              <strong>SLA Çözüm Hedefi:</strong>
+              <span>{{ request.slaDeadline | date:'dd.MM.yyyy HH:mm' }}</span>
+              @if (slaService.isSlaOverdue(request.slaDeadline)) {
+                <span class="sla-alert-text">
+                  (SLA Süresi Aşılmıştır!)
+                </span>
+              }
+              @if (!slaService.isSlaOverdue(request.slaDeadline) && slaService.isSlaApproaching(request.slaDeadline)) {
+                <span class="sla-alert-text">
+                  (SLA Süresinin Dolmasına 2 Saatten Az Kalmıştır!)
+                </span>
+              }
+            </div>
+          </div>
+          <div class="details-grid">
+            <div class="detail-section">
+              <h4>Müşteri Bilgileri</h4>
+              <div class="detail-item"><strong>Adı Soyadı:</strong> {{ request.customerName }}</div>
+              <div class="detail-item"><strong>Telefon:</strong> {{ request.customerPhone }}</div>
+              <div class="detail-item"><strong>Adres:</strong> {{ request.customerAddress || '—' }}</div>
+              <div class="detail-item"><strong>Bölge:</strong> {{ request.customerRegion || '—' }}</div>
+              <div class="detail-item"><strong>Bağlı Şube:</strong> {{ getBranchName(request.branchId) }}</div>
+            </div>
+            <div class="detail-section">
+              <h4>Teknik Detaylar</h4>
+              <div class="detail-item"><strong>Cihaz / Marka:</strong> {{ request.deviceBrandModel }}</div>
+              <div class="detail-item"><strong>Hizmet Kategorisi:</strong> {{ request.serviceCategory }}</div>
+              <div class="detail-item"><strong>Gerekli Yetkinlik:</strong> {{ skillLabel(request.requiredSkill) }}</div>
+              <div class="detail-item"><strong>Öncelik:</strong> {{ request.priority | priorityLabel }}</div>
+            </div>
+          </div>
+          <div class="description-section">
+            <h4>Arıza / Talep Açıklaması</h4>
+            <p class="description-text">{{ request.description }}</p>
+          </div>
+          <div class="warranty-section">
+            <div class="w-item">
+              <strong>Garanti Durumu:</strong>
+              <span class="bool-badge" [class.true]="request.hasWarranty">
+                {{ request.hasWarranty ? 'Garanti Kapsamında' : 'Garanti Dışı' }}
+              </span>
+            </div>
+            <div class="w-item">
+              <strong>Müşteri Ön Onayı:</strong>
+              <span class="bool-badge" [class.true]="request.hasCustomerApproval">
+                {{ request.hasCustomerApproval ? 'Onaylandı' : 'Onay Bekliyor' }}
+              </span>
+            </div>
+          </div>
+          <div class="meta-section">
+            <span>Oluşturulma Tarihi: {{ request.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
           </div>
         </div>
-
-        <div class="details-grid">
-          <div class="detail-section">
-            <h4>Müşteri Bilgileri</h4>
-            <div class="detail-item"><strong>Adı Soyadı:</strong> {{ request.customerName }}</div>
-            <div class="detail-item"><strong>Telefon:</strong> {{ request.customerPhone }}</div>
-            <div class="detail-item"><strong>Adres:</strong> {{ request.customerAddress || '—' }}</div>
-            <div class="detail-item"><strong>Bölge:</strong> {{ request.customerRegion || '—' }}</div>
-            <div class="detail-item"><strong>Bağlı Şube:</strong> {{ getBranchName(request.branchId) }}</div>
-          </div>
-
-          <div class="detail-section">
-            <h4>Teknik Detaylar</h4>
-            <div class="detail-item"><strong>Cihaz / Marka:</strong> {{ request.deviceBrandModel }}</div>
-            <div class="detail-item"><strong>Hizmet Kategorisi:</strong> {{ request.serviceCategory }}</div>
-            <div class="detail-item"><strong>Gerekli Yetkinlik:</strong> {{ skillLabel(request.requiredSkill) }}</div>
-            <div class="detail-item"><strong>Öncelik:</strong> {{ request.priority | priorityLabel }}</div>
-          </div>
+      }
+    
+      @if (errorMessage) {
+        <div class="error-alert">
+          {{ errorMessage }}
         </div>
-
-        <div class="description-section">
-          <h4>Arıza / Talep Açıklaması</h4>
-          <p class="description-text">{{ request.description }}</p>
-        </div>
-
-        <div class="warranty-section">
-          <div class="w-item">
-            <strong>Garanti Durumu:</strong>
-            <span class="bool-badge" [class.true]="request.hasWarranty">
-              {{ request.hasWarranty ? 'Garanti Kapsamında' : 'Garanti Dışı' }}
-            </span>
-          </div>
-          <div class="w-item">
-            <strong>Müşteri Ön Onayı:</strong>
-            <span class="bool-badge" [class.true]="request.hasCustomerApproval">
-              {{ request.hasCustomerApproval ? 'Onaylandı' : 'Onay Bekliyor' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="meta-section">
-          <span>Oluşturulma Tarihi: {{ request.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
-        </div>
-      </div>
-
-      <div class="error-alert" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./request-detail.component.scss']
 })
 export class RequestDetailPage implements OnInit {

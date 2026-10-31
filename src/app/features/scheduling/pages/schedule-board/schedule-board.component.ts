@@ -27,34 +27,38 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
         <h2>İş Emri Planlama ve Kaynak Atama</h2>
         <p class="subtitle">Açık servis taleplerini değerlendirip, en uygun teknisyen, araç ve yedek parçayı atayarak planlama yapın.</p>
       </div>
-
+    
       <div class="planning-grid">
         <!-- Sol Kolon: Seçimler ve Planlama Parametreleri -->
         <div class="control-panel card">
           <h3>1. Talep ve Zaman Dilimi Seçimi</h3>
-          
+    
           <div class="form-group">
             <label for="requestSelect">Açık Servis Talebi</label>
             <select id="requestSelect" [value]="selectedRequestId" (change)="selectedRequestId = $any($event.target).value; onRequestChange()" class="form-control">
               <option value="" disabled selected>-- Talep Seçiniz --</option>
-              <option *ngFor="let req of openRequests" [value]="req.id">
-                [{{ req.code }}] - {{ req.customerName }} - {{ req.title }} ({{ translatePriority(req.priority) }})
-              </option>
+              @for (req of openRequests; track req) {
+                <option [value]="req.id">
+                  [{{ req.code }}] - {{ req.customerName }} - {{ req.title }} ({{ translatePriority(req.priority) }})
+                </option>
+              }
             </select>
           </div>
-
+    
           <!-- Seçilen Talep Detayları -->
-          <div class="request-details-box" *ngIf="selectedRequest">
-            <h4>Talep Bilgileri</h4>
-            <p><strong>Cihaz/Marka/Model:</strong> {{ selectedRequest.deviceBrandModel }}</p>
-            <p><strong>Gerekli Yetkinlik:</strong> <span class="badge skill-badge">{{ translateSkill(selectedRequest.requiredSkill) }}</span></p>
-            <p><strong>Öncelik:</strong> <span class="badge priority-badge" [class]="selectedRequest.priority.toLowerCase()">{{ translatePriority(selectedRequest.priority) }}</span></p>
-            <p><strong>SLA Deadline:</strong> {{ selectedRequest.slaDeadline | date:'dd.MM.yyyy HH:mm' }}</p>
-            <p><strong>Arıza Açıklaması:</strong> {{ selectedRequest.description }}</p>
-          </div>
-
+          @if (selectedRequest) {
+            <div class="request-details-box">
+              <h4>Talep Bilgileri</h4>
+              <p><strong>Cihaz/Marka/Model:</strong> {{ selectedRequest.deviceBrandModel }}</p>
+              <p><strong>Gerekli Yetkinlik:</strong> <span class="badge skill-badge">{{ translateSkill(selectedRequest.requiredSkill) }}</span></p>
+              <p><strong>Öncelik:</strong> <span class="badge priority-badge" [class]="selectedRequest.priority.toLowerCase()">{{ translatePriority(selectedRequest.priority) }}</span></p>
+              <p><strong>SLA Deadline:</strong> {{ selectedRequest.slaDeadline | date:'dd.MM.yyyy HH:mm' }}</p>
+              <p><strong>Arıza Açıklaması:</strong> {{ selectedRequest.description }}</p>
+            </div>
+          }
+    
           <hr class="divider" />
-
+    
           <h3>2. Randevu Saatleri</h3>
           <div class="date-time-grid">
             <div class="form-group">
@@ -77,179 +81,216 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
               <input id="slotEnd" type="time" [value]="slotEnd" (change)="slotEnd = $any($event.target).value; onSlotChange()" class="form-control" />
             </div>
           </div>
-
+    
           <hr class="divider" />
-
+    
           <h3>3. Gerekli Yedek Parçalar</h3>
-          <div class="parts-selector-box" *ngIf="selectedRequest">
-            <div class="parts-add-form">
-              <div class="form-group select-part-group">
-                <label>Parça Seç</label>
-                <select [value]="selectedPartId" (change)="selectedPartId = $any($event.target).value" class="form-control">
-                  <option value="" disabled>-- Parça Seçiniz --</option>
-                  <option *ngFor="let p of branchParts" [value]="p.id">
-                    {{ p.name }} (Kod: {{ p.code }}) - Kalan: {{ getPartAvailable(p) }}
-                  </option>
-                </select>
+          @if (selectedRequest) {
+            <div class="parts-selector-box">
+              <div class="parts-add-form">
+                <div class="form-group select-part-group">
+                  <label>Parça Seç</label>
+                  <select [value]="selectedPartId" (change)="selectedPartId = $any($event.target).value" class="form-control">
+                    <option value="" disabled>-- Parça Seçiniz --</option>
+                    @for (p of branchParts; track p) {
+                      <option [value]="p.id">
+                        {{ p.name }} (Kod: {{ p.code }}) - Kalan: {{ getPartAvailable(p) }}
+                      </option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group qty-group">
+                  <label>Miktar</label>
+                  <input type="number" [value]="selectedPartQty" (input)="selectedPartQty = $any($event.target).valueAsNumber || 0" min="1" class="form-control" />
+                </div>
+                <button (click)="addPartToPlan()" class="add-part-btn">Ekle</button>
               </div>
-              <div class="form-group qty-group">
-                <label>Miktar</label>
-                <input type="number" [value]="selectedPartQty" (input)="selectedPartQty = $any($event.target).valueAsNumber || 0" min="1" class="form-control" />
-              </div>
-              <button (click)="addPartToPlan()" class="add-part-btn">Ekle</button>
+              <!-- Eklenen Parçalar Tablosu -->
+              @if (plannedParts.length > 0) {
+                <div class="added-parts-list">
+                  <table class="parts-table">
+                    <thead>
+                      <tr>
+                        <th>Parça</th>
+                        <th>Miktar</th>
+                        <th>Mevcut</th>
+                        <th>İşlem</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (p of plannedParts; track p; let idx = $index) {
+                        <tr>
+                          <td>{{ getPartName(p.partId) }}</td>
+                          <td class="font-bold">{{ p.quantity }}</td>
+                          <td>{{ getPartAvailableById(p.partId) }}</td>
+                          <td><button (click)="removePartFromPlan(idx)" class="delete-link">Kaldır</button></td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
             </div>
-
-            <!-- Eklenen Parçalar Tablosu -->
-            <div class="added-parts-list" *ngIf="plannedParts.length > 0">
-              <table class="parts-table">
-                <thead>
-                  <tr>
-                    <th>Parça</th>
-                    <th>Miktar</th>
-                    <th>Mevcut</th>
-                    <th>İşlem</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let p of plannedParts; let idx = index">
-                    <td>{{ getPartName(p.partId) }}</td>
-                    <td class="font-bold">{{ p.quantity }}</td>
-                    <td>{{ getPartAvailableById(p.partId) }}</td>
-                    <td><button (click)="removePartFromPlan(idx)" class="delete-link">Kaldır</button></td>
-                  </tr>
-                </tbody>
-              </table>
+          }
+          @if (!selectedRequest) {
+            <div class="alert alert-info">
+              Öncelikle bir servis talebi seçmelisiniz.
             </div>
-          </div>
-          <div class="alert alert-info" *ngIf="!selectedRequest">
-            Öncelikle bir servis talebi seçmelisiniz.
-          </div>
+          }
         </div>
-
+    
         <!-- Sağ Kolon: Skorlama Kırılımları ve Atama -->
         <div class="results-panel card">
           <div class="panel-section-header">
             <h3>4. Kaynak Atama ve Skorlama</h3>
             <span class="step-desc">Seçilen zamana ve talebe göre en uyumlu kaynaklar puanlanarak sıralanmıştır.</span>
           </div>
-
+    
           <!-- Hata ve Başarı Mesajları -->
-          <div class="alert alert-danger" *ngIf="errorMessage">
-            <strong>Planlama Başarısız:</strong> {{ errorMessage }}
-          </div>
-          <div class="alert alert-success" *ngIf="successMessage">
-            <strong>Başarılı:</strong> {{ successMessage }}
-          </div>
-
+          @if (errorMessage) {
+            <div class="alert alert-danger">
+              <strong>Planlama Başarısız:</strong> {{ errorMessage }}
+            </div>
+          }
+          @if (successMessage) {
+            <div class="alert alert-success">
+              <strong>Başarılı:</strong> {{ successMessage }}
+            </div>
+          }
+    
           <!-- Teknisyen Atama -->
           <div class="resource-section">
             <h4>Uygun Teknisyenler</h4>
-            <div class="resource-list" *ngIf="selectedRequest && eligibleTechnicians.length > 0">
-              <div
-                *ngFor="let item of paginatedTechnicians"
-                class="resource-card"
-                [class.selected]="selectedTechnicianId === item.technician.id"
-                (click)="selectTechnician(item.technician.id)"
-              >
-                <div class="card-header">
-                  <div class="card-title-info">
-                    <h5>{{ item.technician.fullName }}</h5>
-                    <span class="sub-label">{{ translateLevel(item.technician.level) }} | Bölge: {{ item.technician.region }}</span>
+            @if (selectedRequest && eligibleTechnicians.length > 0) {
+              <div class="resource-list">
+                @for (item of paginatedTechnicians; track item) {
+                  <div
+                    class="resource-card"
+                    [class.selected]="selectedTechnicianId === item.technician.id"
+                    (click)="selectTechnician(item.technician.id)"
+                    >
+                    <div class="card-header">
+                      <div class="card-title-info">
+                        <h5>{{ item.technician.fullName }}</h5>
+                        <span class="sub-label">{{ translateLevel(item.technician.level) }} | Bölge: {{ item.technician.region }}</span>
+                      </div>
+                      <div class="score-badge" [class.high-score]="item.totalScore >= 75">
+                        {{ item.totalScore }} Puan
+                      </div>
+                    </div>
+                    <!-- Explanation / Breakdown -->
+                    <div class="card-body">
+                      <ul class="breakdown-list">
+                        @for (exp of item.explanation; track exp) {
+                          <li>{{ exp }}</li>
+                        }
+                      </ul>
+                    </div>
                   </div>
-                  <div class="score-badge" [class.high-score]="item.totalScore >= 75">
-                    {{ item.totalScore }} Puan
-                  </div>
-                </div>
-
-                <!-- Explanation / Breakdown -->
-                <div class="card-body">
-                  <ul class="breakdown-list">
-                    <li *ngFor="let exp of item.explanation">{{ exp }}</li>
-                  </ul>
+                }
+              </div>
+            }
+            @if (selectedRequest && eligibleTechnicians.length > 0) {
+              <div class="mini-pagination">
+                <span class="page-info">
+                  <strong>{{ eligibleTechnicians.length }}</strong> uygun teknisyenden {{ techStartIdx + 1 }}–{{ techEndIdx }} arası
+                </span>
+                <div class="page-controls">
+                  <button [disabled]="techPage === 1" (click)="setTechPage(techPage - 1)">‹</button>
+                  <span class="page-num">{{ techPage }} / {{ techTotalPages || 1 }}</span>
+                  <button [disabled]="techPage >= techTotalPages" (click)="setTechPage(techPage + 1)">›</button>
                 </div>
               </div>
-            </div>
-            <div class="mini-pagination" *ngIf="selectedRequest && eligibleTechnicians.length > 0">
-              <span class="page-info">
-                <strong>{{ eligibleTechnicians.length }}</strong> uygun teknisyenden {{ techStartIdx + 1 }}–{{ techEndIdx }} arası
-              </span>
-              <div class="page-controls">
-                <button [disabled]="techPage === 1" (click)="setTechPage(techPage - 1)">‹</button>
-                <span class="page-num">{{ techPage }} / {{ techTotalPages || 1 }}</span>
-                <button [disabled]="techPage >= techTotalPages" (click)="setTechPage(techPage + 1)">›</button>
+            }
+            @if (!selectedRequest) {
+              <div class="alert alert-info">
+                Teknisyenleri listelemek için talep seçiniz.
               </div>
-            </div>
-            <div class="alert alert-info" *ngIf="!selectedRequest">
-              Teknisyenleri listelemek için talep seçiniz.
-            </div>
-            <div class="alert alert-warning" *ngIf="selectedRequest && eligibleTechnicians.length === 0">
-              Bu tarih ve saatte uygun teknisyen yok. Teknisyenler hafta içi mesai saatlerinde çalışır; başka bir zaman seçin.
-            </div>
+            }
+            @if (selectedRequest && eligibleTechnicians.length === 0) {
+              <div class="alert alert-warning">
+                Bu tarih ve saatte uygun teknisyen yok. Teknisyenler hafta içi mesai saatlerinde çalışır; başka bir zaman seçin.
+              </div>
+            }
           </div>
-
+    
           <!-- Araç Atama -->
           <div class="resource-section">
             <h4>Uygun Araçlar</h4>
-            <div class="resource-list" *ngIf="selectedRequest && eligibleVehicles.length > 0">
-              <div
-                *ngFor="let item of paginatedVehicles"
-                class="resource-card"
-                [class.selected]="selectedVehicleId === item.vehicle.id"
-                (click)="selectVehicle(item.vehicle.id)"
-              >
-                <div class="card-header">
-                  <div class="card-title-info">
-                    <h5>{{ item.vehicle.brand }} {{ item.vehicle.model }}</h5>
-                    <span class="sub-label">Plaka: {{ item.vehicle.plateNumber }} | Yakıt: %{{ item.vehicle.fuelLevel }}</span>
+            @if (selectedRequest && eligibleVehicles.length > 0) {
+              <div class="resource-list">
+                @for (item of paginatedVehicles; track item) {
+                  <div
+                    class="resource-card"
+                    [class.selected]="selectedVehicleId === item.vehicle.id"
+                    (click)="selectVehicle(item.vehicle.id)"
+                    >
+                    <div class="card-header">
+                      <div class="card-title-info">
+                        <h5>{{ item.vehicle.brand }} {{ item.vehicle.model }}</h5>
+                        <span class="sub-label">Plaka: {{ item.vehicle.plateNumber }} | Yakıt: %{{ item.vehicle.fuelLevel }}</span>
+                      </div>
+                      <div class="score-badge vehicle-badge" [class.high-score]="item.totalScore >= 75">
+                        {{ item.totalScore }} Puan
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <ul class="breakdown-list">
+                        @for (exp of item.explanation; track exp) {
+                          <li>{{ exp }}</li>
+                        }
+                      </ul>
+                    </div>
                   </div>
-                  <div class="score-badge vehicle-badge" [class.high-score]="item.totalScore >= 75">
-                    {{ item.totalScore }} Puan
-                  </div>
-                </div>
-
-                <div class="card-body">
-                  <ul class="breakdown-list">
-                    <li *ngFor="let exp of item.explanation">{{ exp }}</li>
-                  </ul>
+                }
+              </div>
+            }
+            @if (selectedRequest && eligibleVehicles.length > 0) {
+              <div class="mini-pagination">
+                <span class="page-info">
+                  <strong>{{ eligibleVehicles.length }}</strong> uygun araçtan {{ vehStartIdx + 1 }}–{{ vehEndIdx }} arası
+                </span>
+                <div class="page-controls">
+                  <button [disabled]="vehPage === 1" (click)="setVehPage(vehPage - 1)">‹</button>
+                  <span class="page-num">{{ vehPage }} / {{ vehTotalPages || 1 }}</span>
+                  <button [disabled]="vehPage >= vehTotalPages" (click)="setVehPage(vehPage + 1)">›</button>
                 </div>
               </div>
-            </div>
-            <div class="mini-pagination" *ngIf="selectedRequest && eligibleVehicles.length > 0">
-              <span class="page-info">
-                <strong>{{ eligibleVehicles.length }}</strong> uygun araçtan {{ vehStartIdx + 1 }}–{{ vehEndIdx }} arası
-              </span>
-              <div class="page-controls">
-                <button [disabled]="vehPage === 1" (click)="setVehPage(vehPage - 1)">‹</button>
-                <span class="page-num">{{ vehPage }} / {{ vehTotalPages || 1 }}</span>
-                <button [disabled]="vehPage >= vehTotalPages" (click)="setVehPage(vehPage + 1)">›</button>
+            }
+            @if (!selectedRequest) {
+              <div class="alert alert-info">
+                Araçları listelemek için talep seçiniz.
               </div>
-            </div>
-            <div class="alert alert-info" *ngIf="!selectedRequest">
-              Araçları listelemek için talep seçiniz.
-            </div>
-            <div class="alert alert-warning" *ngIf="selectedRequest && eligibleVehicles.length === 0">
-              Bu kriterlere uygun araç bulunamadı.
-            </div>
+            }
+            @if (selectedRequest && eligibleVehicles.length === 0) {
+              <div class="alert alert-warning">
+                Bu kriterlere uygun araç bulunamadı.
+              </div>
+            }
           </div>
-
+    
           <!-- Planlama Butonu -->
-          <div class="planning-actions" *ngIf="selectedRequest">
-            <button 
-              [disabled]="!selectedTechnicianId || !selectedVehicleId || isPlanning" 
-              (click)="onPlanSubmit()" 
-              class="plan-submit-btn"
-            >
-              {{ isPlanning ? 'Planlanıyor...' : 'İş Emrini Oluştur ve Planla' }}
-            </button>
-            <p class="help-text" *ngIf="!selectedTechnicianId || !selectedVehicleId">
-              Planlama yapabilmek için listeden uygun bir teknisyen ve araç seçmelisiniz.
-            </p>
-          </div>
-
+          @if (selectedRequest) {
+            <div class="planning-actions">
+              <button
+                [disabled]="!selectedTechnicianId || !selectedVehicleId || isPlanning"
+                (click)="onPlanSubmit()"
+                class="plan-submit-btn"
+                >
+                {{ isPlanning ? 'Planlanıyor...' : 'İş Emrini Oluştur ve Planla' }}
+              </button>
+              @if (!selectedTechnicianId || !selectedVehicleId) {
+                <p class="help-text">
+                  Planlama yapabilmek için listeden uygun bir teknisyen ve araç seçmelisiniz.
+                </p>
+              }
+            </div>
+          }
+    
         </div>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./schedule-board.component.scss']
 })
 export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {

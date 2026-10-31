@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ShiftAssignmentService } from '../../../../core/services/shift-assignment.service';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -24,7 +24,7 @@ interface EligibleEntry {
 
 @Component({
     selector: 'app-shift-list',
-    imports: [CommonModule, ReactiveFormsModule, FormFieldComponent, DataTableComponent, PermissionVisibilityDirective],
+    imports: [ReactiveFormsModule, FormFieldComponent, DataTableComponent, PermissionVisibilityDirective],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -36,122 +36,119 @@ interface EligibleEntry {
           *appPermissionVisibility="'SHIFT_CREATE'"
           (click)="toggleCreate()"
           class="primary-btn"
-        >
+          >
           {{ showCreate ? 'Kapat' : '+ Yeni Vardiya' }}
         </button>
       </div>
-
+    
       <!-- Create form -->
-      <div class="card form-card animate-slide" *ngIf="showCreate">
-        <h3>Yeni Vardiya / Görev Tanımla</h3>
-        <form [formGroup]="createForm" (ngSubmit)="onCreate()">
-          <div class="form-grid">
-            <app-form-field
-              label="Başlık"
-              [control]="$any(createForm.get('title'))"
-              [maxLength]="100"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Hafta sonu kombi periyodik bakım"
-            ></app-form-field>
-
-            <app-form-field
-              label="Görev Tipi"
-              type="select"
-              [control]="$any(createForm.get('taskType'))"
-              [required]="true"
-            >
-              <option value="" disabled>Görev tipi seçin</option>
-              <option *ngFor="let opt of taskTypeOptions" [value]="opt.value">{{ opt.label }}</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Şube / Lokasyon"
-              type="select"
-              [control]="$any(createForm.get('branchId'))"
-              [required]="true"
-            >
-              <option value="" disabled>Şube seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }} ({{ b.city }})</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Bölge / Saha"
-              [control]="$any(createForm.get('region'))"
-              [maxLength]="60"
-              [required]="true"
-              [showCounter]="true"
-              placeholder="Örn: Anadolu Yakası, Çankaya, ..."
-            ></app-form-field>
-
-            <app-form-field
-              label="Gerekli Yetkinlik"
-              type="select"
-              [control]="$any(createForm.get('requiredSkill'))"
-              [required]="true"
-            >
-              <option value="WHITE_GOODS">Beyaz Eşya</option>
-              <option value="HVAC">Klima / Soğutma</option>
-              <option value="ELECTRIC">Elektrik Tesisatı</option>
-              <option value="ELECTRONICS_MOTHERBOARD">Elektronik / Anakart</option>
-              <option value="PLUMBING">Sıhhi Tesisat</option>
-              <option value="BOILER_HEATING">Kombi / Isıtma</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Kişi Sayısı"
-              type="number"
-              [control]="$any(createForm.get('requiredHeadcount'))"
-              [min]="1"
-              [max]="50"
-              [maxLength]="2"
-              [showCounter]="true"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Başlangıç (Tarih + Saat)"
-              type="datetime-local"
-              [control]="$any(createForm.get('start'))"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Bitiş (Tarih + Saat)"
-              type="datetime-local"
-              [control]="$any(createForm.get('end'))"
-              [required]="true"
-            ></app-form-field>
-
-            <app-form-field
-              label="Öncelik"
-              type="select"
-              [control]="$any(createForm.get('priority'))"
-              [required]="true"
-            >
-              <option value="STANDARD">Standart</option>
-              <option value="URGENT">Acil</option>
-              <option value="CRITICAL">Kritik</option>
-            </app-form-field>
-
-            <app-form-field
-              label="Açıklama"
-              [control]="$any(createForm.get('description'))"
-              [maxLength]="300"
-              [showCounter]="true"
-              placeholder="Görev detayı (opsiyonel)"
-            ></app-form-field>
-          </div>
-
-          <div *ngIf="errorMessage" class="error-alert">{{ errorMessage }}</div>
-
-          <div class="form-actions">
-            <button type="button" (click)="toggleCreate()" class="cancel-btn">Vazgeç</button>
-            <button type="submit" [disabled]="createForm.invalid" class="save-btn">Vardiyayı Oluştur</button>
-          </div>
-        </form>
-      </div>
-
+      @if (showCreate) {
+        <div class="card form-card animate-slide">
+          <h3>Yeni Vardiya / Görev Tanımla</h3>
+          <form [formGroup]="createForm" (ngSubmit)="onCreate()">
+            <div class="form-grid">
+              <app-form-field
+                label="Başlık"
+                [control]="$any(createForm.get('title'))"
+                [maxLength]="100"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Hafta sonu kombi periyodik bakım"
+              ></app-form-field>
+              <app-form-field
+                label="Görev Tipi"
+                type="select"
+                [control]="$any(createForm.get('taskType'))"
+                [required]="true"
+                >
+                <option value="" disabled>Görev tipi seçin</option>
+                @for (opt of taskTypeOptions; track opt) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Şube / Lokasyon"
+                type="select"
+                [control]="$any(createForm.get('branchId'))"
+                [required]="true"
+                >
+                <option value="" disabled>Şube seçin</option>
+                @for (b of branches; track b) {
+                  <option [value]="b.id">{{ b.name }} ({{ b.city }})</option>
+                }
+              </app-form-field>
+              <app-form-field
+                label="Bölge / Saha"
+                [control]="$any(createForm.get('region'))"
+                [maxLength]="60"
+                [required]="true"
+                [showCounter]="true"
+                placeholder="Örn: Anadolu Yakası, Çankaya, ..."
+              ></app-form-field>
+              <app-form-field
+                label="Gerekli Yetkinlik"
+                type="select"
+                [control]="$any(createForm.get('requiredSkill'))"
+                [required]="true"
+                >
+                <option value="WHITE_GOODS">Beyaz Eşya</option>
+                <option value="HVAC">Klima / Soğutma</option>
+                <option value="ELECTRIC">Elektrik Tesisatı</option>
+                <option value="ELECTRONICS_MOTHERBOARD">Elektronik / Anakart</option>
+                <option value="PLUMBING">Sıhhi Tesisat</option>
+                <option value="BOILER_HEATING">Kombi / Isıtma</option>
+              </app-form-field>
+              <app-form-field
+                label="Kişi Sayısı"
+                type="number"
+                [control]="$any(createForm.get('requiredHeadcount'))"
+                [min]="1"
+                [max]="50"
+                [maxLength]="2"
+                [showCounter]="true"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Başlangıç (Tarih + Saat)"
+                type="datetime-local"
+                [control]="$any(createForm.get('start'))"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Bitiş (Tarih + Saat)"
+                type="datetime-local"
+                [control]="$any(createForm.get('end'))"
+                [required]="true"
+              ></app-form-field>
+              <app-form-field
+                label="Öncelik"
+                type="select"
+                [control]="$any(createForm.get('priority'))"
+                [required]="true"
+                >
+                <option value="STANDARD">Standart</option>
+                <option value="URGENT">Acil</option>
+                <option value="CRITICAL">Kritik</option>
+              </app-form-field>
+              <app-form-field
+                label="Açıklama"
+                [control]="$any(createForm.get('description'))"
+                [maxLength]="300"
+                [showCounter]="true"
+                placeholder="Görev detayı (opsiyonel)"
+              ></app-form-field>
+            </div>
+            @if (errorMessage) {
+              <div class="error-alert">{{ errorMessage }}</div>
+            }
+            <div class="form-actions">
+              <button type="button" (click)="toggleCreate()" class="cancel-btn">Vazgeç</button>
+              <button type="submit" [disabled]="createForm.invalid" class="save-btn">Vardiyayı Oluştur</button>
+            </div>
+          </form>
+        </div>
+      }
+    
       <!-- List -->
       <div class="card">
         <h3>Mevcut Vardiyalar</h3>
@@ -164,71 +161,83 @@ interface EligibleEntry {
           (deleteClick)="onDelete($event)"
         ></app-data-table>
       </div>
-
+    
       <!-- Assign modal -->
-      <div class="modal-backdrop" *ngIf="assignModalOpen && selectedShift">
-        <div class="modal-box">
-          <h3>Vardiyaya Teknisyen Ata — {{ selectedShift.code }}</h3>
-          <p class="modal-sub">
-            <strong>{{ selectedShift.title }}</strong> ·
-            {{ taskTypeLabel(selectedShift.taskType) }} ·
-            Yetkinlik: {{ skillLabel(selectedShift.requiredSkill) }} ·
-            Bölge: {{ selectedShift.region }}<br>
-            {{ formatDate(selectedShift.start) }} → {{ formatDate(selectedShift.end) }} ·
-            Atanan: <strong>{{ selectedShift.assignedTechnicianIds.length }} / {{ selectedShift.requiredHeadcount }}</strong>
-          </p>
-
-          <div class="assigned-list" *ngIf="selectedShift.assignedTechnicianIds.length > 0">
-            <h4>Şu an atanmış teknisyenler</h4>
-            <div class="assigned-chip" *ngFor="let id of selectedShift.assignedTechnicianIds">
-              <span>{{ technicianName(id) }}</span>
-              <button class="chip-remove" (click)="onRemoveTechnician(id)" title="Çıkar">×</button>
+      @if (assignModalOpen && selectedShift) {
+        <div class="modal-backdrop">
+          <div class="modal-box">
+            <h3>Vardiyaya Teknisyen Ata — {{ selectedShift.code }}</h3>
+            <p class="modal-sub">
+              <strong>{{ selectedShift.title }}</strong> ·
+              {{ taskTypeLabel(selectedShift.taskType) }} ·
+              Yetkinlik: {{ skillLabel(selectedShift.requiredSkill) }} ·
+              Bölge: {{ selectedShift.region }}<br>
+              {{ formatDate(selectedShift.start) }} → {{ formatDate(selectedShift.end) }} ·
+              Atanan: <strong>{{ selectedShift.assignedTechnicianIds.length }} / {{ selectedShift.requiredHeadcount }}</strong>
+            </p>
+            @if (selectedShift.assignedTechnicianIds.length > 0) {
+              <div class="assigned-list">
+                <h4>Şu an atanmış teknisyenler</h4>
+                @for (id of selectedShift.assignedTechnicianIds; track id) {
+                  <div class="assigned-chip">
+                    <span>{{ technicianName(id) }}</span>
+                    <button class="chip-remove" (click)="onRemoveTechnician(id)" title="Çıkar">×</button>
+                  </div>
+                }
+              </div>
+            }
+            <h4>Aday Teknisyenler</h4>
+            <table class="candidate-table">
+              <thead>
+                <tr>
+                  <th>Ad Soyad</th>
+                  <th>Yetkinlik / Bölge</th>
+                  <th>Durum</th>
+                  <th>İşlem</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (e of eligibleList; track e) {
+                  <tr>
+                    <td>{{ e.technician.fullName }}</td>
+                    <td>
+                      <span class="badge">{{ skillsLabel(e.technician.skills) }}</span>
+                      <small> · {{ e.technician.region }}</small>
+                    </td>
+                    <td>
+                      @if (!e.reason) {
+                        <span class="status-tag ok">Uygun</span>
+                      }
+                      @if (e.reason) {
+                        <span class="status-tag blocked">{{ e.reason }}</span>
+                      }
+                    </td>
+                    <td>
+                      <button class="primary-btn small"
+                        [disabled]="!!e.reason || atCapacity()"
+                        (click)="onAssignTechnician(e.technician.id)"
+                      >Ata</button>
+                    </td>
+                  </tr>
+                }
+                @if (eligibleList.length === 0) {
+                  <tr>
+                    <td colspan="4" class="empty">Listelenecek teknisyen yok.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            @if (assignError) {
+              <div class="error-alert">{{ assignError }}</div>
+            }
+            <div class="modal-actions">
+              <button (click)="closeAssignModal()" class="cancel-btn">Kapat</button>
             </div>
           </div>
-
-          <h4>Aday Teknisyenler</h4>
-          <table class="candidate-table">
-            <thead>
-              <tr>
-                <th>Ad Soyad</th>
-                <th>Yetkinlik / Bölge</th>
-                <th>Durum</th>
-                <th>İşlem</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let e of eligibleList">
-                <td>{{ e.technician.fullName }}</td>
-                <td>
-                  <span class="badge">{{ skillsLabel(e.technician.skills) }}</span>
-                  <small> · {{ e.technician.region }}</small>
-                </td>
-                <td>
-                  <span class="status-tag ok" *ngIf="!e.reason">Uygun</span>
-                  <span class="status-tag blocked" *ngIf="e.reason">{{ e.reason }}</span>
-                </td>
-                <td>
-                  <button class="primary-btn small"
-                    [disabled]="!!e.reason || atCapacity()"
-                    (click)="onAssignTechnician(e.technician.id)"
-                  >Ata</button>
-                </td>
-              </tr>
-              <tr *ngIf="eligibleList.length === 0">
-                <td colspan="4" class="empty">Listelenecek teknisyen yok.</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div *ngIf="assignError" class="error-alert">{{ assignError }}</div>
-
-          <div class="modal-actions">
-            <button (click)="closeAssignModal()" class="cancel-btn">Kapat</button>
-          </div>
         </div>
-      </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./shift-list.component.scss']
 })
 export class ShiftListComponent implements OnInit {

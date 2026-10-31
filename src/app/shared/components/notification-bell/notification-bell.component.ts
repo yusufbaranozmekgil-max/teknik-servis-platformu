@@ -15,44 +15,49 @@ import { Notification } from '../../../core/models/notification.model';
           <path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/>
           <path d="M10.3 20a2 2 0 0 0 3.4 0"/>
         </svg>
-        <span class="unread-badge" *ngIf="unreadCount() > 0">{{ unreadCount() }}</span>
+        @if (unreadCount() > 0) {
+          <span class="unread-badge">{{ unreadCount() }}</span>
+        }
       </button>
-
+    
       <!-- Dropdown Menu -->
-      <div class="dropdown-menu" *ngIf="isOpen" (click)="$event.stopPropagation()">
-        <div class="dropdown-header">
-          <span>Bildirimler</span>
-          <button class="mark-all-btn" (click)="markAllAsRead()">Tümünü Okundu Say</button>
-        </div>
-
-        <div class="dropdown-body">
-          <div 
-            *ngFor="let n of userNotifications" 
-            class="notification-item" 
-            [class.unread]="!n.isRead"
-            [class.info]="n.severity === 'INFO'"
-            [class.warning]="n.severity === 'WARNING'"
-            [class.error]="n.severity === 'ERROR'"
-            (click)="onNotificationClick(n)"
-          >
-            <div class="item-header">
-              <span class="severity-dot"></span>
-              <span class="item-title">{{ n.title }}</span>
-              <span class="item-time">{{ n.createdAt | date:'HH:mm' }}</span>
-            </div>
-            <div class="item-message">{{ n.message }}</div>
+      @if (isOpen) {
+        <div class="dropdown-menu" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <span>Bildirimler</span>
+            <button class="mark-all-btn" (click)="markAllAsRead()">Tümünü Okundu Say</button>
           </div>
-          <div class="no-notifications" *ngIf="userNotifications.length === 0">
-            Yeni bildirim bulunmuyor.
+          <div class="dropdown-body">
+            @for (n of userNotifications; track n) {
+              <div
+                class="notification-item"
+                [class.unread]="!n.isRead"
+                [class.info]="n.severity === 'INFO'"
+                [class.warning]="n.severity === 'WARNING'"
+                [class.error]="n.severity === 'ERROR'"
+                (click)="onNotificationClick(n)"
+                >
+                <div class="item-header">
+                  <span class="severity-dot"></span>
+                  <span class="item-title">{{ n.title }}</span>
+                  <span class="item-time">{{ n.createdAt | date:'HH:mm' }}</span>
+                </div>
+                <div class="item-message">{{ n.message }}</div>
+              </div>
+            }
+            @if (userNotifications.length === 0) {
+              <div class="no-notifications">
+                Yeni bildirim bulunmuyor.
+              </div>
+            }
+          </div>
+          <div class="dropdown-footer">
+            <button (click)="goToNotificationsCenter()">Tüm Bildirimleri Gör</button>
           </div>
         </div>
-
-        <div class="dropdown-footer">
-          <button (click)="goToNotificationsCenter()">Tüm Bildirimleri Gör</button>
-        </div>
-      </div>
+      }
     </div>
-  `,
+    `,
     styleUrls: ['./notification-bell.component.scss']
 })
 export class NotificationBellComponent implements OnInit {

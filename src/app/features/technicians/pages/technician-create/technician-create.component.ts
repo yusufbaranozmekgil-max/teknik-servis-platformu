@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { TechnicianService } from '../../../../core/services/technician.service';
@@ -15,7 +15,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
 
 @Component({
     selector: 'app-technician-create',
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    imports: [ReactiveFormsModule, RouterModule, FormFieldComponent],
     template: `
     <div class="page-container">
       <div class="header-section">
@@ -24,7 +24,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
           <h2>Yeni Teknisyen Ekle</h2>
         </div>
       </div>
-
+    
       <div class="card-content">
         <form [formGroup]="techForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
@@ -37,7 +37,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               inputFilter="letters"
               placeholder="Örn: Ahmet Yılmaz"
             ></app-form-field>
-
+    
             <app-form-field
               label="Telefon"
               [control]="$any(techForm.get('phone'))"
@@ -47,7 +47,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               inputFilter="digits"
               placeholder="Örn: 05551234567"
             ></app-form-field>
-
+    
             <app-form-field
               label="E-posta"
               [control]="$any(techForm.get('email'))"
@@ -56,17 +56,19 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               placeholder="Örn: ahmet@operasyon.com"
             ></app-form-field>
-
+    
             <app-form-field
               label="Bağlı Şube"
               type="select"
               [control]="$any(techForm.get('branchId'))"
               [required]="true"
-            >
+              >
               <option value="" disabled selected>Şube Seçin</option>
-              <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
+              @for (b of branches; track b) {
+                <option [value]="b.id">{{ b.name }}</option>
+              }
             </app-form-field>
-
+    
             <app-form-field
               label="Çalıştığı Bölge (İlçe/Semt)"
               [control]="$any(techForm.get('region'))"
@@ -76,18 +78,18 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               inputFilter="letters"
               placeholder="Örn: Çankaya veya Kadıköy"
             ></app-form-field>
-
+    
             <app-form-field
               label="Kıdem Seviyesi"
               type="select"
               [control]="$any(techForm.get('level'))"
               [required]="true"
-            >
+              >
               <option value="JUNIOR">Çırak</option>
               <option value="MID">Kalfa</option>
               <option value="SENIOR">Usta</option>
             </app-form-field>
-
+    
             <app-form-field
               label="Mesai Başlangıcı"
               type="time"
@@ -95,7 +97,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               placeholder="08:30"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Mesai Bitişi"
               type="time"
@@ -103,11 +105,13 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               placeholder="17:30"
               [required]="true"
             ></app-form-field>
-
-            <div class="error-alert" style="grid-column:1/-1" *ngIf="techForm.errors?.['workingHoursRange'] && (techForm.get('workingHoursStart')?.touched || techForm.get('workingHoursEnd')?.touched)">
-              Mesai bitişi başlangıç saatinden sonra olmalıdır.
-            </div>
-
+    
+            @if (techForm.errors?.['workingHoursRange'] && (techForm.get('workingHoursStart')?.touched || techForm.get('workingHoursEnd')?.touched)) {
+              <div class="error-alert" style="grid-column:1/-1">
+                Mesai bitişi başlangıç saatinden sonra olmalıdır.
+              </div>
+            }
+    
             <app-form-field
               label="Performans Puanı (0 - 100)"
               type="number"
@@ -118,7 +122,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Tamamladığı İş Sayısı"
               type="number"
@@ -129,7 +133,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               [showCounter]="true"
               [required]="true"
             ></app-form-field>
-
+    
             <app-form-field
               label="Günlük Maksimum İş Kapasitesi"
               type="number"
@@ -142,41 +146,50 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
               hint="Bir günde en fazla kaç iş üstlenebileceği (önerilen 3-6)"
             ></app-form-field>
           </div>
-
+    
           <div class="form-group full-width">
             <label>Yetkinlikler / Uzmanlık Alanları (En az bir adet seçiniz)</label>
             <div class="skills-grid">
-              <div *ngFor="let s of skillOptions" class="skill-row" [class.selected]="isSkillSelected(s)">
-                <label class="skill-check">
-                  <input type="checkbox" [checked]="isSkillSelected(s)" (change)="onSkillChange(s, $any($event.target).checked)" />
-                  <span>{{ getSkillLabel(s) }}</span>
-                </label>
-                <select class="skill-level"
-                        *ngIf="isSkillSelected(s)"
-                        [value]="skillLevels[s] || 'BEGINNER'"
-                        (change)="onSkillLevelChange(s, $any($event.target).value)">
-                  <option *ngFor="let lvl of levelOptions" [value]="lvl" [selected]="(skillLevels[s] || 'BEGINNER') === lvl">
-                    {{ levelLabel(lvl) }}
-                  </option>
-                </select>
+              @for (s of skillOptions; track s) {
+                <div class="skill-row" [class.selected]="isSkillSelected(s)">
+                  <label class="skill-check">
+                    <input type="checkbox" [checked]="isSkillSelected(s)" (change)="onSkillChange(s, $any($event.target).checked)" />
+                    <span>{{ getSkillLabel(s) }}</span>
+                  </label>
+                  @if (isSkillSelected(s)) {
+                    <select class="skill-level"
+                      [value]="skillLevels[s] || 'BEGINNER'"
+                      (change)="onSkillLevelChange(s, $any($event.target).value)">
+                      @for (lvl of levelOptions; track lvl) {
+                        <option [value]="lvl" [selected]="(skillLevels[s] || 'BEGINNER') === lvl">
+                          {{ levelLabel(lvl) }}
+                        </option>
+                      }
+                    </select>
+                  }
+                </div>
+              }
+            </div>
+            @if (skillsError) {
+              <div class="error-text">
+                {{ skillsError }}
               </div>
-            </div>
-            <div class="error-text" *ngIf="skillsError">
-              {{ skillsError }}
-            </div>
+            }
           </div>
-
+    
           <div class="form-group check-group">
             <label class="switch-label">
               <input type="checkbox" formControlName="isActive" />
               <span class="switch-text">Aktif Teknisyen</span>
             </label>
           </div>
-
-          <div *ngIf="errorMessage" class="error-alert">
-            {{ errorMessage }}
-          </div>
-
+    
+          @if (errorMessage) {
+            <div class="error-alert">
+              {{ errorMessage }}
+            </div>
+          }
+    
           <div class="form-actions">
             <button type="button" routerLink="/teknisyenler" class="cancel-btn">Vazgeç</button>
             <button type="submit" [disabled]="techForm.invalid || loading" class="save-btn">
@@ -186,7 +199,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
         </form>
       </div>
     </div>
-  `,
+    `,
     styleUrls: ['./technician-create.component.scss']
 })
 export class TechnicianCreatePage implements OnInit, ComponentCanDeactivate {
