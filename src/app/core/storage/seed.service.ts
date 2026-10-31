@@ -25,7 +25,7 @@ export class SeedService {
   private storage = inject(StorageService);
 
   /** Demo veri sürümü — seed içeriği değiştiğinde artırılır; eski localStorage otomatik tazelenir. */
-  private static readonly SEED_VERSION = '7';
+  private static readonly SEED_VERSION = '8';
   private static readonly SEED_VERSION_KEY = 'ts_seed_version';
 
   seedAll(): void {

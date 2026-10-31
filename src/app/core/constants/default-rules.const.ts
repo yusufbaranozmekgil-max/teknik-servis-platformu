@@ -6,7 +6,7 @@ export function createDefaultRules(): Rule[] {
   {
     id: 'rule-1',
     name: 'Kritik Talep Otomatik Önceliklendirme',
-    description: 'Önceliği CRITICAL olan servis taleplerini otomatik en üst sıraya çeker.',
+    description: 'Önceliği kritik olan servis taleplerini otomatik en üst sıraya çeker.',
     trigger: 'SERVICE_REQUEST_CREATE',
     conditions: JSON.stringify({ priority: 'CRITICAL' }),
     actions: JSON.stringify({ action: 'AUTO_PRIORITIZE' }),
