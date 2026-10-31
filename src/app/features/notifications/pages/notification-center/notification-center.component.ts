@@ -41,7 +41,6 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
             [class.warning]="n.severity === 'WARNING'"
             [class.error]="n.severity === 'ERROR'"
             >
-            <div class="card-indicator"></div>
             <div class="card-content">
               <div class="card-header">
                 <span class="badge severity-badge">{{ n.severity | statusLabel:'severity' }}</span>

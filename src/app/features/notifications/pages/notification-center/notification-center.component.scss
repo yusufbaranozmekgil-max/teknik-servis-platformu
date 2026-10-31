@@ -16,10 +16,6 @@
     .notification-card { display: flex; padding: 0; overflow: hidden; position: relative; transition: all 0.2s; }
     .notification-card.unread { background-color: #f0f6f8; border-color: #c4dee3; }
     
-    .card-indicator { width: 6px; flex-shrink: 0; }
-    .info .card-indicator { background-color: #1a8798; }
-    .warning .card-indicator { background-color: #f59e0b; }
-    .error .card-indicator { background-color: #ef4444; }
 
     .card-content { padding: 1.25rem 1.5rem; flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
     

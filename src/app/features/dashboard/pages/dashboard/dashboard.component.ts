@@ -1,3 +1,4 @@
+import { SKILL_LABELS } from '../../../../core/constants/labels.const';
 import { Component, inject, OnInit, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../../core/services/dashboard.service';
@@ -373,7 +374,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
                           <td>{{ tech.level | techLevelLabel }}</td>
                           <td>
                             @for (s of tech.skills; track s) {
-                              <span class="badge badge-skill">{{ s }}</span>
+                              <span class="badge badge-skill">{{ SKILL_LABELS[s] || s }}</span>
                             }
                           </td>
                           <td>
@@ -471,7 +472,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
                         <td>{{ tech.fullName }}</td>
                         <td>
                           @for (s of tech.skills; track s) {
-                            <span class="badge badge-skill">{{ s }}</span>
+                            <span class="badge badge-skill">{{ SKILL_LABELS[s] || s }}</span>
                           }
                         </td>
                         <td>{{ tech.level | techLevelLabel }}</td>
@@ -886,6 +887,7 @@ export class DashboardComponent implements OnInit {
   private toastService = inject(ToastService);
   permissionService = inject(PermissionService);
 
+  readonly SKILL_LABELS: Record<string, string> = SKILL_LABELS;
   currentUser = this.authStateService.currentUser;
 
   sendPartReminder(part: any): void {

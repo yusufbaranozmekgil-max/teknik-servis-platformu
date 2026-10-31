@@ -144,15 +144,15 @@
     }
     tr:hover td { background: #1f2b2d !important; }
     // Yarı saydam kırmızı altı boş kaldığında beyaz sızıyordu — solid koyu kırmızı kullan.
-    .failed-row td { background: #450a0a !important; }
-    .failed-row:hover td { background: #5c1414 !important; }
+    .failed-row td { background: rgba(127, 29, 29, 0.28) !important; }
+    .failed-row:hover td { background: rgba(127, 29, 29, 0.4) !important; }
   }
 
   .role-badge, .entity-badge { background: #374345 !important; color: #f0f5f6 !important; }
   .action-badge {
     background: #013d46 !important; color: #ddecef !important;
     &.delete { background: #7f1d1d !important; color: #fecaca !important; }
-    &.security_violation { background: #7f1d1d !important; color: #fecaca !important; }
+    &.security_violation { background: rgba(127, 29, 29, 0.45) !important; color: #fecaca !important; }
   }
   .result-badge {
     &.success { background: #064e3b !important; color: #d1fae5 !important; }

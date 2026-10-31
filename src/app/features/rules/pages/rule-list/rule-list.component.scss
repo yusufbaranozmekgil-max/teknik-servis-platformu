@@ -453,3 +453,17 @@ input:focus + .slider { box-shadow: 0 0 1px $primary; }
   .slider { background-color: #4a5759 !important; }
   input:checked + .slider { background-color: #026f7e !important; }
 }
+
+.new-rule-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: #026f7e;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover { background-color: #015d6a; }
+}

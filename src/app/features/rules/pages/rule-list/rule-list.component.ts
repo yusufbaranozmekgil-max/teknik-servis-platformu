@@ -26,8 +26,7 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
           </div>
           <button *appRoleVisibility="['SYSTEM_ADMIN', 'OPERATION_MANAGER']"
             routerLink="/kurallar/yeni"
-            class="simulate-btn"
-          style="padding:0.5rem 1rem;">+ Yeni Kural</button>
+            class="new-rule-btn">+ Yeni Kural</button>
         </div>
       </div>
     
