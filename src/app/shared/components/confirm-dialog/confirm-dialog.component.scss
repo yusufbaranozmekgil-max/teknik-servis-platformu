@@ -4,7 +4,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(7, 17, 19, 0.6);
 
       display: flex;
       justify-content: center;
@@ -67,4 +67,12 @@
     }
     .btn-confirm:hover {
       background: #dc2626;
+    }
+
+    :host-context(body.dark-theme) {
+      .confirm-box { background: #101a1d; border-color: #374345; }
+      h3 { color: #f6fbfc; }
+      p { color: #cad8db; }
+      .btn-cancel { background: #1f2b2d; border-color: #374345; color: #e3e8e9; }
+      .btn-cancel:hover { background: #374345; border-color: #5f6c6e; }
     }

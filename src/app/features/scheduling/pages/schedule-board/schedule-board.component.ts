@@ -1,3 +1,4 @@
+import { PermissionService } from '../../../../core/services/permission.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -253,6 +254,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
 })
 export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
   private requestService = inject(ServiceRequestService);
+  private permissionService = inject(PermissionService);
   private inventoryService = inject(InventoryService);
   private workOrderService = inject(WorkOrderService);
   private techScoringService = inject(TechnicianScoringService);
@@ -329,7 +331,7 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
 
   loadOpenRequests(): void {
     try {
-      this.openRequests = this.requestService.getServiceRequests().filter(r => r.status === 'NEW');
+      this.openRequests = this.permissionService.scopeToBranch(this.requestService.getServiceRequests()).filter(r => r.status === 'NEW');
     } catch (err: any) {
       this.errorMessage = err.message || 'Hizmet talepleri yüklenemedi.';
     }
@@ -376,6 +378,15 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
       start: `${this.slotDate}T${this.slotStart}:00`,
       end: `${this.slotDate}T${this.slotEnd}:00`
     };
+
+    if (this.slotEnd <= this.slotStart) {
+      this.scoredTechnicians = [];
+      this.scoredVehicles = [];
+      this.selectedTechnicianId = '';
+      this.selectedVehicleId = '';
+      this.errorMessage = 'Bitiş saati başlangıç saatinden sonra olmalıdır.';
+      return;
+    }
 
     try {
       this.scoredTechnicians = this.techScoringService.getEligibleTechnicians(this.selectedRequest.id, slot);

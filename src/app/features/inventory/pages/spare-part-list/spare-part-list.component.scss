@@ -16,3 +16,8 @@
     .info-btn:hover { background-color: #ddecef; }
     
     .table-container { margin-top: 0.5rem; }
+
+    :host-context(body.dark-theme) {
+      .secondary-btn, .warning-btn, .info-btn { background-color: #1f2b2d; border-color: #374345; color: #e3e8e9; }
+      .secondary-btn:hover, .warning-btn:hover, .info-btn:hover { background-color: #374345; }
+    }

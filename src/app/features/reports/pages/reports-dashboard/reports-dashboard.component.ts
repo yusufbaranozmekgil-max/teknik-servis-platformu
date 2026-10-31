@@ -1,3 +1,4 @@
+import { Chart, registerables } from 'chart.js';
 import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StorageService } from '../../../../core/storage/storage.service';
@@ -18,7 +19,7 @@ import {
   PRIORITY_LABELS
 } from '../../../../core/constants/labels.const';
 
-declare var Chart: any;
+Chart.register(...registerables);
 
 interface ReportOption {
   id: ReportId;
@@ -934,7 +935,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               display: true,
               position: 'bottom',
               labels: {
-                font: { family: 'Barlow', size: 11, weight: '600' },
+                font: { family: 'Barlow', size: 11, weight: 600 },
                 color: isDarkTheme ? '#c9d7da' : '#4a5759',
                 padding: 14, usePointStyle: true, pointStyle: 'circle', boxWidth: 8
               }
@@ -1048,7 +1049,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
             display: isPieLike,
             position: 'bottom',
             labels: {
-              font: { family: 'Barlow', size: 11, weight: '600' },
+              font: { family: 'Barlow', size: 11, weight: 600 },
               color: isDark ? '#c9d7da' : '#4a5759',
               padding: 14,
               usePointStyle: true,

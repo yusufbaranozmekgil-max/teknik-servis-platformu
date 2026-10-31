@@ -52,7 +52,7 @@ npm run test:ci  # testler (tek sefer, başsız Chrome)
 
 ## Testler
 
-60 birim testi vardır ve her push'ta CI'da build ile birlikte çalışır. Kapsananlar: iş emri durum geçişleri, kod üretimi, iptal ve geri alma, zaman çakışması, kural çakışması çözümü, stok rezervasyonu, şubeler arası transfer, sayısal form alanları. Diğer servisler ve arayüz akışları henüz otomatik test kapsamında değildir.
+67 birim testi vardır ve her push'ta CI'da build ile birlikte çalışır. Kapsananlar: iş emri durum geçişleri, kod üretimi, iptal ve geri alma, zaman çakışması, kural çakışması çözümü, stok rezervasyonu, şubeler arası transfer, sayısal form alanları, rol yetkileri ve kapsamı. Diğer servisler ve arayüz akışları henüz otomatik test kapsamında değildir.
 
 ## Bilinen sınırlar
 

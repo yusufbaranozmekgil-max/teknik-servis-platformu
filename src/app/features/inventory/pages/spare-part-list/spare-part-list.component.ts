@@ -85,7 +85,7 @@ export class SparePartListComponent implements OnInit {
   loadParts(): void {
     try {
       // Pasifleştirilen (silinen) parçalar listede gösterilmez.
-      this.parts = this.inventoryService.getSpareParts().filter(p => p.isActive !== false);
+      this.parts = this.permissionService.scopeToBranch(this.inventoryService.getSpareParts()).filter(p => p.isActive !== false);
       this.partsWithAvailability = this.parts.map(p => ({
         ...p,
         category: this.categoryLabels[p.category as string] ?? p.category,

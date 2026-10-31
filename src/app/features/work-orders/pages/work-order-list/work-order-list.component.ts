@@ -394,7 +394,7 @@ export class WorkOrderListComponent implements OnInit {
 
   loadWorkOrders(): void {
     try {
-      this.workOrders = this.woService.getWorkOrders();
+      this.workOrders = this.permissionService.scopeWorkOrders(this.woService.getWorkOrders());
       this.applyFilters();
     } catch (err: any) {
       this.errorMessage = err.message || 'İş emirleri yüklenemedi.';

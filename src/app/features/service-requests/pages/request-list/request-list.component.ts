@@ -83,7 +83,7 @@ export class RequestListComponent implements OnInit {
 
   loadRequests(): void {
     try {
-      this.requests = this.requestService.getServiceRequests();
+      this.requests = this.permissionService.scopeToBranch(this.requestService.getServiceRequests());
       let filtered = [...this.requests];
       if (this.branchFilter) {
         filtered = filtered.filter(r => r.branchId === this.branchFilter);

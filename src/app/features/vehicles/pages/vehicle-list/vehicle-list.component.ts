@@ -75,7 +75,7 @@ export class VehicleListComponent implements OnInit {
   loadVehicles(): void {
     try {
       // Pasifleştirilen (silinen) araçlar listede gösterilmez.
-      this.vehicles = this.vehicleService.getVehicles().filter(v => v.isActive !== false);
+      this.vehicles = this.permissionService.scopeToBranch(this.vehicleService.getVehicles()).filter(v => v.isActive !== false);
       this.vehiclesWithDetails = this.vehicles.map(v => ({
         ...v,
         brandModel: `${v.brand} ${v.model}`,

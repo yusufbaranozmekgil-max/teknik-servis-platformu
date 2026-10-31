@@ -14,6 +14,22 @@ export class PermissionService {
   private auditLog = inject(AuditLogService);
   private notification = inject(NotificationService);
 
+  /** Şube sorumlusu yalnız kendi şubesinin kayıtlarını görür; diğer roller daraltılmaz. */
+  scopeToBranch<T extends { branchId: string | null }>(items: T[]): T[] {
+    const user = this.authState.currentUser();
+    if (user?.role !== 'BRANCH_MANAGER' || !user.branchId) return items;
+    return items.filter(item => item.branchId === user.branchId);
+  }
+
+  /** Teknisyen yalnız kendisine atanan iş emirlerini görür. */
+  scopeWorkOrders<T extends { branchId: string | null; technicianId: string | null }>(items: T[]): T[] {
+    const user = this.authState.currentUser();
+    if (user?.role === 'TECHNICIAN') {
+      return items.filter(item => !!user.technicianId && item.technicianId === user.technicianId);
+    }
+    return this.scopeToBranch(items);
+  }
+
   hasPermission(permission: Permission): boolean {
     const user = this.authState.currentUser();
     if (!user) return false;

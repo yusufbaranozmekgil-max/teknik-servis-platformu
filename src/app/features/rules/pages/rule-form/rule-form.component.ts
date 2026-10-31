@@ -56,7 +56,9 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
             </select>
           </div>
 
-          <div class="form-group">
+          <p class="form-group full" *ngIf="isSystemRule">Bu bir sistem kuralıdır; koşulu kodda tanımlıdır. Ad, açıklama, öncelik ve durum düzenlenebilir.</p>
+
+          <div class="form-group" *ngIf="!isSystemRule">
             <label>Aksiyon Tipi *</label>
             <select formControlName="actionType" class="form-control">
               <option value="BLOCK_ASSIGNMENT">İşlemi Engelle</option>
@@ -66,12 +68,12 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" *ngIf="!isSystemRule">
             <label>Koşul Alanı (örn: request.priority) *</label>
             <input type="text" formControlName="conditionField" maxlength="60" class="form-control" placeholder="request.priority"/>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" *ngIf="!isSystemRule">
             <label>Operatör *</label>
             <select formControlName="operator" class="form-control">
               <option value="EQUALS">Eşit (=)</option>
@@ -82,12 +84,12 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" *ngIf="!isSystemRule">
             <label>Koşul Değeri *</label>
             <input type="text" formControlName="conditionValue" maxlength="100" class="form-control"/>
           </div>
 
-          <div class="form-group full">
+          <div class="form-group full" *ngIf="!isSystemRule">
             <label>Aksiyon Değeri (opsiyonel)</label>
             <input type="text" formControlName="actionValue" maxlength="250" class="form-control" placeholder="Bildirim metni / hedef değer"/>
           </div>
@@ -121,6 +123,7 @@ export class RuleFormComponent implements OnInit {
 
   isEdit = false;
   ruleId: string | null = null;
+  isSystemRule = false;
 
   form: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(70), CustomValidators.noWhitespace()]],
@@ -142,7 +145,17 @@ export class RuleFormComponent implements OnInit {
       this.isEdit = true;
       this.ruleId = id;
       const rule = this.ruleService.getRuleById(id);
-      if (rule) this.form.patchValue(rule as any);
+      if (rule) {
+        this.form.patchValue(rule as any);
+        // Hazır kuralların koşulu kodda olduğu için bu alanlar boştur ve zorunlu olamaz
+        this.isSystemRule = !rule.conditionField;
+        if (this.isSystemRule) {
+          ['conditionField', 'conditionValue'].forEach(name => {
+            this.form.controls[name].clearValidators();
+            this.form.controls[name].updateValueAndValidity();
+          });
+        }
+      }
     }
   }
 
@@ -159,7 +172,9 @@ export class RuleFormComponent implements OnInit {
 
     try {
       if (this.isEdit && this.ruleId) {
-        this.ruleService.updateRule(this.ruleId, this.form.value as Partial<Rule>);
+        const { name, description, priority, isActive } = this.form.value;
+        const changes = this.isSystemRule ? { name, description, priority, isActive } : this.form.value;
+        this.ruleService.updateRule(this.ruleId, changes as Partial<Rule>);
         this.toast.showSuccess('Kural güncellendi.');
       } else {
         this.ruleService.createRule(this.form.value as Omit<Rule, 'id' | 'createdAt'>);

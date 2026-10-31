@@ -105,7 +105,7 @@ export class RuleEngineService {
   }
 
   testRule(rule: Rule, sampleContext: any): RuleResult {
-    this.permissionService.assertPermission('RULE_MANAGE');
+    this.permissionService.assertPermission('RULE_VIEW');
     const match = this.evaluateCondition(rule, sampleContext);
     return {
       rule,
