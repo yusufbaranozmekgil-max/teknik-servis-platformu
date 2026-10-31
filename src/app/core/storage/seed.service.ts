@@ -1,3 +1,4 @@
+import { createDefaultRules } from '../constants/default-rules.const';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from './storage.service';
 import { STORAGE_KEYS } from './storage-keys';
@@ -24,7 +25,7 @@ export class SeedService {
   private storage = inject(StorageService);
 
   /** Demo veri sürümü — seed içeriği değiştiğinde artırılır; eski localStorage otomatik tazelenir. */
-  private static readonly SEED_VERSION = '6';
+  private static readonly SEED_VERSION = '7';
   private static readonly SEED_VERSION_KEY = 'ts_seed_version';
 
   seedAll(): void {
@@ -591,110 +592,7 @@ export class SeedService {
   }
 
   private seedRules(): void {
-    const rules: Rule[] = [
-      {
-        id: 'rule-1',
-        name: 'Garanti Dışı İşlerde Parça Kısıtı',
-        description: 'Garanti kapsamı dışındaki işlerde müşteri onayı alınmamışsa, iş emri tamamlanmadan önce parça tüketimi bloke edilir.',
-        evaluatorFnName: 'evaluateWarrantyApproval',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 1,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-2',
-        name: 'Müdür Onayı',
-        description: 'Tahmini maliyeti 50.000 TL\'yi geçen işler Şube Sorumlusu onayı olmadan planlanamaz.',
-        evaluatorFnName: 'evaluateHighCostApproval',
-        actionType: 'REQUIRE_APPROVAL',
-        priority: 2,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-3',
-        name: 'Kritik Stok Uyarı Motoru',
-        description: 'Bir parçanın stoku kritik eşiğin altına inerse sistem otomatik olarak LOW_STOCK bildirimi üretir.',
-        evaluatorFnName: 'evaluateCriticalStock',
-        actionType: 'TRIGGER_ALERT',
-        priority: 3,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-4',
-        name: 'Araç Yakıt Sınırı',
-        description: 'Yakıt seviyesi %30\'un altında olan araçlar işe atanamaz.',
-        evaluatorFnName: 'evaluateVehicleFuel',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 4,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-5',
-        name: 'Araç Bakım Zaman Aşımı',
-        description: 'Son bakım tarihi üzerinden 180 gün geçmiş saha araçları planlamada atanamaz.',
-        evaluatorFnName: 'evaluateVehicleMaintenance',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 5,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-6',
-        name: 'İzinli Personel Kısıtı',
-        description: 'Yıllık izin döneminde olan veya o gün pasif işaretlenen teknisyenler işe atanamaz.',
-        evaluatorFnName: 'evaluateTechnicianLeave',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 6,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-7',
-        name: 'SLA Acil Yukseltme',
-        description: 'Çözümüne 2 saatten az süre kalan işlerin öncelik durumu otomatik olarak CRITICAL yapılır.',
-        evaluatorFnName: 'evaluateSlaUrgency',
-        actionType: 'AUTO_PRIORITIZE',
-        priority: 7,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-8',
-        name: 'Şube Kapasite Aşımı',
-        description: 'Şube günlük iş kapasitesi dolduğunda şubeye yeni iş ataması engellenir.',
-        evaluatorFnName: 'evaluateBranchCapacity',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 8,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-9',
-        name: 'Vardiya Dışı Planlama Kısıtı',
-        description: 'Teknisyenlerin tanımlı mesai günleri ve saatleri dışında iş planlaması yapılamaz.',
-        evaluatorFnName: 'evaluateShiftHours',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 9,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'rule-10',
-        name: 'Kıdem Eşleşmesi',
-        description: 'CRITICAL öncelikli işlere JUNIOR seviyesindeki teknisyenler atanamaz.',
-        evaluatorFnName: 'evaluateJuniorAssignment',
-        actionType: 'BLOCK_ASSIGNMENT',
-        priority: 10,
-        isActive: true,
-        createdAt: new Date().toISOString()
-      }
-    ];
-
-    this.storage.setCollection(STORAGE_KEYS.RULES, rules);
+    this.storage.setCollection(STORAGE_KEYS.RULES, createDefaultRules());
   }
 
   private seedRequestsAndOrders(
@@ -1267,7 +1165,7 @@ export class SeedService {
         type: 'NEW_REQUEST',
         severity: 'INFO',
         title: 'Sistem Denetim Kaydı İnceleme Talebi',
-        message: 'Sistem ayarlarında yapılan son kritik güncellemeler denetimDiff günlüğüne kaydedilmiştir. İncelemeniz bekleniyor.',
+        message: 'Sistem ayarlarında yapılan son kritik güncellemeler denetim günlüğüne kaydedilmiştir. İncelemeniz bekleniyor.',
         targetRole: 'SYSTEM_ADMIN',
         targetUserId: null,
         relatedEntityType: 'SYSTEM',

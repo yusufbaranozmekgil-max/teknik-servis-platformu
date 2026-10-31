@@ -1,3 +1,4 @@
+import { createDefaultRules } from '../constants/default-rules.const';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -24,6 +25,12 @@ export class RuleEngineService {
 
   constructor() {
     this.seedDefaultRules();
+  }
+
+  /** Kural kaydı yoksa güvenli varsayılan olarak etkin sayılır. */
+  isRuleActive(id: string): boolean {
+    const rule = this.storage.getById<Rule>(STORAGE_KEYS.RULES, id);
+    return rule ? rule.isActive : true;
   }
 
   getActiveRules(): Rule[] {
@@ -292,14 +299,14 @@ export class RuleEngineService {
               }
 
               if (triggered) {
-                const allowed = rule.actionType !== 'BLOCK_ASSIGNMENT';
+                const allowed = rule.actionType !== 'BLOCK_ASSIGNMENT' && rule.actionType !== 'REQUIRE_APPROVAL';
                 const actionText = rule.actionType === 'REQUIRE_APPROVAL' ? 'onay gerektirir' :
                                    rule.actionType === 'BLOCK_ASSIGNMENT' ? 'engellendi' :
                                    rule.actionType === 'TRIGGER_ALERT' ? 'uyarı' : 'önceliklendirildi';
                 return {
                   triggered: true,
                   allowed,
-                  reason: `Kural '${rule.name}' tetiklendi: ${rule.conditionField} (${value}) ${rule.operator} ${rule.conditionValue}. Aksiyon: ${actionText} (${rule.actionValue || ''})`
+                  reason: `'${rule.name}' kuralı: ${rule.actionValue || actionText}.`
                 };
               }
             }
@@ -450,128 +457,7 @@ export class RuleEngineService {
     const list = this.storage.getCollection<Rule>(STORAGE_KEYS.RULES);
     if (list.length > 0) return;
 
-    const defaultRules: Rule[] = [
-      {
-        id: 'rule-1',
-        name: 'Kritik Talep Otomatik Önceliklendirme',
-        description: 'Önceliği CRITICAL olan servis taleplerini otomatik en üst sıraya çeker.',
-        trigger: 'SERVICE_REQUEST_CREATE',
-        conditions: JSON.stringify({ priority: 'CRITICAL' }),
-        actions: JSON.stringify({ action: 'AUTO_PRIORITIZE' }),
-        priority: 1,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-2',
-        name: '50.000 TL Üzeri Harcama Onayı',
-        description: 'Tahmini tutarı 50.000 TL üzerindeki iş emirleri için şube yöneticisi onayı gerektirir.',
-        trigger: 'WORK_ORDER_PLAN',
-        conditions: JSON.stringify({ estimatedCostGreaterThan: 50000 }),
-        actions: JSON.stringify({ action: 'REQUIRE_APPROVAL' }),
-        priority: 3,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-3',
-        name: 'Minimum Stok Seviyesi Uyarısı',
-        description: 'Stok miktarı minimum kritik seviyenin altına düşen parçalar için uyarı bildirimi üretir.',
-        trigger: 'SYSTEM_EVENT',
-        conditions: JSON.stringify({ availableStockLessThanMin: true }),
-        actions: JSON.stringify({ action: 'TRIGGER_ALERT', type: 'LOW_STOCK' }),
-        priority: 5,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-4',
-        name: 'SLA Süresi Aşım Uyarısı',
-        description: 'SLA deadline süresini geçen açık talepleri gecikmiş olarak işaretler.',
-        trigger: 'SYSTEM_EVENT',
-        conditions: JSON.stringify({ nowGreaterThanSlaDeadline: true }),
-        actions: JSON.stringify({ action: 'TRIGGER_ALERT', type: 'SLA_OVERDUE' }),
-        priority: 2,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-5',
-        name: 'SLA < 2 Saat Kalan Alarmı',
-        description: 'SLA deadline dolmasına 2 saatten az süre kalan işleri acil olarak işaretler.',
-        trigger: 'SYSTEM_EVENT',
-        conditions: JSON.stringify({ hoursToSlaDeadlineLessThan: 2 }),
-        actions: JSON.stringify({ action: 'AUTO_PRIORITIZE', priority: 'CRITICAL' }),
-        priority: 2,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-6',
-        name: 'Bakımsız Araç Engeli',
-        description: 'Son bakım tarihinin üzerinden 180 gün geçen araçların iş emirlerine atanmasını engeller.',
-        trigger: 'WORK_ORDER_PLAN',
-        conditions: JSON.stringify({ daysSinceMaintenanceGreaterThan: 180 }),
-        actions: JSON.stringify({ action: 'BLOCK_ASSIGNMENT' }),
-        priority: 1,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-7',
-        name: 'Düşük Yakıt Seviyesi Engeli',
-        description: 'Yakıt seviyesi %30 altındaki araçların görevlendirilmesini engeller.',
-        trigger: 'WORK_ORDER_PLAN',
-        conditions: JSON.stringify({ fuelLevelLessThan: 30 }),
-        actions: JSON.stringify({ action: 'BLOCK_ASSIGNMENT' }),
-        priority: 1,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-8',
-        name: 'İzinli/Pasif Teknisyen Engeli',
-        description: 'İzinli veya pasif durumda olan teknisyenlerin planlamaya dahil edilmesini engeller.',
-        trigger: 'WORK_ORDER_PLAN',
-        conditions: JSON.stringify({ isOnLeaveOrInactive: true }),
-        actions: JSON.stringify({ action: 'BLOCK_ASSIGNMENT' }),
-        priority: 1,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-9',
-        name: 'Şube Günlük Kapasite Sınırı',
-        description: 'Günlük planlanan iş sayısı şube kapasite sınırını aşan durumlarda yeni atamaları engeller.',
-        trigger: 'WORK_ORDER_PLAN',
-        conditions: JSON.stringify({ branchCapacityFull: true }),
-        actions: JSON.stringify({ action: 'BLOCK_ASSIGNMENT' }),
-        priority: 4,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      },
-      {
-        id: 'rule-10',
-        name: 'Garanti Dışı İşlerde Müşteri Onayı',
-        description: 'Garanti kapsamı dışındaki işlerde müşteri onayı yoksa yedek parça kullanımını engeller.',
-        trigger: 'WORK_ORDER_PLAN',
-        conditions: JSON.stringify({ noWarrantyAndNoCustomerApproval: true }),
-        actions: JSON.stringify({ action: 'BLOCK_ASSIGNMENT' }),
-        priority: 3,
-        isActive: true,
-        createdAt: '2026-01-01T00:00:00.000Z',
-        updatedAt: '2026-01-01T00:00:00.000Z'
-      }
-    ];
+    const defaultRules = createDefaultRules();
 
     for (const rule of defaultRules) {
       this.storage.create<Rule>(STORAGE_KEYS.RULES, rule);

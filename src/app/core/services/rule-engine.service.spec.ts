@@ -67,3 +67,34 @@ describe('RuleEngineService.resolveConflicts', () => {
         expect(notifications.createNotification).toHaveBeenCalledTimes(2);
     });
 });
+
+describe('RuleEngineService kural durumu', () => {
+    const setup = (rules: any[]) => {
+        const storage = new MockStorageService();
+        storage.setCollection('ts_rules', rules);
+        TestBed.configureTestingModule({
+            providers: [
+                RuleEngineService,
+                { provide: StorageService, useValue: storage },
+                { provide: AuditLogService, useValue: { logAction: () => { }, logRuleConflict: () => { } } },
+                { provide: NotificationService, useValue: { createNotification: () => { } } },
+                { provide: PermissionService, useValue: { assertPermission: () => { } } }
+            ]
+        });
+        return TestBed.inject(RuleEngineService);
+    };
+
+    it('kapatılan kural etkin sayılmaz', () => {
+        expect(setup([{ id: 'rule-7', isActive: false }]).isRuleActive('rule-7')).toBe(false);
+    });
+
+    it('kullanıcı kuralı koşul sağlanınca planlamayı engeller', () => {
+        const engine = setup([{
+            id: 'rule-custom-1', name: 'Kritik engeli', trigger: 'WORK_ORDER_PLAN', isActive: true, priority: 1, createdAt: '2026-01-01',
+            conditionField: 'request.priority', operator: 'EQUALS', conditionValue: 'CRITICAL', actionType: 'BLOCK_ASSIGNMENT'
+        }]);
+
+        expect(engine.evaluateRules('WORK_ORDER_PLAN', { request: { priority: 'CRITICAL' } as any })[0].allowed).toBe(false);
+        expect(engine.evaluateRules('WORK_ORDER_PLAN', { request: { priority: 'STANDARD' } as any })).toEqual([]);
+    });
+});

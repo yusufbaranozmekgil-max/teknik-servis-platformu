@@ -1,3 +1,4 @@
+import { RuleEngineService } from './rule-engine.service';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -31,6 +32,7 @@ export interface TechnicianScoreResult {
 })
 export class TechnicianScoringService {
   private storage = inject(StorageService);
+  private ruleEngine = inject(RuleEngineService);
   private schedulingService = inject(SchedulingService);
   private permissionService = inject(PermissionService);
 
@@ -72,7 +74,7 @@ export class TechnicianScoringService {
     }
 
     // Leave check
-    if (eligible && tech.isOnLeave && tech.leaveStart && tech.leaveEnd) {
+    if (eligible && this.ruleEngine.isRuleActive('rule-8') && tech.isOnLeave && tech.leaveStart && tech.leaveEnd) {
       const slotStart = new Date(slot.start).getTime();
       const slotEnd = new Date(slot.end).getTime();
       const leaveStart = new Date(tech.leaveStart).getTime();

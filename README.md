@@ -19,7 +19,7 @@ Giriş ekranındaki demo kullanıcılarından birini seçmek yeterli (ortak şif
 - **Çakışma önleme:** Bir teknisyen ya da araç aynı anda iki aktif işe atanamaz. Biten veya iptal edilen işler zaman dilimini serbest bırakır.
 - **Stok rezervasyonu:** Planlanan işin parçaları stoktan düşülmez, rezerve edilir. Kullanılabilir stok `stockQuantity - reservedQuantity` ile hesaplanır. İptalde rezervasyon bırakılır, kısmi tamamlamada yalnızca kullanılan parça düşer.
 - **Kaynak puanlama:** Teknisyen ve araçlar 100 puan üzerinden sıralanır. Yetkinlik uyumu, yakınlık, müsaitlik ve iş yükü gibi kriterlerin katkısı ekranda görünür.
-- **Kural motoru:** Çelişen kurallar her seferinde aynı şekilde çözülür: önce düşük `priority`, eşitse eski kural kazanır. Kaybeden kural denetim kaydına yazılır.
+- **Kural motoru:** Kurallar planlama sırasında gerçekten uygulanır; bir kuralı kapatmak aday listesini ve planlamayı değiştirir, kullanıcı yeni engelleyici kural ekleyebilir. Çelişen kurallar her seferinde aynı şekilde çözülür: önce düşük `priority`, eşitse eski kural kazanır. Kaybeden kural denetim kaydına yazılır.
 - **Rol bazlı yetki:** 7 rol vardır. Yetki hem rota koruyucularında hem servis metotlarında (`assertPermission`) denetlenir.
 - **Dayanıklı depolama:** Bozuk `localStorage` verisi uygulamayı düşürmez, yedeklenip koleksiyon sıfırlanır. Kota aşımı yakalanır.
 - **Simülasyon ekranı:** SLA gecikmesi, çakışma, bozuk veri ve 5.000+ kayıt gibi senaryolar tek tıkla denenebilir.
@@ -52,7 +52,7 @@ npm run test:ci  # testler (tek sefer)
 
 ## Testler
 
-92 birim testi vardır ve her push'ta CI'da build ile birlikte çalışır. Kapsananlar: iş emri durum geçişleri, kod üretimi, iptal ve geri alma, zaman çakışması, kural çakışması çözümü, stok rezervasyonu, şubeler arası transfer, sayısal form alanları, rol yetkileri ve kapsamı, silme korumaları, izin kontrolü, kod üretimi, bildirim hedefi. Diğer servisler ve arayüz akışları henüz otomatik test kapsamında değildir.
+94 birim testi vardır ve her push'ta CI'da build ile birlikte çalışır. Kapsananlar: iş emri durum geçişleri, kod üretimi, iptal ve geri alma, zaman çakışması, kural çakışması çözümü, stok rezervasyonu, şubeler arası transfer, sayısal form alanları, rol yetkileri ve kapsamı, silme korumaları, izin kontrolü, kod üretimi, bildirim hedefi. Diğer servisler ve arayüz akışları henüz otomatik test kapsamında değildir.
 
 ## Bilinen sınırlar
 

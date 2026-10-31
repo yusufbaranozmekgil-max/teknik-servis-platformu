@@ -371,7 +371,10 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
 
   loadOpenRequests(): void {
     try {
-      this.openRequests = this.permissionService.scopeToBranch(this.requestService.getServiceRequests()).filter(r => r.status === 'NEW');
+      // Planlaması reddedilen talep açılmış iş emriyle kalır; listeden düşerse bir daha planlanamaz
+      const opened = new Set(this.workOrderService.getWorkOrders().filter(wo => wo.status === 'OPENED').map(wo => wo.serviceRequestId));
+      this.openRequests = this.permissionService.scopeToBranch(this.requestService.getServiceRequests())
+        .filter(r => r.status === 'NEW' || (r.status === 'IN_PROGRESS' && opened.has(r.id)));
     } catch (err: any) {
       this.errorMessage = err.message || 'Hizmet talepleri yüklenemedi.';
     }

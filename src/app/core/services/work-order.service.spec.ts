@@ -1,3 +1,4 @@
+import { RuleEngineService } from './rule-engine.service';
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TestBed } from '@angular/core/testing';
 import { WorkOrderService } from './work-order.service';
@@ -56,7 +57,8 @@ describe('WorkOrderService durum makinesi', () => {
                     } },
                 { provide: SchedulingService, useValue: {} },
                 { provide: VehicleScoringService, useValue: {} },
-                { provide: InventoryService, useValue: {} }
+                { provide: InventoryService, useValue: {} },
+                { provide: RuleEngineService, useValue: { isRuleActive: () => true, evaluateRules: () => [] } }
             ]
         });
         service = TestBed.inject(WorkOrderService);

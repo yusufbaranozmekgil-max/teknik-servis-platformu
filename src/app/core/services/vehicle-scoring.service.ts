@@ -1,3 +1,4 @@
+import { RuleEngineService } from './rule-engine.service';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -30,6 +31,7 @@ export interface VehicleScoreResult {
 })
 export class VehicleScoringService {
   private storage = inject(StorageService);
+  private ruleEngine = inject(RuleEngineService);
   private schedulingService = inject(SchedulingService);
   private permissionService = inject(PermissionService);
 
@@ -81,7 +83,7 @@ export class VehicleScoringService {
     }
 
     // Fuel level check
-    if (eligible && vehicle.fuelLevel < 30) {
+    if (eligible && this.ruleEngine.isRuleActive('rule-7') && vehicle.fuelLevel < 30) {
       eligible = false;
       ineligibleReason = `Yakıt seviyesi %30'un altında (Mevcut: %${vehicle.fuelLevel}).`;
     }
@@ -92,7 +94,7 @@ export class VehicleScoringService {
       const maintDate = new Date(vehicle.lastMaintenanceDate).getTime();
       const diffMs = Date.now() - maintDate;
       daysSinceMaint = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      if (daysSinceMaint > 180) {
+      if (this.ruleEngine.isRuleActive('rule-6') && daysSinceMaint > 180) {
         eligible = false;
         ineligibleReason = `Son bakımın üzerinden 180 günden fazla zaman geçti (${daysSinceMaint} gün).`;
       }

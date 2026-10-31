@@ -1,3 +1,4 @@
+import { RuleEngineService } from './rule-engine.service';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -40,6 +41,7 @@ export class WorkOrderService {
   private reservationService = inject(ReservationService);
   private notificationService = inject(NotificationService);
   private inventoryService = inject(InventoryService);
+  private ruleEngine = inject(RuleEngineService);
 
   getWorkOrders(): WorkOrder[] {
     this.permissionService.assertPermission('WORK_ORDER_VIEW');
@@ -167,7 +169,7 @@ export class WorkOrderService {
     }
 
     // 4b. Technician leave check (Kural 8 — izinli personel atanamaz)
-    if (isOnLeaveDuring(tech, slot)) {
+    if (this.ruleEngine.isRuleActive('rule-8') && isOnLeaveDuring(tech, slot)) {
       throw new Error('Teknisyen izinli olduğu için atanamaz.');
     }
 
@@ -178,7 +180,7 @@ export class WorkOrderService {
 
     // 5b. Kural 2 — 50.000 TL üzeri işler şube sorumlusu onayı olmadan planlanamaz.
     // Onay bekleyen iş için şube sorumlusuna aksiyon bildirimi düşer.
-    if (wo.estimatedCost > 50000 && !wo.managerApproved) {
+    if (this.ruleEngine.isRuleActive('rule-2') && wo.estimatedCost > 50000 && !wo.managerApproved) {
       this.notificationService.createForRole(
         'BRANCH_MANAGER',
         'APPROVAL_REQUIRED',
@@ -202,7 +204,7 @@ export class WorkOrderService {
 
     // 8. Branch capacity check
     const dateStr = slot.start.split('T')[0];
-    if (this.schedulingService.branchCapacityExceeded(wo.branchId, dateStr)) {
+    if (this.ruleEngine.isRuleActive('rule-9') && this.schedulingService.branchCapacityExceeded(wo.branchId, dateStr)) {
       // Şartname Bölüm 13: kapasite dolduğunda ilgili role bildirim düşer.
       try {
         this.notificationService.createForRole(
@@ -236,12 +238,12 @@ export class WorkOrderService {
     if (vehicle.status === 'OUT_OF_SERVICE') {
       throw new Error('Araç hizmet dışı olduğu için atanamaz.');
     }
-    if (vehicle.fuelLevel < 30) {
+    if (this.ruleEngine.isRuleActive('rule-7') && vehicle.fuelLevel < 30) {
       throw new Error('Aracın yakıt seviyesi %30 altındadır.');
     }
     // 9b. Araç bakım süresi (Şartname Bölüm 8 — son bakımın üzerinden 180 gün geçtiyse atanamaz)
     const daysSinceMaint = Math.floor((Date.now() - new Date(vehicle.lastMaintenanceDate).getTime()) / (1000 * 60 * 60 * 24));
-    if (daysSinceMaint > 180) {
+    if (this.ruleEngine.isRuleActive('rule-6') && daysSinceMaint > 180) {
       throw new Error(`Aracın son bakımının üzerinden 180 günden fazla zaman geçti (${daysSinceMaint} gün), atanamaz.`);
     }
     // 9c. Ekipman uygunluğu (işin gerektirdiği donanım araçta bulunmalı)
@@ -260,6 +262,18 @@ export class WorkOrderService {
     }
 
     try {
+      // Kullanıcının tanımladığı engelleyici kurallar burada devreye girer
+      const blocking = this.ruleEngine.evaluateRules('WORK_ORDER_PLAN', {
+        request: req,
+        workOrder: { ...wo, estimatedCost: wo.managerApproved ? 0 : wo.estimatedCost },
+        technician: { ...tech, isOnLeave: isOnLeaveDuring(tech, slot) },
+        vehicle,
+        estimatedCost: wo.managerApproved ? 0 : wo.estimatedCost
+      }).find(result => !result.allowed);
+      if (blocking) {
+        throw new Error(blocking.reason || `'${blocking.rule.name}' kuralı bu planlamayı engelledi.`);
+      }
+
       // 10. Required parts reservation
       this.reservationService.reserveParts(workOrderId, requiredParts);
 
