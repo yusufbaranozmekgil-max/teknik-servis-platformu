@@ -182,7 +182,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
               Teknisyenleri listelemek için talep seçiniz.
             </div>
             <div class="alert alert-warning" *ngIf="selectedRequest && eligibleTechnicians.length === 0">
-              Bu kriterlere uygun teknisyen bulunamadı.
+              Bu tarih ve saatte uygun teknisyen yok. Teknisyenler hafta içi mesai saatlerinde çalışır; başka bir zaman seçin.
             </div>
           </div>
 
@@ -317,9 +317,14 @@ export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
     // Get requests in NEW status
     this.loadOpenRequests();
     
-    // Set default date to today
-    const today = new Date();
-    this.slotDate = today.toISOString().split('T')[0];
+    // Teknisyenler hafta içi çalıştığı için varsayılan tarih ilk iş günüdür
+    const date = new Date();
+    while (date.getDay() === 0 || date.getDay() === 6) {
+      date.setDate(date.getDate() + 1);
+    }
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    this.slotDate = `${date.getFullYear()}-${month}-${day}`;
   }
 
   loadOpenRequests(): void {
