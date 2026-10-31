@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
+import { Component, inject, signal, OnInit, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -110,6 +110,7 @@ interface MenuGroup {
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./main-layout.component.scss']
 })
 export class MainLayoutComponent implements OnInit {

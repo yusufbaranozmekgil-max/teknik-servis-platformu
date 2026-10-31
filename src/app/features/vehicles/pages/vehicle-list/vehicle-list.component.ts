@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import { VehicleService } from '../../../../core/services/vehicle.service';
@@ -39,6 +39,7 @@ import { ToastService } from '../../../../core/services/toast.service';
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vehicle-list.component.scss']
 })
 export class VehicleListComponent implements OnInit {

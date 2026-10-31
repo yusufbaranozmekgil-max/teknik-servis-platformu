@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuditLogService } from '../../../../core/services/audit-log.service';
 import { StorageService } from '../../../../core/storage/storage.service';
@@ -263,6 +263,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
     }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./audit-list.component.scss']
 })
 export class AuditListComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, computed, signal } from '@angular/core';
+import { Component, inject, OnInit, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardService } from '../../../../core/services/dashboard.service';
 import { AuthStateService } from '../../../../core/auth/auth-state.service';
@@ -21,7 +21,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
       <header class="dashboard-header animate-fade-in">
         <div class="header-info">
           <h1>Saha Operasyonları Paneli</h1>
-          <p class="subtitle">Hoş geldiniz, <strong>{{ currentUser()?.fullName || 'Kullanıcı' }}</strong> <span class="role-badge">{{ currentUser()?.role | roleLabel }}</span></p>
+          <p class="subtitle">Hoş geldiniz, <strong>{{ currentUser()?.fullName || 'Kullanıcı' }}</strong> <span class="role-badge">{{ $safeNavigationMigration(currentUser()?.role) | roleLabel }}</span></p>
         </div>
         <button (click)="refreshData()" class="btn-refresh">
           Verileri Yenile
@@ -876,6 +876,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
     
     <!-- Fallback if branch manager doesn't have a branchId -->
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -178,6 +178,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./branch-create.component.scss']
 })
 export class BranchCreatePage {

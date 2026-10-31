@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ServiceRequestService } from '../../../../core/services/service-request.service';
@@ -102,6 +102,7 @@ const SKILL_LABELS: Record<string, string> = {
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./request-detail.component.scss']
 })
 export class RequestDetailPage implements OnInit {

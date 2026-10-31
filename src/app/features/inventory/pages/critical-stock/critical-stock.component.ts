@@ -1,5 +1,5 @@
 import { PermissionService } from '../../../../core/services/permission.service';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { InventoryService } from '../../../../core/services/inventory.service';
@@ -34,6 +34,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./critical-stock.component.scss']
 })
 export class CriticalStockPage implements OnInit {

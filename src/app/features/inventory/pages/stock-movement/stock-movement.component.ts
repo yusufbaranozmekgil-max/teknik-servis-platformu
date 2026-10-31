@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -264,6 +264,7 @@ type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./stock-movement.component.scss']
 })
 export class StockMovementPage implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -225,6 +225,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, todayISO } from '../../../../core/constan
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./technician-edit.component.scss']
 })
 export class TechnicianEditPage implements OnInit, ComponentCanDeactivate {

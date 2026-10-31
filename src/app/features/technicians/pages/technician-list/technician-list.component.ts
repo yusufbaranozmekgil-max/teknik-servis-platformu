@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import { TechnicianService } from '../../../../core/services/technician.service';
@@ -42,6 +42,7 @@ import { TECHNICIAN_LEVEL_LABELS } from '../../../../core/constants/labels.const
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./technician-list.component.scss']
 })
 export class TechnicianListComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -71,6 +71,7 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./notification-center.component.scss']
 })
 export class NotificationCenterComponent implements OnInit {

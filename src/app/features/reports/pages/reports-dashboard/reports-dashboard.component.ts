@@ -1,6 +1,6 @@
 import { toLocalDateISO } from '../../../../core/constants/form-limits.const';
 import { Chart, registerables } from 'chart.js';
-import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { StorageService } from '../../../../core/storage/storage.service';
 import { STORAGE_KEYS } from '../../../../core/storage/storage-keys';
@@ -297,6 +297,7 @@ const SKILL_LABELS: Record<string, string> = {
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./reports-dashboard.component.scss']
 })
 export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewInit {

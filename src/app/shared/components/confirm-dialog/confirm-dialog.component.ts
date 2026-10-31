@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { ConfirmService } from '../../../core/services/confirm.service';
 
@@ -19,6 +19,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
       </div>
     }
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {

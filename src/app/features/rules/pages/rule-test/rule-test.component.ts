@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { RuleEngineService } from '../../../../core/services/rule-engine.service';
@@ -150,6 +150,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styles: [`
     .page-container {
       padding: 1.5rem;

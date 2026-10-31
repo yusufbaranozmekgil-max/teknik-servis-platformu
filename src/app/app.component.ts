@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ConfirmDialogComponent } from './shared/components/confirm-dialog/confirm-dialog.component';
 import { ToastsComponent } from './shared/components/toasts/toasts.component';
@@ -8,6 +8,7 @@ import { StorageService } from './core/storage/storage.service';
     selector: 'app-root',
     imports: [RouterOutlet, ConfirmDialogComponent, ToastsComponent],
     templateUrl: './app.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {

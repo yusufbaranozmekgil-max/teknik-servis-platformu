@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { VehicleService } from '../../../../core/services/vehicle.service';
@@ -82,6 +82,7 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./vehicle-maintenance.component.scss']
 })
 export class VehicleMaintenancePage implements OnInit {

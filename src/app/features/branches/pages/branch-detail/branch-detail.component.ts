@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -71,6 +71,7 @@ import { StatusBadgeComponent } from '../../../../shared/components/status-badge
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./branch-detail.component.scss']
 })
 export class BranchDetailPage implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import {
   WORK_ORDER_STATUS_LABELS,
@@ -44,6 +44,7 @@ const LEGACY_LABELS: Record<string, string> = {
       {{ statusLabel }}
     </span>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./status-badge.component.scss']
 })
 export class StatusBadgeComponent {

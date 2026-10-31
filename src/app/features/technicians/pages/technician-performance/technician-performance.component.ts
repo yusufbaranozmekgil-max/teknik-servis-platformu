@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { TechnicianService } from '../../../../core/services/technician.service';
@@ -92,6 +92,7 @@ import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pi
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./technician-performance.component.scss']
 })
 export class TechnicianPerformancePage implements OnInit {

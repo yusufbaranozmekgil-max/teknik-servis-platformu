@@ -1,6 +1,6 @@
 import { todayISO, toLocalDateISO } from '../../../../core/constants/form-limits.const';
 import { PermissionService } from '../../../../core/services/permission.service';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -291,6 +291,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./schedule-board.component.scss']
 })
 export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
@@ -187,6 +187,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
     }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./form-field.component.scss']
 })
 export class FormFieldComponent {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { RouterModule } from '@angular/router';
 import { RuleEngineService } from '../../../../core/services/rule-engine.service';
@@ -280,6 +280,7 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./rule-list.component.scss']
 })
 export class RuleListComponent implements OnInit {

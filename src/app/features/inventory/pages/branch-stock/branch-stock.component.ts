@@ -1,5 +1,5 @@
 import { PermissionService } from '../../../../core/services/permission.service';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -67,6 +67,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./branch-stock.component.scss']
 })
 export class BranchStockPage implements OnInit {

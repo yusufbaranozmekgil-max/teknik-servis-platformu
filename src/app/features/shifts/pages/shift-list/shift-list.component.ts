@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ShiftAssignmentService } from '../../../../core/services/shift-assignment.service';
@@ -238,6 +238,7 @@ interface EligibleEntry {
       }
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./shift-list.component.scss']
 })
 export class ShiftListComponent implements OnInit {

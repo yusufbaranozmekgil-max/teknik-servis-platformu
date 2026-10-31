@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import { InventoryService } from '../../../../core/services/inventory.service';
@@ -43,6 +43,7 @@ import { TooltipDirective } from '../../../../shared/directives/tooltip.directiv
       </div>
     </div>
   `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./spare-part-list.component.scss']
 })
 export class SparePartListComponent implements OnInit {

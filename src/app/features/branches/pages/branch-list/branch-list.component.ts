@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import { BranchService } from '../../../../core/services/branch.service';
@@ -36,6 +36,7 @@ import { ToastService } from '../../../../core/services/toast.service';
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./branch-list.component.scss']
 })
 export class BranchListComponent implements OnInit {

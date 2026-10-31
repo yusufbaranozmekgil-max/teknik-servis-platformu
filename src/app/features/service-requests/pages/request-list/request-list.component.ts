@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { ServiceRequestService } from '../../../../core/services/service-request.service';
@@ -47,6 +47,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
     </div>
     `,
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./request-list.component.scss']
 })
 export class RequestListComponent implements OnInit {
