@@ -353,9 +353,9 @@ export class SeedService {
     // spec'teki özel test senaryoları için ilk teknisyeni sabitleyelim
     technicians[0] = {
       id: 'tech-1',
-      fullName: 'Ahmet Yilmaz',
+      fullName: 'Fatih Mert',
       phone: '05550000001',
-      email: 'ahmet.yilmaz@operasyon.com',
+      email: 'fatih.mert@operasyon.com',
       branchId: 'branch-1',
       region: 'Cankaya',
       level: 'SENIOR',

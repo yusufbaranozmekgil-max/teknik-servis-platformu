@@ -172,6 +172,7 @@
 // Dark mode variants
 // ====================================================================
 :host-context(body.dark-theme) {
+  .panel-section-header { border-bottom-color: #374345; }
   .page-container { background: #071113; }
   h2 { color: #f6fbfc; }
   h3, h4, h5 { color: #f6fbfc; }

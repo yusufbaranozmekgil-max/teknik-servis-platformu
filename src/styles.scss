@@ -20,6 +20,7 @@ table { font-variant-numeric: tabular-nums; }
 
 ::selection { background: #c4dee3; color: #0f1a1c; }
 :focus-visible { outline: 2px solid #1a8798; outline-offset: 2px; }
+body.dark-theme { color-scheme: dark; }
 
 // ====================================================================
 // GLOBAL RESPONSIVE — form ve detay grid'lerinin mobile fallback'i.
