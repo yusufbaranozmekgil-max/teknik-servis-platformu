@@ -108,6 +108,21 @@ describe('WorkOrderService durum makinesi', () => {
     expect(storage.getById<any>(STORAGE_KEYS.SERVICE_REQUESTS, 'sr-1').status).toBe('NEW');
   });
 
+  it('art arda oluşturulan iş emirlerine benzersiz kod verir', () => {
+    const year = new Date().getFullYear();
+    storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, [
+      { id: 'sr-1', code: `TALEP-${year}-0001`, status: 'NEW' },
+      { id: 'sr-2', code: `TALEP-${year}-0002`, status: 'NEW' }
+    ]);
+    storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [{ id: 'wo-old', code: `WO-${year}-0002`, serviceRequestId: 'sr-old' }]);
+
+    const first = service.createWorkOrderFromRequest('sr-1');
+    const second = service.createWorkOrderFromRequest('sr-2');
+
+    expect(first.code).toBe(`WO-${year}-0003`);
+    expect(second.code).toBe(`WO-${year}-0004`);
+  });
+
   it('boş iptal nedenini reddeder ve rezervasyona dokunmaz', () => {
     seed('PLANNED');
     expect(() => service.cancelWorkOrder('wo-1', '   ')).toThrowError(/İptal nedeni/);

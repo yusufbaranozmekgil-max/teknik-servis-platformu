@@ -63,9 +63,13 @@ export class WorkOrderService {
       return existing; // Return existing if already created
     }
 
-    const code = `WO-${request.code.split('-')[1] || Date.now()}`;
-    if (workOrders.some(wo => wo.code.toLowerCase() === code.toLowerCase())) {
-      throw new Error('Bu iş emri kodu zaten kullanılıyor.');
+    const usedCodes = new Set(workOrders.map(wo => wo.code));
+    const year = new Date().getFullYear();
+    let sequence = workOrders.length + 1;
+    let code = `WO-${year}-${sequence.toString().padStart(4, '0')}`;
+    while (usedCodes.has(code)) {
+      sequence++;
+      code = `WO-${year}-${sequence.toString().padStart(4, '0')}`;
     }
 
     const newWO: WorkOrder = {
