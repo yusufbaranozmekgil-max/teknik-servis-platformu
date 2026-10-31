@@ -99,7 +99,7 @@ type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
       <!-- Transfer Formu -->
       <div class="card-content form-card animate-slide" *ngIf="showForm && activeMode === 'TRANSFER'">
         <h3>Şubeler Arası Transfer</h3>
-        <p class="form-hint">Bir parçayı kaynak şubeden hedef şubeye taşır. Hedef şubede aynı kodlu aktif parça bulunmalıdır.</p>
+        <p class="form-hint">Bir parçayı kaynak şubeden hedef şubeye taşır. Hedef şubede bu parça yoksa aynı kodla otomatik açılır.</p>
         <form [formGroup]="transferForm" (ngSubmit)="onSubmitTransfer()">
           <div class="form-grid">
             <app-form-field

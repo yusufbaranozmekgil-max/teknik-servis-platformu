@@ -934,7 +934,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               display: true,
               position: 'bottom',
               labels: {
-                font: { family: 'Inter', size: 11, weight: '600' },
+                font: { family: 'Barlow', size: 11, weight: '600' },
                 color: isDarkTheme ? '#c9d7da' : '#4a5759',
                 padding: 14, usePointStyle: true, pointStyle: 'circle', boxWidth: 8
               }
@@ -943,7 +943,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.95)' : 'rgba(30, 41, 59, 0.95)',
               titleColor: '#f6fbfc', bodyColor: '#e3e8e9',
               padding: 12, cornerRadius: 10,
-              titleFont: { family: 'Inter', size: 12, weight: 'bold' }, bodyFont: { family: 'Inter', size: 11 }
+              titleFont: { family: 'Barlow', size: 12, weight: 'bold' }, bodyFont: { family: 'Barlow', size: 11 }
             }
           },
           scales: {
@@ -951,12 +951,12 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               beginAtZero: true,
               border: { display: false },
               grid: { color: isDarkTheme ? 'rgba(255,255,255,0.06)' : '#eef2f7', drawTicks: false },
-              ticks: { color: isDarkTheme ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 }, padding: 8, precision: 0 }
+              ticks: { color: isDarkTheme ? '#97a5a7' : '#5f6c6e', font: { family: 'Barlow', size: 11 }, padding: 8, precision: 0 }
             },
             x: {
               border: { display: false },
               grid: { display: false },
-              ticks: { color: isDarkTheme ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 } }
+              ticks: { color: isDarkTheme ? '#97a5a7' : '#5f6c6e', font: { family: 'Barlow', size: 11 } }
             }
           }
         }
@@ -966,9 +966,9 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
 
     const palette = [
       'rgba(26, 135, 152, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(249, 115, 22, 0.85)',
-      'rgba(239, 68, 68, 0.85)', 'rgba(139, 92, 246, 0.85)', 'rgba(236, 72, 153, 0.85)',
+      'rgba(239, 68, 68, 0.85)', 'rgba(2, 111, 126, 0.85)', 'rgba(1, 61, 70, 0.85)',
       'rgba(100, 116, 139, 0.85)', 'rgba(234, 179, 8, 0.85)', 'rgba(20, 184, 166, 0.85)',
-      'rgba(168, 85, 247, 0.85)'
+      'rgba(91, 159, 173, 0.85)'
     ];
     const border = ['#1a8798', '#10b981', '#f97316', '#ef4444', '#1a8798', '#ec4899', '#5f6c6e', '#eab308', '#14b8a6', '#1a8798'];
 
@@ -1015,10 +1015,10 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
       datasetLabel = 'Eksik Adet';
     }
 
-    const bgColors = labels.map((_, i) => palette[i % palette.length]);
-    const borderColors = labels.map((_, i) => border[i % border.length]);
-
     const isPieLike = ['pie', 'doughnut'].includes(opt.chartType);
+    const bgColors = labels.map((_, i) => isPieLike ? palette[i % palette.length] : palette[0]);
+    const borderColors = labels.map((_, i) => isPieLike ? border[i % border.length] : border[0]);
+
     const isDark = document.body.classList.contains('dark-theme');
 
     this.chartInstance = new Chart(ctx, {
@@ -1048,7 +1048,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
             display: isPieLike,
             position: 'bottom',
             labels: {
-              font: { family: 'Inter', size: 11, weight: '600' },
+              font: { family: 'Barlow', size: 11, weight: '600' },
               color: isDark ? '#c9d7da' : '#4a5759',
               padding: 14,
               usePointStyle: true,
@@ -1064,8 +1064,8 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
             cornerRadius: 10,
             displayColors: true,
             boxPadding: 4,
-            titleFont: { family: 'Inter', size: 12, weight: 'bold' },
-            bodyFont: { family: 'Inter', size: 11 }
+            titleFont: { family: 'Barlow', size: 12, weight: 'bold' },
+            bodyFont: { family: 'Barlow', size: 11 }
           }
         },
         scales: isPieLike ? undefined : {
@@ -1076,12 +1076,12 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               color: isDark ? 'rgba(255,255,255,0.06)' : '#eef2f7',
               drawTicks: false
             },
-            ticks: { color: isDark ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 }, padding: 8 }
+            ticks: { color: isDark ? '#97a5a7' : '#5f6c6e', font: { family: 'Barlow', size: 11 }, padding: 8 }
           },
           x: {
             border: { display: false },
             grid: { display: false },
-            ticks: { color: isDark ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 } }
+            ticks: { color: isDark ? '#97a5a7' : '#5f6c6e', font: { family: 'Barlow', size: 11 } }
           }
         }
       }

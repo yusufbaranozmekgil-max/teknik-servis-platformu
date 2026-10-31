@@ -58,7 +58,7 @@ export class WorkOrderService {
     }
 
     const workOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
-    const existing = workOrders.find(wo => wo.serviceRequestId === requestId);
+    const existing = workOrders.find(wo => wo.serviceRequestId === requestId && wo.status !== 'CANCELLED');
     if (existing) {
       return existing; // Return existing if already created
     }
@@ -151,6 +151,12 @@ export class WorkOrderService {
 
     if (wo.status !== 'OPENED') {
       throw new Error(`İş emri planlanacak durumda değil. Mevcut durum: ${wo.status}`);
+    }
+
+    // Yeni iş emirlerinde tahmini maliyet parçalardan gelir; 50.000 TL onay kuralı buna bakar
+    if (!wo.estimatedCost) {
+      wo.estimatedCost = this.calculatePartsCost(requiredParts);
+      this.storage.update<WorkOrder>(STORAGE_KEYS.WORK_ORDERS, wo.id, { estimatedCost: wo.estimatedCost });
     }
 
     const req = this.storage.getById<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS, wo.serviceRequestId);
@@ -435,6 +441,17 @@ export class WorkOrderService {
     const oldWO = { ...wo };
     const wasCancelled = wo.status === 'CANCELLED';
 
+    // İptal sonrası talep yeniden planlanmışsa aynı talep için iki aktif iş oluşmasın
+    if (wasCancelled) {
+      const workOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
+      const hasActive = workOrders.some(other =>
+        other.id !== wo.id && other.serviceRequestId === wo.serviceRequestId && other.status !== 'CANCELLED'
+      );
+      if (hasActive) {
+        throw new Error('Bu talep için zaten aktif bir iş emri var; iptal geri alınamaz.');
+      }
+    }
+
     // 1) Tüketilen parçaları stoğa iade et (varsa) — sadece COMPLETED/PARTIALLY için
     // CANCELLED'da parça zaten kullanılmamış (sadece rezerve serbest bırakılmıştı)
     if (wo.usedParts && wo.usedParts.length > 0) {
@@ -458,11 +475,24 @@ export class WorkOrderService {
       }
     }
 
+    // Planlıya dönen iş yeniden tamamlanabilsin diye parçalar tekrar rezerve edilir
+    if (!wasCancelled && wo.requiredParts && wo.requiredParts.length > 0) {
+      this.reservationService.reserveParts(wo.id, wo.requiredParts);
+    }
+
+    // Tamamlamada verilen teknisyen sayacı ve puanı geri alınır
+    if (oldWO.status === 'COMPLETED') {
+      this.revertTechnicianPerformance(wo.technicianId, 1);
+    } else if (oldWO.status === 'PARTIALLY_COMPLETED') {
+      this.revertTechnicianPerformance(wo.technicianId, 0);
+    }
+
     // 2) İş emrini uygun duruma geri çek:
     //    - CANCELLED ise: atama bilgileri zaten temizlendiğinden OPENED'a döner; yeniden planlanması gerekir.
     //    - Diğerleri (COMPLETED/PARTIALLY/FAILED): planlama bilgileri korunduğundan PLANNED'a döner.
     wo.status = wasCancelled ? 'OPENED' : 'PLANNED';
     wo.usedParts = [];
+    wo.actualCost = 0;
     wo.failureReason = null;
     wo.actualEnd = null;
     wo.notes = (wo.notes || '') + `\n[GERİ ALINDI] ${new Date().toISOString()} — Neden: ${reason}`;
@@ -634,6 +664,7 @@ export class WorkOrderService {
 
     wo.status = 'COMPLETED';
     wo.usedParts = usedParts;
+    wo.actualCost = this.calculatePartsCost(usedParts);
     wo.actualEnd = new Date().toISOString();
 
     this.storage.update<WorkOrder>(STORAGE_KEYS.WORK_ORDERS, wo.id, wo);
@@ -673,6 +704,23 @@ export class WorkOrderService {
     });
   }
 
+  private revertTechnicianPerformance(technicianId: string | null | undefined, perfDelta: number): void {
+    if (!technicianId) return;
+    const tech = this.storage.getById<Technician>(STORAGE_KEYS.TECHNICIANS, technicianId);
+    if (!tech) return;
+    this.storage.update<Technician>(STORAGE_KEYS.TECHNICIANS, tech.id, {
+      completedJobsCount: Math.max(0, (tech.completedJobsCount || 0) - 1),
+      performanceScore: Math.max(0, Math.min(100, (tech.performanceScore || 0) - perfDelta))
+    });
+  }
+
+  private calculatePartsCost(parts: { partId: string; quantity: number }[]): number {
+    return parts.reduce((total, item) => {
+      const part = this.storage.getById<SparePart>(STORAGE_KEYS.SPARE_PARTS, item.partId);
+      return total + (part?.unitPrice || 0) * item.quantity;
+    }, 0);
+  }
+
   private partiallyCompleteWorkOrderInternal(wo: WorkOrder, usedParts: UsedPart[], followUpNote: string): void {
     if (!followUpNote || followUpNote.trim().length === 0) {
       throw new Error('Takip notu sadece boşluklardan oluşamaz.');
@@ -696,6 +744,7 @@ export class WorkOrderService {
 
     wo.status = 'PARTIALLY_COMPLETED';
     wo.usedParts = usedParts;
+    wo.actualCost = this.calculatePartsCost(usedParts);
     wo.actualEnd = new Date().toISOString();
 
     this.storage.update<WorkOrder>(STORAGE_KEYS.WORK_ORDERS, wo.id, wo);

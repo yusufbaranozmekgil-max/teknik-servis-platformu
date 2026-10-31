@@ -145,12 +145,17 @@ export class StockMovementService {
     }
 
     const allParts = this.storage.getCollection<SparePart>(STORAGE_KEYS.SPARE_PARTS);
-    let targetPart = allParts.find(
+    // Hedef şubede bu parça hiç yoksa aynı kodla sıfır stoklu kayıt açılır
+    const targetPart = allParts.find(
       p => p.code === sourcePart.code && p.branchId === params.targetBranchId && p.isActive
-    );
-    if (!targetPart) {
-      throw new Error(`Hedef şubede "${sourcePart.code}" kodlu aktif parça bulunamadı. Önce hedef şubede parça tanımlanmalıdır.`);
-    }
+    ) ?? this.storage.create<SparePart>(STORAGE_KEYS.SPARE_PARTS, {
+      ...sourcePart,
+      id: `part-${Date.now()}`,
+      branchId: params.targetBranchId,
+      stockQuantity: 0,
+      reservedQuantity: 0,
+      createdAt: new Date().toISOString()
+    });
 
     // Stok güncelle (her iki taraf)
     this.storage.update<SparePart>(STORAGE_KEYS.SPARE_PARTS, sourcePart.id, {

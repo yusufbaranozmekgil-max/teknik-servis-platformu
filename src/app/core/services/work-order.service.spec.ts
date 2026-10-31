@@ -36,7 +36,7 @@ describe('WorkOrderService durum makinesi', () => {
   beforeEach(() => {
     storage = new MockStorageService();
     auditLog = jasmine.createSpyObj('AuditLogService', ['logAction']);
-    reservations = jasmine.createSpyObj('ReservationService', ['releaseAllReservationsInternal']);
+    reservations = jasmine.createSpyObj('ReservationService', ['releaseAllReservationsInternal', 'reserveParts', 'consumeReservedPartsInternal']);
     TestBed.configureTestingModule({
       providers: [
         WorkOrderService,
@@ -121,6 +121,82 @@ describe('WorkOrderService durum makinesi', () => {
 
     expect(first.code).toBe(`WO-${year}-0003`);
     expect(second.code).toBe(`WO-${year}-0004`);
+  });
+
+  it('iptal edilen işin talebi için yeni iş emri açar', () => {
+    storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, [{ id: 'sr-1', code: 'TALEP-2026-0001', status: 'NEW' }]);
+    storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [{ id: 'wo-old', code: 'WO-2026-0001', serviceRequestId: 'sr-1', status: 'CANCELLED' }]);
+
+    const created = service.createWorkOrderFromRequest('sr-1');
+
+    expect(created.id).not.toBe('wo-old');
+    expect(created.status).toBe('OPENED');
+  });
+
+  it('aktif iş emri varsa yenisini açmaz', () => {
+    storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, [{ id: 'sr-1', code: 'TALEP-2026-0001', status: 'PLANNED' }]);
+    storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [{ id: 'wo-1', code: 'WO-2026-0001', serviceRequestId: 'sr-1', status: 'PLANNED' }]);
+
+    expect(service.createWorkOrderFromRequest('sr-1').id).toBe('wo-1');
+  });
+
+  describe('geri alma', () => {
+    const closed = (status: WorkOrderStatus, extra = {}) => ({
+      id: 'wo-1', code: 'WO-1', status, serviceRequestId: 'sr-1', technicianId: 'tech-1', notes: '',
+      requiredParts: [{ partId: 'part-1', quantity: 2 }],
+      usedParts: [{ partId: 'part-1', quantity: 1 }],
+      actualEnd: new Date().toISOString(),
+      ...extra
+    });
+
+    it('tamamlanan iş geri alınınca parçaları yeniden rezerve eder', () => {
+      storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [closed('COMPLETED')]);
+      storage.setCollection(STORAGE_KEYS.SPARE_PARTS, [{ id: 'part-1', stockQuantity: 5, reservedQuantity: 0 }]);
+
+      service.reopenWorkOrder('wo-1', 'Yanlışlıkla kapatıldı');
+
+      expect(stored().status).toBe('PLANNED');
+      expect(reservations.reserveParts).toHaveBeenCalledOnceWith('wo-1', [{ partId: 'part-1', quantity: 2 }]);
+      expect(storage.getById<any>(STORAGE_KEYS.SPARE_PARTS, 'part-1').stockQuantity).toBe(6);
+    });
+
+    it('tamamlanan iş geri alınınca teknisyen sayacını düşürür', () => {
+      storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [closed('COMPLETED')]);
+      storage.setCollection(STORAGE_KEYS.TECHNICIANS, [{ id: 'tech-1', completedJobsCount: 5, performanceScore: 80 }]);
+
+      service.reopenWorkOrder('wo-1', 'Yanlışlıkla kapatıldı');
+
+      expect(storage.getById<any>(STORAGE_KEYS.TECHNICIANS, 'tech-1').completedJobsCount).toBe(4);
+    });
+
+    it('iptal edilen iş rezervasyon oluşturmadan OPENED olur', () => {
+      storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [closed('CANCELLED', { usedParts: [] })]);
+
+      service.reopenWorkOrder('wo-1', 'Müşteri geri döndü');
+
+      expect(stored().status).toBe('OPENED');
+      expect(reservations.reserveParts).not.toHaveBeenCalled();
+    });
+
+    it('aynı talep için aktif iş varsa iptali geri almaz', () => {
+      storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [
+        closed('CANCELLED', { usedParts: [] }),
+        { id: 'wo-2', code: 'WO-2', status: 'PLANNED', serviceRequestId: 'sr-1' }
+      ]);
+
+      expect(() => service.reopenWorkOrder('wo-1', 'Müşteri geri döndü')).toThrowError(/aktif bir iş emri/);
+      expect(stored().status).toBe('CANCELLED');
+    });
+  });
+
+  it('tamamlanınca kullanılan parçalardan gerçek maliyeti hesaplar', () => {
+    seed('ON_SITE');
+    storage.setCollection(STORAGE_KEYS.SPARE_PARTS, [{ id: 'part-1', unitPrice: 250 }]);
+    storage.update<any>(STORAGE_KEYS.WORK_ORDERS, 'wo-1', { requiredParts: [{ partId: 'part-1', quantity: 2 }] });
+
+    service.completeWorkOrder('wo-1', [{ partId: 'part-1', quantity: 2 }]);
+
+    expect(stored().actualCost).toBe(500);
   });
 
   it('boş iptal nedenini reddeder ve rezervasyona dokunmaz', () => {

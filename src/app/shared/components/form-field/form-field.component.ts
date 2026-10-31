@@ -213,11 +213,15 @@ export class FormFieldComponent {
     }
 
     // 3) FormControl senkronizasyonu
-    if (target.value !== (this.control?.value ?? '')) {
-      if (this.type === 'number') {
-        const n = raw === '' || raw === '-' ? null : Number(raw);
+    // [type] dinamik olduğu için Angular metin erişimcisini seçer; sayı alanı burada sayıya çevrilir
+    if (this.type === 'number') {
+      const n = raw === '' || raw === '-' ? null : Number(raw);
+      if (this.control?.value !== n) {
         this.control?.setValue(n, { emitEvent: false });
-      } else if (this.inputFilter !== 'none') {
+        this.control?.markAsDirty();
+      }
+    } else if (target.value !== (this.control?.value ?? '')) {
+      if (this.inputFilter !== 'none') {
         this.control?.setValue(raw, { emitEvent: false });
       }
       this.control?.markAsDirty();

@@ -76,7 +76,8 @@ export class InventoryService {
     this.validateSparePart(part);
     
     const parts = this.storage.getCollection<SparePart>(STORAGE_KEYS.SPARE_PARTS);
-    if (parts.some(p => p.code.toLowerCase() === part.code.toLowerCase())) {
+    // Aynı parça şubeler arası transferle birden fazla şubede bulunabilir; kod şube içinde benzersizdir
+    if (parts.some(p => p.code.toLowerCase() === part.code.toLowerCase() && p.branchId === part.branchId)) {
       throw new Error('Bu parça kodu zaten kullanılıyor.');
     }
 
@@ -112,7 +113,7 @@ export class InventoryService {
 
     if (part.code) {
       const parts = this.storage.getCollection<SparePart>(STORAGE_KEYS.SPARE_PARTS);
-      if (parts.some(p => p.code.toLowerCase() === part.code!.toLowerCase() && p.id !== id)) {
+      if (parts.some(p => p.code.toLowerCase() === part.code!.toLowerCase() && p.branchId === merged.branchId && p.id !== id)) {
         throw new Error('Bu parça kodu zaten kullanılıyor.');
       }
     }

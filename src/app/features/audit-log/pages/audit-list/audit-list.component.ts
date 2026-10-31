@@ -177,6 +177,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
 
             <div class="diff-section">
               <h4>Veri Değişim Detayı</h4>
+              <p class="summary-text" *ngIf="!selectedLog.oldValue && !selectedLog.newValue">Bu işlemde saklanan bir veri değişikliği yok.</p>
               
               <!-- Case 1: Create (No oldValue) -->
               <div *ngIf="selectedLog.actionType === 'CREATE'" class="diff-summary create">
