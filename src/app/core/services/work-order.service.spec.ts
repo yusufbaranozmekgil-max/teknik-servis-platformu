@@ -52,7 +52,7 @@ describe('WorkOrderService durum makinesi', () => {
                 { provide: PermissionService, useValue: { assertPermission: () => { } } },
                 { provide: NotificationService, useValue: {
                         createNotification: vi.fn().mockName("NotificationService.createNotification"),
-                        createForUser: vi.fn().mockName("NotificationService.createForUser")
+                        createForTechnician: vi.fn().mockName("NotificationService.createForTechnician")
                     } },
                 { provide: SchedulingService, useValue: {} },
                 { provide: VehicleScoringService, useValue: {} },
@@ -158,6 +158,23 @@ describe('WorkOrderService durum makinesi', () => {
     });
 
     describe('geri alma', () => {
+        it('kısmi işin bekleyen takip talebini geri almada kaldırır', () => {
+            storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [{ id: 'wo-1', code: 'WO-1', status: 'PARTIALLY_COMPLETED', serviceRequestId: 'sr-1', notes: '', requiredParts: [], usedParts: [], actualEnd: new Date().toISOString() }]);
+            storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, [{ id: 'sr-1', status: 'CLOSED' }, { id: 'sr-2', status: 'NEW', sourceWorkOrderId: 'wo-1' }]);
+
+            service.reopenWorkOrder('wo-1', 'Yanlışlıkla kapatıldı');
+
+            expect(storage.getCollection<any>(STORAGE_KEYS.SERVICE_REQUESTS).map(r => r.id)).toEqual(['sr-1']);
+        });
+
+        it('takip talebi planlanmışsa geri almaz', () => {
+            storage.setCollection(STORAGE_KEYS.WORK_ORDERS, [{ id: 'wo-1', code: 'WO-1', status: 'PARTIALLY_COMPLETED', serviceRequestId: 'sr-1', notes: '', requiredParts: [], usedParts: [], actualEnd: new Date().toISOString() }]);
+            storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, [{ id: 'sr-2', status: 'PLANNED', sourceWorkOrderId: 'wo-1' }]);
+
+            expect(() => service.reopenWorkOrder('wo-1', 'Yanlışlıkla kapatıldı')).toThrowError(/takip talebi/);
+            expect(stored().status).toBe('PARTIALLY_COMPLETED');
+        });
+
         const closed = (status: WorkOrderStatus, extra = {}) => ({
             id: 'wo-1', code: 'WO-1', status, serviceRequestId: 'sr-1', technicianId: 'tech-1', notes: '',
             requiredParts: [{ partId: 'part-1', quantity: 2 }],

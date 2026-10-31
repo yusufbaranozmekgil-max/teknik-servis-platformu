@@ -23,4 +23,5 @@ export interface ServiceRequest {
   hasWarranty: boolean;
   hasCustomerApproval: boolean;
   createdAt: string;
+  sourceWorkOrderId?: string; // Kısmi tamamlanan işten doğan takip talebinin kaynağı
 }

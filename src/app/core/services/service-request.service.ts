@@ -1,3 +1,5 @@
+import { WorkOrder } from '../models/work-order.model';
+import { nextCode } from '../utils/code.util';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -67,7 +69,7 @@ export class ServiceRequestService {
     this.validateServiceRequest(request);
 
     const requests = this.storage.getCollection<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS);
-    const generatedCode = `TALEP-${new Date().getFullYear()}-${(requests.length + 1).toString().padStart(4, '0')}`;
+    const generatedCode = nextCode('TALEP', requests.map(r => r.code));
     const code = request.code || generatedCode;
 
     if (requests.some(r => r.code.toLowerCase() === code.toLowerCase())) {
@@ -111,9 +113,10 @@ export class ServiceRequestService {
       }
     }
 
-    if (request.priority && request.priority !== oldRequest.priority) {
-      const category = request.requiredSkill ?? oldRequest.requiredSkill;
-      request.slaDeadline = this.slaService.calculateSlaDeadline(request.priority, category, new Date(oldRequest.createdAt));
+    const priority = request.priority ?? oldRequest.priority;
+    const category = request.requiredSkill ?? oldRequest.requiredSkill;
+    if (priority !== oldRequest.priority || category !== oldRequest.requiredSkill) {
+      request.slaDeadline = this.slaService.calculateSlaDeadline(priority, category, new Date(oldRequest.createdAt));
     }
 
     const updated = this.storage.update<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS, id, request);
@@ -134,6 +137,11 @@ export class ServiceRequestService {
     this.permissionService.assertPermission('SERVICE_REQUEST_DELETE');
     const oldRequest = this.storage.getById<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS, id);
     if (!oldRequest) throw new Error('Silinecek servis talebi bulunamadı.');
+
+    const workOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
+    if (workOrders.some(wo => wo.serviceRequestId === id && ['OPENED', 'PLANNED', 'ON_THE_WAY', 'ON_SITE'].includes(wo.status))) {
+      throw new Error('Bu talebin aktif iş emri var; önce iş emrini kapatın.');
+    }
 
     const success = this.storage.delete(STORAGE_KEYS.SERVICE_REQUESTS, id);
     if (success) {

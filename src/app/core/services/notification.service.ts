@@ -1,3 +1,4 @@
+import { User } from '../models/user.model';
 import { Injectable, inject, signal } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -78,6 +79,22 @@ export class NotificationService {
       relatedEntityId: relatedEntity ? relatedEntity.id : null,
       link: relatedEntity ? relatedEntity.link : null
     });
+  }
+
+  /** Teknisyen kaydı ile kullanıcı hesabı ayrıdır; bildirim hesaba gönderilir. */
+  createForTechnician(
+    technicianId: string,
+    type: NotificationType,
+    title: string,
+    message: string,
+    severity: NotificationSeverity,
+    relatedEntity?: { type: any; id: string; link: string }
+  ): void {
+    const users = this.storage.getCollection<User>(STORAGE_KEYS.USERS);
+    const account = users.find(user => user.technicianId === technicianId);
+    if (account) {
+      this.createForUser(account.id, type, title, message, severity, relatedEntity);
+    }
   }
 
   createForUser(

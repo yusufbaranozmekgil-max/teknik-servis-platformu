@@ -1,5 +1,6 @@
 import { SKILL_LABELS } from '../constants/labels.const';
 import { isOnLeaveDuring } from '../utils/leave.util';
+import { nextCode } from '../utils/code.util';
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
 import { STORAGE_KEYS } from '../storage/storage-keys';
@@ -41,7 +42,7 @@ export class ShiftAssignmentService {
     this.validate(input);
 
     const list = this.storage.getCollection<ShiftAssignment>(STORAGE_KEYS.SHIFT_ASSIGNMENTS);
-    const code = `VRD-${new Date().getFullYear()}-${(list.length + 1).toString().padStart(4, '0')}`;
+    const code = nextCode('VRD', list.map(shift => shift.code));
 
     const me = this.authState.currentUser();
     const newShift: ShiftAssignment = {
@@ -107,9 +108,9 @@ export class ShiftAssignmentService {
         newValue: null,
         description: `Yetkinlik uyumsuzluğu nedeniyle vardiya atama reddedildi: ${tech.fullName} → ${shift.code}`,
         result: 'FAILURE',
-        failureReason: `Yetkinlik '${shift.requiredSkill}' teknisyende bulunmuyor.`
+        failureReason: `Yetkinlik '${SKILL_LABELS[shift.requiredSkill] || shift.requiredSkill}' teknisyende bulunmuyor.`
       });
-      throw new Error(`Yetkinlik uyumsuzluğu: ${tech.fullName} '${shift.requiredSkill}' yetkinliğine sahip değil.`);
+      throw new Error(`Yetkinlik uyumsuzluğu: ${tech.fullName} '${SKILL_LABELS[shift.requiredSkill] || shift.requiredSkill}' yetkinliğine sahip değil.`);
     }
 
     const sameBranch = tech.branchId === shift.branchId;
@@ -140,7 +141,7 @@ export class ShiftAssignmentService {
     });
 
     try {
-      this.notificationService.createForUser(
+      this.notificationService.createForTechnician(
         tech.id,
         'TECHNICIAN_ASSIGNED',
         'Yeni Vardiya / Görev',

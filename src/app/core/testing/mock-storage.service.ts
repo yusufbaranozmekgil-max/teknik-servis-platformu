@@ -20,6 +20,12 @@ export class MockStorageService {
     return item;
   }
 
+  delete(key: string, id: string): boolean {
+    const list = this.getCollection<{ id: string }>(key);
+    this.setCollection(key, list.filter(item => item.id !== id));
+    return list.some(item => item.id === id);
+  }
+
   update<T extends { id: string }>(key: string, id: string, item: Partial<T>): T {
     const list = this.getCollection<T>(key);
     const idx = list.findIndex(i => i.id === id);

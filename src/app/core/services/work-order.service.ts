@@ -11,6 +11,7 @@ import { ReservationService } from './reservation.service';
 import { NotificationService } from './notification.service';
 import { TimeSlot } from '../models/time-slot.model';
 import { isOnLeaveDuring } from '../utils/leave.util';
+import { nextCode } from '../utils/code.util';
 import { Technician } from '../models/technician.model';
 import { Vehicle } from '../models/vehicle.model';
 import { SparePart } from '../models/spare-part.model';
@@ -64,14 +65,7 @@ export class WorkOrderService {
       return existing; // Return existing if already created
     }
 
-    const usedCodes = new Set(workOrders.map(wo => wo.code));
-    const year = new Date().getFullYear();
-    let sequence = workOrders.length + 1;
-    let code = `WO-${year}-${sequence.toString().padStart(4, '0')}`;
-    while (usedCodes.has(code)) {
-      sequence++;
-      code = `WO-${year}-${sequence.toString().padStart(4, '0')}`;
-    }
+    const code = nextCode('WO', workOrders.map(wo => wo.code));
 
     const newWO: WorkOrder = {
       id: `wo-${Date.now()}`,
@@ -402,7 +396,7 @@ export class WorkOrderService {
       link: null
     } as any);
     if (wo.technicianId) {
-      this.notificationService.createForUser(wo.technicianId, 'TECHNICIAN_ASSIGNED' as any, title, message, 'INFO' as any);
+      this.notificationService.createForTechnician(wo.technicianId, 'TECHNICIAN_ASSIGNED' as any, title, message, 'INFO' as any);
     }
   }
 
@@ -451,6 +445,16 @@ export class WorkOrderService {
       if (hasActive) {
         throw new Error('Bu talep için zaten aktif bir iş emri var; iptal geri alınamaz.');
       }
+    }
+
+    // Kısmi tamamlamadan doğan takip talebi: planlanmışsa geri alma engellenir, değilse kaldırılır
+    const followUp = this.storage.getCollection<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS)
+      .find(request => request.sourceWorkOrderId === wo.id);
+    if (followUp && followUp.status !== 'NEW') {
+      throw new Error('Bu işin takip talebi planlanmış; önce takip işini iptal edin.');
+    }
+    if (followUp) {
+      this.storage.delete(STORAGE_KEYS.SERVICE_REQUESTS, followUp.id);
     }
 
     // 1) Tüketilen parçaları stoğa iade et (varsa) — sadece COMPLETED/PARTIALLY için
@@ -780,6 +784,7 @@ export class WorkOrderService {
         slaDeadline: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // standard 48 hours for follow-ups
         hasWarranty: oldRequest.hasWarranty,
         hasCustomerApproval: oldRequest.hasCustomerApproval,
+        sourceWorkOrderId: wo.id,
         createdAt: new Date().toISOString()
       };
       this.storage.create<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS, followUpRequest);
