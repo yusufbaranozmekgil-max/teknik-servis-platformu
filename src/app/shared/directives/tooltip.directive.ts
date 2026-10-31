@@ -33,8 +33,8 @@ export class TooltipDirective implements OnDestroy {
 
     // Apply basic styles
     this.renderer.setStyle(this.tooltipEl, 'position', 'absolute');
-    this.renderer.setStyle(this.tooltipEl, 'background-color', '#1e293b');
-    this.renderer.setStyle(this.tooltipEl, 'color', '#f8fafc');
+    this.renderer.setStyle(this.tooltipEl, 'background-color', '#202b2d');
+    this.renderer.setStyle(this.tooltipEl, 'color', '#f5fbfc');
     this.renderer.setStyle(this.tooltipEl, 'padding', '4px 8px');
     this.renderer.setStyle(this.tooltipEl, 'border-radius', '4px');
     this.renderer.setStyle(this.tooltipEl, 'font-size', '0.75rem');

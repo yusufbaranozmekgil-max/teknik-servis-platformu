@@ -197,7 +197,7 @@ export class SeedService {
       {
         id: 'user-admin',
         username: 'admin@demo.com',
-        fullName: 'Ahmet Yilmaz (Sistem Yöneticisi)',
+        fullName: 'Ahmet Yilmaz',
         email: 'admin@demo.com',
         role: 'SYSTEM_ADMIN',
         branchId: null,
@@ -208,7 +208,7 @@ export class SeedService {
       {
         id: 'user-operation',
         username: 'operation@demo.com',
-        fullName: 'Buse Tan (Operasyon Müdürü)',
+        fullName: 'Buse Tan',
         email: 'operation@demo.com',
         role: 'OPERATION_MANAGER',
         branchId: null,
@@ -219,7 +219,7 @@ export class SeedService {
       {
         id: 'user-branch',
         username: 'branch@demo.com',
-        fullName: 'Can Kozan (Şube Sorumlusu)',
+        fullName: 'Can Kozan',
         email: 'branch@demo.com',
         role: 'BRANCH_MANAGER',
         branchId: 'branch-1',
@@ -230,7 +230,7 @@ export class SeedService {
       {
         id: 'user-dispatcher',
         username: 'dispatcher@demo.com',
-        fullName: 'Deniz Simsek (Planlamaci)',
+        fullName: 'Deniz Simsek',
         email: 'dispatcher@demo.com',
         role: 'DISPATCHER',
         branchId: 'branch-1',
@@ -241,7 +241,7 @@ export class SeedService {
       {
         id: 'user-warehouse',
         username: 'warehouse@demo.com',
-        fullName: 'Emre Aslan (Depo Sorumlusu)',
+        fullName: 'Emre Aslan',
         email: 'warehouse@demo.com',
         role: 'WAREHOUSE_MANAGER',
         branchId: 'branch-1',
@@ -252,7 +252,7 @@ export class SeedService {
       {
         id: 'user-technician',
         username: 'technician@demo.com',
-        fullName: 'Fatih Mert (Saha Teknisyeni)',
+        fullName: 'Fatih Mert',
         email: 'technician@demo.com',
         role: 'TECHNICIAN',
         branchId: 'branch-1',
@@ -263,7 +263,7 @@ export class SeedService {
       {
         id: 'user-report',
         username: 'report@demo.com',
-        fullName: 'Gizem Can (Raporlama Kullanıcısı)',
+        fullName: 'Gizem Can',
         email: 'report@demo.com',
         role: 'REPORTING_USER',
         branchId: null,
@@ -1060,12 +1060,20 @@ export class SeedService {
   generateLargeDataset(): void {
     console.log('5.000+ Kayit Büyük Veri Simülasyonu baslatiliyor...');
     
-    // Performans testleri için mevcut verileri temizlemeden üzerine 5000'er adet kayıt ekleyeceğiz
-    const currentRequests = this.storage.getCollection<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS);
-    const currentWorkOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
-    const stockMovements: StockMovement[] = this.storage.getCollection<StockMovement>(STORAGE_KEYS.STOCK_MOVEMENTS);
-    const auditLogs: AuditLog[] = this.storage.getCollection<AuditLog>(STORAGE_KEYS.AUDIT_LOGS);
-    const notifications: Notification[] = this.storage.getCollection<Notification>(STORAGE_KEYS.NOTIFICATIONS);
+    // Mevcut verilerin üzerine toplam 5.000 kayıt eklenir (2.500 talep + 2.500 iş emri).
+    // localStorage yaklaşık 5 MB olduğu için daha fazlası kotayı aşar.
+    // Önceki çalıştırmanın kayıtları atılır; böylece senaryo tekrar çalıştırılabilir.
+    const withoutLarge = <T extends { id: string }>(items: T[]) => items.filter(item => !item.id.startsWith('large-'));
+    const originalRequests = this.storage.getCollection<ServiceRequest>(STORAGE_KEYS.SERVICE_REQUESTS);
+    const originalWorkOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
+    const originalMovements = this.storage.getCollection<StockMovement>(STORAGE_KEYS.STOCK_MOVEMENTS);
+    const originalAuditLogs = this.storage.getCollection<AuditLog>(STORAGE_KEYS.AUDIT_LOGS);
+    const originalNotifications = this.storage.getCollection<Notification>(STORAGE_KEYS.NOTIFICATIONS);
+    const currentRequests = withoutLarge(originalRequests);
+    const currentWorkOrders = withoutLarge(originalWorkOrders);
+    const stockMovements: StockMovement[] = withoutLarge(originalMovements);
+    const auditLogs: AuditLog[] = withoutLarge(originalAuditLogs);
+    const notifications: Notification[] = withoutLarge(originalNotifications);
 
     const branches = this.storage.getCollection<Branch>(STORAGE_KEYS.BRANCHES);
     const branchIds = branches.map(b => b.id);
@@ -1074,8 +1082,8 @@ export class SeedService {
     const woStatuses: WorkOrderStatus[] = ['OPENED', 'PLANNED', 'ON_THE_WAY', 'COMPLETED'];
     const skills: SkillType[] = ['WHITE_GOODS', 'HVAC', 'ELECTRIC', 'ELECTRONICS_MOTHERBOARD', 'PLUMBING', 'BOILER_HEATING'];
 
-    // 1. 5000 adet Servis Talebi ve İş Emri Üretimi
-    for (let i = 10001; i <= 15000; i++) {
+    // 1. 2.500 Servis Talebi ve 2.500 İş Emri Üretimi
+    for (let i = 10001; i <= 12500; i++) {
       const branchId = branchIds[i % branchIds.length] || 'branch-1';
       const priority = priorities[i % priorities.length];
       const status = statuses[i % statuses.length];
@@ -1175,12 +1183,21 @@ export class SeedService {
       });
     }
 
-    // Koleksiyonları yaz
-    this.storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, currentRequests);
-    this.storage.setCollection(STORAGE_KEYS.WORK_ORDERS, currentWorkOrders);
-    this.storage.setCollection(STORAGE_KEYS.STOCK_MOVEMENTS, stockMovements);
-    this.storage.setCollection(STORAGE_KEYS.AUDIT_LOGS, auditLogs);
-    this.storage.setCollection(STORAGE_KEYS.NOTIFICATIONS, notifications);
+    // Koleksiyonları yaz; kota aşılırsa yarım veri bırakmadan önceki hale dön
+    try {
+      this.storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, currentRequests);
+      this.storage.setCollection(STORAGE_KEYS.WORK_ORDERS, currentWorkOrders);
+      this.storage.setCollection(STORAGE_KEYS.STOCK_MOVEMENTS, stockMovements);
+      this.storage.setCollection(STORAGE_KEYS.AUDIT_LOGS, auditLogs);
+      this.storage.setCollection(STORAGE_KEYS.NOTIFICATIONS, notifications);
+    } catch (e) {
+      this.storage.setCollection(STORAGE_KEYS.SERVICE_REQUESTS, originalRequests);
+      this.storage.setCollection(STORAGE_KEYS.WORK_ORDERS, originalWorkOrders);
+      this.storage.setCollection(STORAGE_KEYS.STOCK_MOVEMENTS, originalMovements);
+      this.storage.setCollection(STORAGE_KEYS.AUDIT_LOGS, originalAuditLogs);
+      this.storage.setCollection(STORAGE_KEYS.NOTIFICATIONS, originalNotifications);
+      throw e;
+    }
 
     console.log('5.000+ Kayit Büyük Veri Simülasyonu basariyla tamamlandi.');
   }

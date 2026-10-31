@@ -24,7 +24,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       <!-- Filtreler -->
       <div class="filters-bar" style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
         <label><strong>Şube Filtresi:</strong></label>
-        <select [value]="branchFilter" (change)="onBranchFilterChange($any($event.target).value)" class="form-control" style="width: 250px; padding: 0.4rem 0.75rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; background-color: white; color: #0f172a;">
+        <select [value]="branchFilter" (change)="onBranchFilterChange($any($event.target).value)" class="form-control" style="width: 250px; padding: 0.4rem 0.75rem; border-radius: 0.5rem; border: 1px solid #c9d7da; background-color: white; color: #0f1a1c;">
           <option value="">-- Tüm Şubeler --</option>
           <option *ngFor="let b of branches" [value]="b.id">{{ b.name }}</option>
         </select>

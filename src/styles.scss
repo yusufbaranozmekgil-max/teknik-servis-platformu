@@ -4,8 +4,8 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #f8fafc;
+  font-family: 'Barlow', sans-serif;
+  background-color: #f5fbfc;
   transition: background-color 0.2s ease, color 0.2s ease;
   // Sayfa içerik genişliği ekran kadar olsun; horizontal scroll'u tek noktadan kapat.
   overflow-x: hidden;
@@ -13,6 +13,13 @@ body {
 }
 
 img, svg, video, canvas { max-width: 100%; height: auto; }
+
+h1, h2, h3 { font-family: 'Barlow Semi Condensed', 'Barlow', sans-serif; }
+button, input, select, textarea { font-family: inherit; }
+table { font-variant-numeric: tabular-nums; }
+
+::selection { background: #c4dee3; color: #0f1a1c; }
+:focus-visible { outline: 2px solid #1a8798; outline-offset: 2px; }
 
 // ====================================================================
 // GLOBAL RESPONSIVE — form ve detay grid'lerinin mobile fallback'i.
@@ -76,71 +83,71 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
 }
 
 body.dark-theme {
-  background-color: #0b0f19 !important;
-  color: #f3f4f6 !important;
+  background-color: #071113 !important;
+  color: #f0f5f6 !important;
 
   /* App Shell & Main Content Area */
   .layout-container {
-    background-color: #0b0f19 !important;
+    background-color: #071113 !important;
   }
   .app-header {
-    background-color: #111827 !important;
-    border-bottom: 1px solid #1f2937 !important;
+    background-color: #101a1d !important;
+    border-bottom: 1px solid #1f2b2d !important;
   }
   .sidebar {
-    background-color: #111827 !important;
-    border-right-color: #1f2937 !important;
+    background-color: #101a1d !important;
+    border-right-color: #1f2b2d !important;
     
     .single-link, .group-header, .group-items a {
-      color: #9ca3af !important;
+      color: #98a5a8 !important;
       &:hover {
-        background-color: #1f2937 !important;
-        color: #f9fafb !important;
-        .sidebar-material-icon { color: #f9fafb !important; }
+        background-color: #1f2b2d !important;
+        color: #f6fbfc !important;
+        .sidebar-material-icon { color: #f6fbfc !important; }
       }
     }
     .single-link.active-link, .group-items .active-link {
-      background-color: #2563eb !important;
+      background-color: #026f7e !important;
       color: white !important;
       .sidebar-material-icon { color: white !important; }
     }
     .sidebar-material-icon {
-      color: #9ca3af !important;
+      color: #98a5a8 !important;
     }
   }
 
   .main-content {
-    background-color: #0b0f19 !important;
+    background-color: #071113 !important;
   }
 
   /* Cards, Containers & Content Sections */
   .card, .transfer-card, .detail-block, .import-results-card, .results-panel, .control-panel, .resource-card, .parts-selector-box, .added-parts-list, .form-group-wrapper, .request-details-box, .console-box {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
-    color: #f3f4f6 !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
+    color: #f0f5f6 !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
   }
 
   .request-details-box, .parts-add-form {
-    background-color: #1f2937 !important;
+    background-color: #1f2b2d !important;
   }
 
   /* Typography */
   h1, h2, h3, h4, h5, h6, label {
-    color: #f9fafb !important;
+    color: #f6fbfc !important;
   }
   p, span, td, th, div:not(.badge):not(.metric-card):not(.alert) {
-    color: #e5e7eb;
+    color: #e3e8e9;
   }
 
   .subtitle, .card-label, .card-sub, .sub-label, .step-desc, .description-text, .hint, .stat-label {
-    color: #9ca3af !important;
+    color: #98a5a8 !important;
   }
 
   /* Metric Cards */
   .metric-card {
-    border-color: #1f2937 !important;
-    color: #f9fafb !important;
+    border-color: #1f2b2d !important;
+    color: #f6fbfc !important;
     
     &.gradient-red, &.gradient-blue, &.gradient-green, &.gradient-purple, &.gradient-orange {
       .card-label, .card-value, .card-sub, p, span, h3 {
@@ -149,167 +156,167 @@ body.dark-theme {
     }
 
     &:not([class*="gradient-"]) {
-      background-color: #111827 !important;
-      border: 1px solid #1f2937 !important;
+      background-color: #101a1d !important;
+      border: 1px solid #1f2b2d !important;
       
       .card-value {
-        color: #f9fafb !important;
+        color: #f6fbfc !important;
       }
     }
   }
 
   /* Forms & Input Elements */
   .form-control, .select-input, .file-input, select, input, textarea, .form-control:focus {
-    background-color: #1f2937 !important;
-    color: #f9fafb !important;
-    border-color: #374151 !important;
+    background-color: #1f2b2d !important;
+    color: #f6fbfc !important;
+    border-color: #374345 !important;
 
     &:focus {
-      border-color: #2563eb !important;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+      border-color: #026f7e !important;
+      box-shadow: 0 0 0 3px rgba(2, 111, 126, 0.25) !important;
     }
 
     &::placeholder {
-      color: #6b7280 !important;
+      color: #5f6c6e !important;
     }
   }
 
   /* Tables & Lists — TÜM tablo class'larını kapsa */
   .list-table, .error-table, .parts-table, .audit-table, .data-table, .premium-table,
   .rules-table, .report-table, .stock-table, table {
-    border-color: #1f2937 !important;
+    border-color: #1f2b2d !important;
     background-color: transparent !important;
 
     th {
-      background-color: #1f2937 !important;
-      color: #f9fafb !important;
-      border-bottom: 2px solid #374151 !important;
+      background-color: #1f2b2d !important;
+      color: #f6fbfc !important;
+      border-bottom: 2px solid #374345 !important;
     }
 
     td {
-      background-color: #111827 !important;
-      border-bottom: 1px solid #1f2937 !important;
-      color: #e5e7eb !important;
+      background-color: #101a1d !important;
+      border-bottom: 1px solid #1f2b2d !important;
+      color: #e3e8e9 !important;
 
       code {
-        background-color: #1f2937 !important;
-        color: #60a5fa !important;
+        background-color: #1f2b2d !important;
+        color: #5b9fad !important;
       }
     }
 
     tr:hover td {
-      background-color: #1f2937 !important;
+      background-color: #1f2b2d !important;
     }
   }
 
   /* DataTable component'in ana wrapper'ı */
   .table-wrapper, .table-container, .table-responsive, .table-card {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
   }
 
   /* DataTable filter row */
   .filter-row th, .filter-input, .filter-select {
-    background-color: #1f2937 !important;
-    color: #f9fafb !important;
-    border-color: #374151 !important;
-    &::placeholder { color: #6b7280 !important; }
+    background-color: #1f2b2d !important;
+    color: #f6fbfc !important;
+    border-color: #374345 !important;
+    &::placeholder { color: #5f6c6e !important; }
   }
 
   /* Tablo içindeki üst arama/filtre çubuğu */
   .table-header-controls, .table-actions {
-    background-color: #1f2937 !important;
-    border-bottom-color: #374151 !important;
+    background-color: #1f2b2d !important;
+    border-bottom-color: #374345 !important;
   }
   .global-search-input {
-    background-color: #0b0f19 !important;
-    color: #f9fafb !important;
-    border-color: #374151 !important;
-    &::placeholder { color: #6b7280 !important; }
+    background-color: #071113 !important;
+    color: #f6fbfc !important;
+    border-color: #374345 !important;
+    &::placeholder { color: #5f6c6e !important; }
   }
   .filter-toggle-btn {
-    background-color: #0b0f19 !important;
-    color: #cbd5e1 !important;
-    border-color: #374151 !important;
-    &:hover { background-color: #1f2937 !important; color: #f8fafc !important; }
-    &.active { background-color: #1e40af !important; color: white !important; border-color: #2563eb !important; }
+    background-color: #071113 !important;
+    color: #c9d7da !important;
+    border-color: #374345 !important;
+    &:hover { background-color: #1f2b2d !important; color: #f5fbfc !important; }
+    &.active { background-color: #024a55 !important; color: white !important; border-color: #026f7e !important; }
   }
 
   /* Pagination bar (work-order özel) */
   .pagination-bar, .pagination-controls {
-    background-color: #111827 !important;
-    border-top-color: #1f2937 !important;
-    color: #cbd5e1 !important;
+    background-color: #101a1d !important;
+    border-top-color: #1f2b2d !important;
+    color: #c9d7da !important;
     button, select {
-      background-color: #0b0f19 !important;
-      color: #cbd5e1 !important;
-      border-color: #374151 !important;
-      &:hover:not(:disabled) { background-color: #1f2937 !important; }
+      background-color: #071113 !important;
+      color: #c9d7da !important;
+      border-color: #374345 !important;
+      &:hover:not(:disabled) { background-color: #1f2b2d !important; }
       &:disabled { opacity: 0.35 !important; }
     }
   }
 
   /* Text muted / empty rows */
   .text-muted, .empty-row {
-    color: #6b7280 !important;
+    color: #5f6c6e !important;
   }
-  .text-center.text-muted { color: #9ca3af !important; }
+  .text-center.text-muted { color: #98a5a8 !important; }
 
   /* Pagination inside Dark Theme */
   .mini-pagination {
-    background-color: #111827 !important;
-    border-top-color: #1f2937 !important;
-    color: #cbd5e1 !important;
+    background-color: #101a1d !important;
+    border-top-color: #1f2b2d !important;
+    color: #c9d7da !important;
 
     .page-info strong {
-      color: #f8fafc !important;
+      color: #f5fbfc !important;
     }
 
     .page-controls {
       label {
-        color: #cbd5e1 !important;
+        color: #c9d7da !important;
       }
 
       select {
-        background-color: #0b0f19 !important;
-        color: #f8fafc !important;
-        border-color: #374151 !important;
-        &:hover { border-color: #4b5563 !important; }
+        background-color: #071113 !important;
+        color: #f5fbfc !important;
+        border-color: #374345 !important;
+        &:hover { border-color: #4a5759 !important; }
       }
 
       button {
-        background-color: #0b0f19 !important;
-        color: #cbd5e1 !important;
-        border-color: #374151 !important;
+        background-color: #071113 !important;
+        color: #c9d7da !important;
+        border-color: #374345 !important;
 
         &:hover:not(:disabled) {
-          background-color: #1f2937 !important;
-          color: #f8fafc !important;
-          border-color: #4b5563 !important;
+          background-color: #1f2b2d !important;
+          color: #f5fbfc !important;
+          border-color: #4a5759 !important;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
         }
 
         &:disabled {
-          background-color: #111827 !important;
-          border-color: #1f2937 !important;
-          color: #475569 !important;
+          background-color: #101a1d !important;
+          border-color: #1f2b2d !important;
+          color: #4a5759 !important;
         }
       }
 
       .page-num {
-        color: #f8fafc !important;
-        background-color: #0b0f19 !important;
+        color: #f5fbfc !important;
+        background-color: #071113 !important;
       }
     }
   }
 
   /* Alerts */
   .alert {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
-    color: #f3f4f6 !important;
+    background-color: #1f2b2d !important;
+    border-color: #374345 !important;
+    color: #f0f5f6 !important;
 
-    &.alert-info { border-left-color: #3b82f6 !important; }
+    &.alert-info { border-left-color: #1a8798 !important; }
     &.alert-warning { border-left-color: #f59e0b !important; }
     &.alert-success { border-left-color: #10b981 !important; }
     &.alert-danger { border-left-color: #ef4444 !important; }
@@ -317,22 +324,22 @@ body.dark-theme {
 
   /* Modals & Dialogs */
   .modal-content, .dialog-box {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
-    color: #f9fafb !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
+    color: #f6fbfc !important;
   }
 
   /* Branch selector panel & Status badges */
   .branch-override-panel {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
-    color: #f3f4f6 !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
+    color: #f0f5f6 !important;
     
     .branch-select {
-      background-color: #1f2937 !important;
-      color: #f9fafb !important;
-      border-color: #374151 !important;
-      &:hover { border-color: #4b5563 !important; }
+      background-color: #1f2b2d !important;
+      color: #f6fbfc !important;
+      border-color: #374345 !important;
+      &:hover { border-color: #4a5759 !important; }
     }
   }
 
@@ -342,16 +349,16 @@ body.dark-theme {
       color: #d1fae5 !important;
     }
     &.status-busy {
-      background-color: #1e40af !important;
-      color: #dbeafe !important;
+      background-color: #024a55 !important;
+      color: #ddecef !important;
     }
     &.status-on-leave {
       background-color: #92400e !important;
       color: #fef3c7 !important;
     }
     &.status-inactive {
-      background-color: #374151 !important;
-      color: #f3f4f6 !important;
+      background-color: #374345 !important;
+      color: #f0f5f6 !important;
     }
   }
 
@@ -367,33 +374,33 @@ body.dark-theme {
 
   /* Rules + Audit pagination — sayfa-spesifik dark stiller */
   .rules-pagination, .audit-pagination {
-    background-color: #111827 !important;
-    border-top-color: #1f2937 !important;
-    color: #cbd5e1 !important;
+    background-color: #101a1d !important;
+    border-top-color: #1f2b2d !important;
+    color: #c9d7da !important;
 
-    .page-info strong { color: #f8fafc !important; }
-    .page-num { color: #f8fafc !important; background-color: #1f2937 !important; }
+    .page-info strong { color: #f5fbfc !important; }
+    .page-num { color: #f5fbfc !important; background-color: #1f2b2d !important; }
     .page-controls button {
-      background-color: #0b0f19 !important;
-      color: #cbd5e1 !important;
-      border-color: #374151 !important;
-      &:hover:not(:disabled) { background-color: #1f2937 !important; border-color: #4b5563 !important; }
+      background-color: #071113 !important;
+      color: #c9d7da !important;
+      border-color: #374345 !important;
+      &:hover:not(:disabled) { background-color: #1f2b2d !important; border-color: #4a5759 !important; }
       &:disabled { opacity: 0.35 !important; }
     }
   }
 
   /* Reports KPI kartları */
   .report-info-card {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%) !important;
-    border-color: #2563eb !important;
-    .info-body h3 { color: #dbeafe !important; }
-    .info-body p { color: #bfdbfe !important; }
+    background: #013d46 !important;
+    border-color: #026f7e !important;
+    .info-body h3 { color: #ddecef !important; }
+    .info-body p { color: #c4dee3 !important; }
   }
   .kpi-card {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
-    .kpi-label { color: #9ca3af !important; }
-    .kpi-value { color: #f9fafb !important; }
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
+    .kpi-label { color: #98a5a8 !important; }
+    .kpi-value { color: #f6fbfc !important; }
   }
 
   /* Final state badge'leri (Tamamlandı/Başarısız/İptal) */
@@ -401,48 +408,48 @@ body.dark-theme {
     background: #064e3b !important;
     color: #d1fae5 !important;
     &.failed { background: #7f1d1d !important; color: #fee2e2 !important; }
-    &.cancelled { background: #374151 !important; color: #d1d5db !important; }
+    &.cancelled { background: #374345 !important; color: #cad8db !important; }
   }
 
   /* Smart date input */
   .smart-date-wrapper {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
-    .d-input { color: #f9fafb !important; }
-    .sep { color: #6b7280 !important; }
-    &:focus-within { border-color: #2563eb !important; }
+    background-color: #1f2b2d !important;
+    border-color: #374345 !important;
+    .d-input { color: #f6fbfc !important; }
+    .sep { color: #5f6c6e !important; }
+    &:focus-within { border-color: #026f7e !important; }
   }
 
   /* Form-field hata mesajı */
   .error-text { color: #fca5a5 !important; }
-  .char-counter { color: #9ca3af !important; }
+  .char-counter { color: #98a5a8 !important; }
 
   /* Status badge dark variant'ları artık status-badge.component.scss içinde
      :host-context(body.dark-theme) ile yönetiliyor — burada tekrar tanımlamaya gerek yok. */
 
   /* Action butonları (Düzenle / Sil) */
-  .action-btn.edit-btn { background-color: #1e3a8a !important; color: #dbeafe !important; }
+  .action-btn.edit-btn { background-color: #013d46 !important; color: #ddecef !important; }
   .action-btn.delete-btn { background-color: #7f1d1d !important; color: #fecaca !important; }
   .action-btn.schedule-btn { background-color: #064e3b !important; color: #d1fae5 !important; }
-  .action-btn.performance-btn { background-color: #4c1d95 !important; color: #ede9fe !important; }
+  .action-btn.performance-btn { background-color: #013d46 !important; color: #ddecef !important; }
 
   /* Toast */
   .toast-success { background-color: #064e3b !important; color: #d1fae5 !important; }
   .toast-error { background-color: #7f1d1d !important; color: #fee2e2 !important; }
-  .toast-info { background-color: #1e3a8a !important; color: #dbeafe !important; }
+  .toast-info { background-color: #013d46 !important; color: #ddecef !important; }
 
   /* Confirm dialog backdrop */
   .modal-backdrop, .dialog-backdrop { background-color: rgba(0,0,0,0.7) !important; }
 
   /* Search wrapper içindeki sayaç */
-  .search-counter, .counter { color: #9ca3af !important; }
+  .search-counter, .counter { color: #98a5a8 !important; }
 
   /* Bell badge — daha okunaklı */
   .unread-badge { background-color: #dc2626 !important; color: white !important; }
 
   /* Empty state */
   .empty-state, .empty-row {
-    color: #6b7280 !important;
+    color: #5f6c6e !important;
   }
 
   /* ================================================================
@@ -469,14 +476,14 @@ body.dark-theme {
   .info-details,
   .performance-card,
   .score-card {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
-    color: #e5e7eb !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
+    color: #e3e8e9 !important;
   }
 
   .back-link {
-    color: #94a3b8 !important;
-    &:hover { color: #93c5fd !important; }
+    color: #97a5a7 !important;
+    &:hover { color: #9ec9d3 !important; }
   }
 
   /* Kritik stok uyarı bandı */
@@ -490,128 +497,128 @@ body.dark-theme {
   /* Bölge etiket girişi (şube formu) */
   .tag-input-container {
     input {
-      background-color: #0b0f19 !important;
-      color: #f9fafb !important;
-      border-color: #374151 !important;
+      background-color: #071113 !important;
+      color: #f6fbfc !important;
+      border-color: #374345 !important;
     }
   }
   .tag-add-btn {
-    background-color: #1f2937 !important;
-    color: #e5e7eb !important;
-    border-color: #374151 !important;
-    &:hover { background-color: #374151 !important; }
+    background-color: #1f2b2d !important;
+    color: #e3e8e9 !important;
+    border-color: #374345 !important;
+    &:hover { background-color: #374345 !important; }
   }
   .tag-chip {
-    background-color: #1e3a8a !important;
-    color: #dbeafe !important;
+    background-color: #013d46 !important;
+    color: #ddecef !important;
   }
-  .no-tags, .area-count { color: #6b7280 !important; }
+  .no-tags, .area-count { color: #5f6c6e !important; }
   .area-error { color: #fca5a5 !important; }
 
   /* Yetkinlik seçim satırları (teknisyen formu) */
   .skill-row {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
-    &.selected { border-color: #2563eb !important; background-color: #172554 !important; }
-    .skill-check span { color: #e5e7eb !important; }
+    background-color: #1f2b2d !important;
+    border-color: #374345 !important;
+    &.selected { border-color: #026f7e !important; background-color: #002229 !important; }
+    .skill-check span { color: #e3e8e9 !important; }
     .skill-level {
-      background-color: #0b0f19 !important;
-      color: #f9fafb !important;
-      border-color: #374151 !important;
+      background-color: #071113 !important;
+      color: #f6fbfc !important;
+      border-color: #374345 !important;
     }
   }
 
   /* Bildirim merkezi kartları */
-  .notif-title { color: #f9fafb !important; }
-  .notif-message { color: #cbd5e1 !important; }
-  .date-text { color: #6b7280 !important; }
+  .notif-title { color: #f6fbfc !important; }
+  .notif-message { color: #c9d7da !important; }
+  .date-text { color: #5f6c6e !important; }
   .no-notifications {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
-    p { color: #6b7280 !important; }
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
+    p { color: #5f6c6e !important; }
   }
   .action-bar {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
   }
   .card-indicator { opacity: 0.85; }
 
   /* Detay sayfaları (talep / araç) */
   .code-badge, .plate-badge {
-    background-color: #1e3a8a !important;
-    color: #dbeafe !important;
+    background-color: #013d46 !important;
+    color: #ddecef !important;
   }
-  .detail-item { color: #e5e7eb !important; strong { color: #f9fafb !important; } }
-  .info-row { color: #e5e7eb !important; border-color: #1f2937 !important; strong { color: #f9fafb !important; } }
+  .detail-item { color: #e3e8e9 !important; strong { color: #f6fbfc !important; } }
+  .info-row { color: #e3e8e9 !important; border-color: #1f2b2d !important; strong { color: #f6fbfc !important; } }
   .sla-card {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
+    background-color: #1f2b2d !important;
+    border-color: #374345 !important;
     &.sla-overdue { background-color: #7f1d1d !important; border-color: #b91c1c !important; }
     &.sla-approaching { background-color: #78350f !important; border-color: #b45309 !important; }
   }
   .bool-badge {
-    background-color: #374151 !important;
-    color: #f3f4f6 !important;
+    background-color: #374345 !important;
+    color: #f0f5f6 !important;
     &.true { background-color: #064e3b !important; color: #a7f3d0 !important; }
   }
-  .meta-section { color: #6b7280 !important; }
-  .description-text { color: #cbd5e1 !important; }
+  .meta-section { color: #5f6c6e !important; }
+  .description-text { color: #c9d7da !important; }
 
   /* Sekme / özet istatistik kutuları */
   .stats-overview .stat-card,
   .summary-cards .stat-card {
-    background-color: #111827 !important;
-    border-color: #1f2937 !important;
+    background-color: #101a1d !important;
+    border-color: #1f2b2d !important;
   }
-  .stat-value { color: #f9fafb !important; }
-  .stat-title, .stat-label { color: #9ca3af !important; }
+  .stat-value { color: #f6fbfc !important; }
+  .stat-title, .stat-label { color: #98a5a8 !important; }
 
   /* Kart genel başlık şeridi */
   .card-header {
-    background-color: #0f172a !important;
-    border-color: #1f2937 !important;
+    background-color: #0f1a1c !important;
+    border-color: #1f2b2d !important;
   }
 
   /* İlerleme / doluluk barları zemini */
   .progress-bar, .mini-progress-bar, .meter-track {
-    background-color: #1f2937 !important;
+    background-color: #1f2b2d !important;
   }
 
   /* Form aksiyon butonları — tüm oluştur/düzenle sayfaları */
   .cancel-btn {
-    background-color: #1f2937 !important;
-    color: #f3f4f6 !important;
-    border-color: #374151 !important;
-    &:hover { background-color: #374151 !important; }
+    background-color: #1f2b2d !important;
+    color: #f0f5f6 !important;
+    border-color: #374345 !important;
+    &:hover { background-color: #374345 !important; }
   }
   .save-btn:disabled {
-    background-color: #1e3a5f !important;
+    background-color: #143238 !important;
     opacity: 0.5 !important;
   }
-  .form-actions { border-top-color: #1f2937 !important; }
+  .form-actions { border-top-color: #1f2b2d !important; }
 
   /* Anahtar / onay kutusu etiketleri */
   .switch-label, .check-group label, .skill-check {
-    color: #e5e7eb !important;
-    .switch-text { color: #e5e7eb !important; }
+    color: #e3e8e9 !important;
+    .switch-text { color: #e3e8e9 !important; }
   }
 
   /* Şube formu — eklenmiş bölgeler kutusu */
   .chips-container {
-    background-color: #0b0f19 !important;
-    border-color: #374151 !important;
+    background-color: #071113 !important;
+    border-color: #374345 !important;
   }
 
   /* Teknisyen formu — uzmanlık alanları ızgarası */
   .skills-grid {
-    background-color: #0b0f19 !important;
-    border-color: #374151 !important;
+    background-color: #071113 !important;
+    border-color: #374345 !important;
   }
 
   /* Talep detayı — arıza açıklaması kutusu */
   .description-text {
-    background-color: #1f2937 !important;
-    border-color: #374151 !important;
+    background-color: #1f2b2d !important;
+    border-color: #374345 !important;
   }
 
   /* Yeni talep — SLA önizleme kutusu */
@@ -628,18 +635,18 @@ body.dark-theme {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  background: #f5fbfc;
+  border-top: 1px solid #e3e9ea;
   font-size: 0.8rem;
-  color: #64748b;
+  color: #5f6c6e;
   flex-wrap: wrap;
   gap: 0.75rem;
 
-  .page-info strong { color: #0f172a; }
+  .page-info strong { color: #0f1a1c; }
   .page-num {
     font-weight: 700;
-    color: #0f172a;
-    background-color: #e2e8f0;
+    color: #0f1a1c;
+    background-color: #e3e9ea;
     padding: 0.25rem 0.625rem;
     border-radius: 9999px;
     font-size: 0.8rem;
@@ -661,12 +668,12 @@ body.dark-theme {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: #475569;
+      color: #4a5759;
       transition: all 0.15s;
       &:hover:not(:disabled) {
-        background: #f1f5f9;
-        border-color: #94a3b8;
-        color: #0f172a;
+        background: #f0f6f7;
+        border-color: #97a5a7;
+        color: #0f1a1c;
       }
       &:disabled { opacity: 0.35; cursor: not-allowed; }
     }
@@ -680,10 +687,10 @@ body.dark-theme {
   align-items: center;
   padding: 0.875rem 1.25rem !important;
   background-color: #fafafa !important;
-  border-top: 1px solid #f1f5f9 !important;
+  border-top: 1px solid #f0f6f7 !important;
   border-radius: 0 0 0.75rem 0.75rem;
   font-size: 0.8rem !important;
-  color: #64748b !important;
+  color: #5f6c6e !important;
   flex-wrap: wrap;
   gap: 0.75rem;
   transition: all 0.2s ease;
@@ -691,7 +698,7 @@ body.dark-theme {
   .page-info {
     font-weight: 500;
     strong {
-      color: #0f172a !important;
+      color: #0f1a1c !important;
     }
   }
 
@@ -702,7 +709,7 @@ body.dark-theme {
     
     label {
       font-size: 0.75rem !important;
-      color: #64748b !important;
+      color: #5f6c6e !important;
       display: flex;
       align-items: center;
       gap: 0.375rem;
@@ -710,22 +717,22 @@ body.dark-theme {
 
     select {
       padding: 0.3rem 0.6rem !important;
-      border: 1px solid #e2e8f0 !important;
+      border: 1px solid #e3e9ea !important;
       border-radius: 0.5rem !important;
       font-size: 0.75rem !important;
       background-color: white !important;
-      color: #0f172a !important;
+      color: #0f1a1c !important;
       cursor: pointer;
       outline: none;
       transition: border-color 0.15s ease;
-      &:hover { border-color: #cbd5e1 !important; }
+      &:hover { border-color: #c9d7da !important; }
     }
 
     button {
       padding: 0.375rem 0.875rem !important;
-      border: 1px solid #e2e8f0 !important;
+      border: 1px solid #e3e9ea !important;
       background-color: white !important;
-      color: #475569 !important;
+      color: #4a5759 !important;
       border-radius: 9999px !important;
       font-size: 0.75rem !important;
       font-weight: 600 !important;
@@ -733,9 +740,9 @@ body.dark-theme {
       transition: all 0.15s ease-in-out;
 
       &:hover:not(:disabled) {
-        background-color: #f1f5f9 !important;
-        color: #0f172a !important;
-        border-color: #cbd5e1 !important;
+        background-color: #f0f6f7 !important;
+        color: #0f1a1c !important;
+        border-color: #c9d7da !important;
         transform: translateY(-1px);
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
       }
@@ -743,8 +750,8 @@ body.dark-theme {
       &:disabled {
         opacity: 0.4 !important;
         cursor: not-allowed !important;
-        background-color: #f8fafc !important;
-        border-color: #e2e8f0 !important;
+        background-color: #f5fbfc !important;
+        border-color: #e3e9ea !important;
         transform: none !important;
         box-shadow: none !important;
       }
@@ -752,9 +759,9 @@ body.dark-theme {
 
     .page-num {
       font-weight: 700 !important;
-      color: #0f172a !important;
+      color: #0f1a1c !important;
       font-size: 0.8rem !important;
-      background-color: #f1f5f9;
+      background-color: #f0f6f7;
       padding: 0.25rem 0.625rem;
       border-radius: 9999px;
     }

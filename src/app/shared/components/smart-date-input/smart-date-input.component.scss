@@ -3,7 +3,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.1rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid #cad8db;
       border-radius: 0.375rem;
       padding: 0 0.35rem;
       height: 34px;                 // komşu .form-control ile aynı yükseklik
@@ -12,10 +12,10 @@
       box-sizing: border-box;
     }
     .smart-date-wrapper:focus-within {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      border-color: #026f7e;
+      box-shadow: 0 0 0 3px rgba(2, 111, 126, 0.1);
     }
-    .smart-date-wrapper.disabled { background: #f3f4f6; opacity: 0.7; }
+    .smart-date-wrapper.disabled { background: #f0f5f6; opacity: 0.7; }
     .d-input {
       border: none;
       outline: none;
@@ -27,8 +27,8 @@
       font-family: inherit;
       color: inherit;
     }
-    .d-input::placeholder { color: #9ca3af; font-size: 0.75rem; }
+    .d-input::placeholder { color: #98a5a8; font-size: 0.75rem; }
     .day-input { width: 1.6rem; }
     .month-input { width: 1.6rem; }
     .year-input { width: 2.6rem; }
-    .sep { color: #94a3b8; font-weight: 600; user-select: none; font-size: 0.8rem; }
+    .sep { color: #97a5a7; font-weight: 600; user-select: none; font-size: 0.8rem; }

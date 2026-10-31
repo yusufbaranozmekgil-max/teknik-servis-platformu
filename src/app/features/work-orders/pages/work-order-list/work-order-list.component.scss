@@ -3,32 +3,32 @@
 // ====================================================================
 
 // --- Light tema değişkenleri ---
-$bg-page:        #f8fafc;
+$bg-page:        #f5fbfc;
 $bg-card:        #ffffff;
-$bg-table-head:  #f8fafc;
-$bg-pagination:  #f8fafc;
+$bg-table-head:  #f5fbfc;
+$bg-pagination:  #f5fbfc;
 $bg-input:       #ffffff;
 $bg-modal:       #ffffff;
-$text-strong:    #0f172a;
-$text-default:   #334155;
-$text-muted:     #64748b;
-$text-faint:     #94a3b8;
-$border:         #e2e8f0;
-$border-strong:  #cbd5e1;
+$text-strong:    #0f1a1c;
+$text-default:   #374345;
+$text-muted:     #5f6c6e;
+$text-faint:     #97a5a7;
+$border:         #e3e9ea;
+$border-strong:  #c9d7da;
 
 // --- Dark tema değişkenleri ---
-$dark-bg-page:        #0b0f19;
-$dark-bg-card:        #111827;
-$dark-bg-table-head:  #1f2937;
-$dark-bg-pagination:  #1f2937;
-$dark-bg-input:       #1f2937;
-$dark-bg-modal:       #111827;
-$dark-text-strong:    #f9fafb;
-$dark-text-default:   #e5e7eb;
-$dark-text-muted:     #9ca3af;
-$dark-text-faint:     #6b7280;
-$dark-border:         #1f2937;
-$dark-border-strong:  #374151;
+$dark-bg-page:        #071113;
+$dark-bg-card:        #101a1d;
+$dark-bg-table-head:  #1f2b2d;
+$dark-bg-pagination:  #1f2b2d;
+$dark-bg-input:       #1f2b2d;
+$dark-bg-modal:       #101a1d;
+$dark-text-strong:    #f6fbfc;
+$dark-text-default:   #e3e8e9;
+$dark-text-muted:     #98a5a8;
+$dark-text-faint:     #5f6c6e;
+$dark-border:         #1f2b2d;
+$dark-border-strong:  #374345;
 
 // --- Mixin: temaya göre değer atama yardımcısı ---
 @mixin themed($prop, $light, $dark) {
@@ -41,9 +41,9 @@ $dark-border-strong:  #374151;
 // === Sayfa kabı ===
 .page-container {
   padding: 1.5rem;
-  max-width: 920px;
+  max-width: 1180px;
   margin: 0 auto;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Barlow', sans-serif;
   min-height: 100vh;
   @include themed(background-color, $bg-page, $dark-bg-page);
 }
@@ -75,17 +75,20 @@ h2 {
 .table-actions {
   padding: 1.25rem 1.5rem;
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
+  gap: 0.75rem 1.25rem;
   @include themed(border-bottom, 1px solid $border, 1px solid $dark-border);
 
   .filter-group {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
     label {
       font-size: 0.875rem;
       font-weight: 600;
-      @include themed(color, #475569, $dark-text-default);
+      @include themed(color, #4a5759, $dark-text-default);
     }
   }
 }
@@ -99,7 +102,7 @@ h2 {
   @include themed(border, 1px solid $border-strong, 1px solid $dark-border-strong);
 
   &:focus {
-    border-color: #2563eb;
+    border-color: #026f7e;
     outline: none;
   }
 }
@@ -133,7 +136,7 @@ h2 {
   th {
     font-weight: 600;
     @include themed(background-color, $bg-table-head, $dark-bg-table-head);
-    @include themed(color, #475569, $dark-text-strong);
+    @include themed(color, #4a5759, $dark-text-strong);
   }
 
   td {
@@ -143,7 +146,7 @@ h2 {
 
   tr:hover td {
     :host-context(body.dark-theme) & { background-color: $dark-border; }
-    &:not(:host-context(body.dark-theme) td) { background-color: #f8fafc; }
+    &:not(:host-context(body.dark-theme) td) { background-color: #f5fbfc; }
   }
 }
 
@@ -186,7 +189,7 @@ h2 {
     @include themed(border, 1px solid $border-strong, 1px solid $dark-border-strong);
 
     &:hover:not(:disabled) {
-      @include themed(background, #f1f5f9, #374151);
+      @include themed(background, #f0f6f7, #374345);
     }
     &:disabled { opacity: 0.4; cursor: not-allowed; }
   }
@@ -217,16 +220,16 @@ h2 {
   transition: all 0.2s;
 
   &.btn-sm { padding: 0.25rem 0.5rem; font-size: 0.75rem; }
-  &.btn-primary { background-color: #2563eb; color: white; &:hover { background-color: #1d4ed8; } }
+  &.btn-primary { background-color: #026f7e; color: white; &:hover { background-color: #015d6a; } }
   &.btn-secondary {
     @include themed(background-color, white, $dark-bg-input);
-    @include themed(border-color, #d1d5db, $dark-border-strong);
-    @include themed(color, #374151, $dark-text-default);
-    &:hover { @include themed(background-color, #f3f4f6, #374151); }
+    @include themed(border-color, #cad8db, $dark-border-strong);
+    @include themed(color, #374345, $dark-text-default);
+    &:hover { @include themed(background-color, #f0f5f6, #374345); }
   }
   &.btn-success { background-color: #10b981; color: white; &:hover { background-color: #059669; } }
   &.btn-danger { background-color: #ef4444; color: white; &:hover { background-color: #dc2626; } }
-  &.btn-info { background-color: #3b82f6; color: white; &:hover { background-color: #2563eb; } }
+  &.btn-info { background-color: #1a8798; color: white; &:hover { background-color: #026f7e; } }
   &.btn-warning { background-color: #f59e0b; color: white; &:hover { background-color: #d97706; } }
 }
 
@@ -255,7 +258,7 @@ h2 {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   display: flex; align-items: center; justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+
   @include themed(background-color, rgba(15, 23, 42, 0.4), rgba(0, 0, 0, 0.7));
 }
 
@@ -274,7 +277,7 @@ h2 {
   }
   p {
     margin: 0; font-size: 0.875rem;
-    @include themed(color, #475569, $dark-text-default);
+    @include themed(color, #4a5759, $dark-text-default);
   }
 }
 
@@ -323,7 +326,7 @@ h2 {
   border-radius: 0.5rem;
   margin: 0.75rem 0 1rem;
   font-size: 0.85rem;
-  border-left: 4px solid #f59e0b;
+  border-left: 1px solid #f59e0b;
   @include themed(background, #fef3c7, #78350f);
   @include themed(color, #92400e, #fde68a);
 
@@ -346,12 +349,12 @@ h2 {
   color: white;
 
   &.failed { background: #b91c1c; }
-  &.cancelled { background: #6b7280; }
+  &.cancelled { background: #5f6c6e; }
 
   :host-context(body.dark-theme) & {
     background: #15803d; color: #d1fae5;
     &.failed { background: #dc2626; color: #fee2e2; }
-    &.cancelled { background: #6b7280; color: #f3f4f6; }
+    &.cancelled { background: #5f6c6e; color: #f0f5f6; }
   }
 }
 
@@ -398,7 +401,22 @@ th.sortable {
   gap: 0.4rem;
 
   .range-dash {
-    color: #94a3b8;
+    color: #97a5a7;
     font-weight: 600;
   }
 }
+
+@media (max-width: 640px) {
+  .table-actions {
+    justify-content: stretch;
+
+    .filter-group {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.25rem;
+      width: 100%;
+    }
+  }
+}
+
+td.font-bold { white-space: nowrap; }

@@ -274,7 +274,7 @@ export class SimulationComponent implements OnInit {
       description: 'Tabloların donmadığını ve sayfalamanın akıcı olduğunu test etmek için 5.000 kayıt üretir.',
       buttonLabel: '5.000+ Üret',
       steps: [
-        '5.000 adet rastgele müşteri ve talep verisi üretilir.',
+        '2.500 adet rastgele müşteri ve talep verisi üretilir.',
         'Veriler tek seferde tarayıcı deposuna yazılır.',
         'Aynı sayıda "Planlandı" durumlu iş emri eklenir.',
         'Denetim kaydına tek toplu girdi düşer.',
@@ -528,12 +528,10 @@ export class SimulationComponent implements OnInit {
       }
 
       const part = parts[Math.floor(Math.random() * parts.length)];
-      const type = Math.random() > 0.5 ? 'IN' : 'OUT';
       const quantity = Math.floor(Math.random() * 5) + 1;
-
-      if (type === 'OUT' && part.stockQuantity < quantity) {
-        throw new Error(`Yetersiz envanter stok. Parça: ${part.name}, Mevcut: ${part.stockQuantity}, Çıkış: ${quantity}`);
-      }
+      // Rastgele parçada kullanılabilir stok yetmiyorsa çıkış yerine giriş yapılır
+      const available = part.stockQuantity - (part.reservedQuantity || 0);
+      const type = Math.random() > 0.5 && available >= quantity ? 'OUT' : 'IN';
 
       const movement = this.stockService.createStockMovement({
         partId: part.id,
@@ -791,7 +789,7 @@ export class SimulationComponent implements OnInit {
           { label: 'Teknisyen', value: tech.fullName },
           { label: 'Mevcut İş', value: `${wo1.code} (10:00-12:00)` },
           { label: 'Reddedilen Talep', value: '11:00-13:00' },
-          { label: 'Sonuç', value: 'Atama engellendi ✓' }
+          { label: 'Sonuç', value: 'Atama engellendi' }
         ]);
       } else {
         this.logConsole(`Beklenmedik sonuç! Çakışma tespiti: ${hasConflict}, boş slot çakışması: ${freeConflict}.`, 'error');
@@ -827,13 +825,13 @@ export class SimulationComponent implements OnInit {
         entityId: 'large-dataset-generator',
         oldValue: null,
         newValue: null,
-        description: `Büyük Veri Simülasyonu çalıştırıldı. 5.000'er adet kayıt sisteme yazıldı. Süre: ${elapsed} ms`
+        description: `Büyük Veri Simülasyonu çalıştırıldı. 2.500 talep ve 2.500 iş emri sisteme yazıldı. Süre: ${elapsed} ms`
       });
 
       this.notificationService.createNotification({
         type: 'NEW_REQUEST',
         title: '5.000+ Kayıt Performans Verisi Yüklendi',
-        message: `Sistem genelinde performans ve sanal liste yüklerini test etmek amacıyla 5.000 adet servis talebi ve iş emri başarıyla üretildi.`,
+        message: `Sistem genelinde performans ve sanal liste yüklerini test etmek amacıyla 2.500 servis talebi ve 2.500 iş emri üretildi.`,
         branchId: null,
         targetRole: 'SYSTEM_ADMIN',
         targetUserId: null,
@@ -844,8 +842,8 @@ export class SimulationComponent implements OnInit {
 
       this.toastService.showSuccess('5.000+ büyük veri simülasyonu başarıyla yüklendi.');
       this.finishScenario(ctx, true, `5.000+ kayıt başarıyla yüklendi (${elapsed} ms).`, [
-        { label: 'Üretilen Talep', value: '5000' },
-        { label: 'Üretilen İş Emri', value: '5000' },
+        { label: 'Üretilen Talep', value: '2500' },
+        { label: 'Üretilen İş Emri', value: '2500' },
         { label: 'Süre', value: elapsed + ' ms' }
       ]);
       this.refreshStats();
@@ -868,7 +866,7 @@ export class SimulationComponent implements OnInit {
       res.logs.forEach(l => this.logConsole(l.text, l.type));
       this.toastService.showSuccess('Bozuk depolama simülasyonu tamamlandı.');
       this.refreshStats();
-      this.finishScenario(ctx, true, 'Bozuk veri yedeklendi ve sıfırlandı.', [
+      this.finishScenario(ctx, true, 'Bozuk veri yedeklendi, iş emirleri geri yüklendi.', [
         { label: 'Yedeklenen Anahtar', value: 'ts_work_orders' },
         { label: 'Kurtarma Durumu', value: 'Başarılı' }
       ]);

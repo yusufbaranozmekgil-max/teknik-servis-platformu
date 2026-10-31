@@ -22,7 +22,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
       <header class="dashboard-header animate-fade-in">
         <div class="header-info">
           <h1>Saha Operasyonları Paneli</h1>
-          <p class="subtitle">Hoş geldiniz, <strong>{{ currentUser()?.fullName || 'Kullanıcı' }}</strong> (Rol: <span class="role-badge">{{ currentUser()?.role | roleLabel }}</span>)</p>
+          <p class="subtitle">Hoş geldiniz, <strong>{{ currentUser()?.fullName || 'Kullanıcı' }}</strong> <span class="role-badge">{{ currentUser()?.role | roleLabel }}</span></p>
         </div>
         <button (click)="refreshData()" class="btn-refresh">
           Verileri Yenile
@@ -1084,7 +1084,7 @@ export class DashboardComponent implements OnInit {
       this.activeTab = 'reporting'; // raporlama yetkilisi için özel sekme
     } else if (role === 'SYSTEM_ADMIN') {
       this.showTabs = true;
-      this.activeTab = 'branch'; // admin tüm sekmeleri görür, varsayılan şube
+      this.activeTab = 'reporting'; // admin tüm sekmeleri görür; bu sekme şube seçimi gerektirmez
     } else if (role === 'BRANCH_MANAGER') {
       this.showTabs = false;
       this.activeTab = 'branch';
@@ -1115,7 +1115,7 @@ export class DashboardComponent implements OnInit {
 
   getScoreColor(score: number): string {
     if (score >= 85) return '#10b981'; // green
-    if (score >= 70) return '#3b82f6'; // blue
+    if (score >= 70) return '#1a8798'; // blue
     if (score >= 50) return '#f59e0b'; // orange
     return '#ef4444'; // red
   }

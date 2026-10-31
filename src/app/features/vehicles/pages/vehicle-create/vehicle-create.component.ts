@@ -133,7 +133,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
                 [minYear]="2000"
                 [maxYear]="2099"
               ></app-smart-date-input>
-              <small class="hint-text" style="color:#64748b;font-size:0.75rem">Gün/Ay/Yıl (örn. 15/06/2025). 30 Şubat gibi geçersiz tarih otomatik düzeltilir.</small>
+              <small class="hint-text" style="color:#5f6c6e;font-size:0.75rem">Gün/Ay/Yıl (örn. 15/06/2025). 30 Şubat gibi geçersiz tarih otomatik düzeltilir.</small>
             </div>
           </div>
 

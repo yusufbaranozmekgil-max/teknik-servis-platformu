@@ -277,8 +277,8 @@ export class StockMovementPage implements OnInit {
   readonly modes: { key: MovementMode; label: string }[] = [
     { key: 'STANDARD', label: '+ Giriş / Çıkış' },
     { key: 'TRANSFER', label: '↔ Şubeler Arası Transfer' },
-    { key: 'FIRE', label: '⚠ Fire / Hasar' },
-    { key: 'ADJUSTMENT', label: '✎ Sayım Düzeltmesi' }
+    { key: 'FIRE', label: 'Fire / Hasar' },
+    { key: 'ADJUSTMENT', label: 'Sayım Düzeltmesi' }
   ];
 
   movementForm: FormGroup = this.fb.group({

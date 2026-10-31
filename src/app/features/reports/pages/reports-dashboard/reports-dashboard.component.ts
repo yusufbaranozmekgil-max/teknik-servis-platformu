@@ -901,14 +901,14 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
             {
               label: 'Açılan Talep',
               data: this.trendRequests,
-              borderColor: '#2563eb',
-              backgroundColor: 'rgba(37, 99, 235, 0.12)',
+              borderColor: '#026f7e',
+              backgroundColor: 'rgba(2, 111, 126, 0.12)',
               fill: true,
               tension: 0.35,
               borderWidth: 2.5,
               pointRadius: 3,
               pointHoverRadius: 6,
-              pointBackgroundColor: '#2563eb'
+              pointBackgroundColor: '#026f7e'
             },
             {
               label: 'Oluşturulan İş Emri',
@@ -935,13 +935,13 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               position: 'bottom',
               labels: {
                 font: { family: 'Inter', size: 11, weight: '600' },
-                color: isDarkTheme ? '#cbd5e1' : '#475569',
+                color: isDarkTheme ? '#c9d7da' : '#4a5759',
                 padding: 14, usePointStyle: true, pointStyle: 'circle', boxWidth: 8
               }
             },
             tooltip: {
               backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.95)' : 'rgba(30, 41, 59, 0.95)',
-              titleColor: '#f9fafb', bodyColor: '#e5e7eb',
+              titleColor: '#f6fbfc', bodyColor: '#e3e8e9',
               padding: 12, cornerRadius: 10,
               titleFont: { family: 'Inter', size: 12, weight: 'bold' }, bodyFont: { family: 'Inter', size: 11 }
             }
@@ -951,12 +951,12 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               beginAtZero: true,
               border: { display: false },
               grid: { color: isDarkTheme ? 'rgba(255,255,255,0.06)' : '#eef2f7', drawTicks: false },
-              ticks: { color: isDarkTheme ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 11 }, padding: 8, precision: 0 }
+              ticks: { color: isDarkTheme ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 }, padding: 8, precision: 0 }
             },
             x: {
               border: { display: false },
               grid: { display: false },
-              ticks: { color: isDarkTheme ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 11 } }
+              ticks: { color: isDarkTheme ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 } }
             }
           }
         }
@@ -965,12 +965,12 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     const palette = [
-      'rgba(59, 130, 246, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(249, 115, 22, 0.85)',
+      'rgba(26, 135, 152, 0.85)', 'rgba(16, 185, 129, 0.85)', 'rgba(249, 115, 22, 0.85)',
       'rgba(239, 68, 68, 0.85)', 'rgba(139, 92, 246, 0.85)', 'rgba(236, 72, 153, 0.85)',
       'rgba(100, 116, 139, 0.85)', 'rgba(234, 179, 8, 0.85)', 'rgba(20, 184, 166, 0.85)',
       'rgba(168, 85, 247, 0.85)'
     ];
-    const border = ['#3b82f6', '#10b981', '#f97316', '#ef4444', '#8b5cf6', '#ec4899', '#64748b', '#eab308', '#14b8a6', '#a855f7'];
+    const border = ['#1a8798', '#10b981', '#f97316', '#ef4444', '#1a8798', '#ec4899', '#5f6c6e', '#eab308', '#14b8a6', '#1a8798'];
 
     let labels: string[] = [];
     let dataValues: number[] = [];
@@ -1029,7 +1029,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
           label: datasetLabel,
           data: dataValues,
           backgroundColor: bgColors,
-          borderColor: isPieLike ? (isDark ? '#111827' : '#ffffff') : borderColors,
+          borderColor: isPieLike ? (isDark ? '#101a1d' : '#ffffff') : borderColors,
           borderWidth: isPieLike ? 3 : 0,
           borderRadius: isPieLike ? 6 : 10,
           borderSkipped: false,
@@ -1049,7 +1049,7 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
             position: 'bottom',
             labels: {
               font: { family: 'Inter', size: 11, weight: '600' },
-              color: isDark ? '#cbd5e1' : '#475569',
+              color: isDark ? '#c9d7da' : '#4a5759',
               padding: 14,
               usePointStyle: true,
               pointStyle: 'circle',
@@ -1058,8 +1058,8 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
           },
           tooltip: {
             backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(30, 41, 59, 0.95)',
-            titleColor: '#f9fafb',
-            bodyColor: '#e5e7eb',
+            titleColor: '#f6fbfc',
+            bodyColor: '#e3e8e9',
             padding: 12,
             cornerRadius: 10,
             displayColors: true,
@@ -1076,12 +1076,12 @@ export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewIn
               color: isDark ? 'rgba(255,255,255,0.06)' : '#eef2f7',
               drawTicks: false
             },
-            ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 11 }, padding: 8 }
+            ticks: { color: isDark ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 }, padding: 8 }
           },
           x: {
             border: { display: false },
             grid: { display: false },
-            ticks: { color: isDark ? '#94a3b8' : '#64748b', font: { family: 'Inter', size: 11 } }
+            ticks: { color: isDark ? '#97a5a7' : '#5f6c6e', font: { family: 'Inter', size: 11 } }
           }
         }
       }

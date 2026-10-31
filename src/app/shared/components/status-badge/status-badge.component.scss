@@ -5,35 +5,35 @@
 
 // --- Light mode tonları (canlı, dark mode kadar belirgin) ---
 $opened-bg:       #dcfce7;  $opened-fg:       #166534;  $opened-border:       #86efac;
-$planned-bg:      #1e40af;  $planned-fg:      #ffffff;  $planned-border:      #1e3a8a;
+$planned-bg:      #024a55;  $planned-fg:      #ffffff;  $planned-border:      #013d46;
 $on-way-bg:       #c2410c;  $on-way-fg:       #ffffff;  $on-way-border:       #9a3412;
-$on-site-bg:      #475569;  $on-site-fg:      #ffffff;  $on-site-border:      #334155;
+$on-site-bg:      #4a5759;  $on-site-fg:      #ffffff;  $on-site-border:      #374345;
 $completed-bg:    #047857;  $completed-fg:    #ffffff;  $completed-border:    #065f46;
 $partial-bg:      #b45309;  $partial-fg:      #ffffff;  $partial-border:      #92400e;
 $failed-bg:       #b91c1c;  $failed-fg:       #ffffff;  $failed-border:       #991b1b;
-$cancelled-bg:    #6b7280;  $cancelled-fg:    #ffffff;  $cancelled-border:    #4b5563;
+$cancelled-bg:    #5f6c6e;  $cancelled-fg:    #ffffff;  $cancelled-border:    #4a5759;
 $active-bg:       #047857;  $active-fg:       #ffffff;  $active-border:       #065f46;
-$passive-bg:      #6b7280;  $passive-fg:      #ffffff;  $passive-border:      #4b5563;
+$passive-bg:      #5f6c6e;  $passive-fg:      #ffffff;  $passive-border:      #4a5759;
 $leave-bg:        #b45309;  $leave-fg:        #ffffff;  $leave-border:        #92400e;
 $critical-bg:     #dc2626;  $critical-fg:     #ffffff;  $critical-border:     #b91c1c;
 $urgent-bg:       #ea580c;  $urgent-fg:       #ffffff;  $urgent-border:       #c2410c;
-$standard-bg:     #475569;  $standard-fg:     #ffffff;  $standard-border:     #334155;
+$standard-bg:     #4a5759;  $standard-fg:     #ffffff;  $standard-border:     #374345;
 $sla-overdue-bg:  #b91c1c;  $sla-overdue-fg:  #ffffff;  $sla-overdue-border:  #991b1b;
 $sla-warn-bg:     #c2410c;  $sla-warn-fg:     #ffffff;  $sla-warn-border:     #9a3412;
 $low-fuel-bg:     #c2410c;  $low-fuel-fg:     #ffffff;  $low-fuel-border:     #9a3412;
 
 // --- Dark mode tonları (biraz daha doygun + daha güçlü kontrast) ---
 $dark-opened-bg:    #166534;  $dark-opened-fg:    #d1fae5;
-$dark-planned-bg:   #1d4ed8;  $dark-planned-fg:   #dbeafe;
+$dark-planned-bg:   #015d6a;  $dark-planned-fg:   #ddecef;
 $dark-on-way-bg:    #ea580c;  $dark-on-way-fg:    #fff7ed;
-$dark-on-site-bg:   #475569;  $dark-on-site-fg:   #f1f5f9;
+$dark-on-site-bg:   #4a5759;  $dark-on-site-fg:   #f0f6f7;
 $dark-completed-bg: #15803d;  $dark-completed-fg: #d1fae5;
 $dark-partial-bg:   #d97706;  $dark-partial-fg:   #fef3c7;
 $dark-failed-bg:    #dc2626;  $dark-failed-fg:    #fee2e2;
-$dark-cancelled-bg: #6b7280;  $dark-cancelled-fg: #f3f4f6;
+$dark-cancelled-bg: #5f6c6e;  $dark-cancelled-fg: #f0f5f6;
 $dark-critical-bg:  #dc2626;  $dark-critical-fg:  #fee2e2;
 $dark-urgent-bg:    #ea580c;  $dark-urgent-fg:    #fff7ed;
-$dark-standard-bg:  #6b7280;  $dark-standard-fg:  #f3f4f6;
+$dark-standard-bg:  #5f6c6e;  $dark-standard-fg:  #f0f5f6;
 
 // --- Mixin: tek satırda renk seti uygula ---
 @mixin badge-color($bg, $fg, $border: null) {
@@ -68,8 +68,8 @@ $dark-standard-bg:  #6b7280;  $dark-standard-fg:  #f3f4f6;
 .standard, .standart                     { @include badge-color($standard-bg, $standard-fg, $standard-border); }
 .sla_overdue, .sla_gecikmis              { @include badge-color($sla-overdue-bg, $sla-overdue-fg, $sla-overdue-border); }
 .sla_warning, .sla_yaklasiyor            { @include badge-color($sla-warn-bg, $sla-warn-fg, $sla-warn-border); }
-.new, .yeni                              { @include badge-color(#dbeafe, #1e40af, #bfdbfe); }
-.closed, .kapatildi, .kapatilmis         { @include badge-color(#f1f5f9, #334155, #cbd5e1); }
+.new, .yeni                              { @include badge-color(#ddecef, #024a55, #c4dee3); }
+.closed, .kapatildi, .kapatilmis         { @include badge-color(#f0f6f7, #374345, #c9d7da); }
 .opened, .acildi                         { @include badge-color($opened-bg, $opened-fg, $opened-border); }
 .planned, .planlandi                     { @include badge-color($planned-bg, $planned-fg, $planned-border); }
 .on_the_way, .yolda                      { @include badge-color($on-way-bg, $on-way-fg, $on-way-border); }
@@ -93,10 +93,10 @@ $dark-standard-bg:  #6b7280;  $dark-standard-fg:  #f3f4f6;
 
 :host-context(body.dark-theme) {
   .active, .aktif, .available, .musait, .opened, .acildi, .new, .yeni {
-    @include badge-color(#1e3a8a, #dbeafe);
+    @include badge-color(#013d46, #ddecef);
   }
   .passive, .pasif, .inactive, .cancelled, .iptal_edildi, .out_of_service, .standard, .standart, .closed, .kapatildi, .kapatilmis {
-    @include badge-color(#374151, #f3f4f6);
+    @include badge-color(#374345, #f0f5f6);
   }
   .on_leave, .izinli, .partially_completed, .kismi_tamamlandi {
     @include badge-color($dark-partial-bg, $dark-partial-fg);

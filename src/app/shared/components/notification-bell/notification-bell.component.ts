@@ -12,7 +12,10 @@ import { Notification } from '../../../core/models/notification.model';
     <div class="bell-container">
       <!-- Bell Icon and Badge -->
       <button class="bell-button" (click)="toggleDropdown($event)" title="Bildirimler">
-        <span class="bell-emoji">🔔</span>
+        <svg class="bell-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/>
+          <path d="M10.3 20a2 2 0 0 0 3.4 0"/>
+        </svg>
         <span class="unread-badge" *ngIf="unreadCount() > 0">{{ unreadCount() }}</span>
       </button>
 

@@ -1,8 +1,8 @@
     .dashboard-container {
       padding: 1.5rem;
-      background-color: #f8fafc;
+      background-color: #f5fbfc;
       min-height: calc(100vh - 4rem);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Barlow', sans-serif;
     }
     
     .dashboard-header {
@@ -16,20 +16,20 @@
 
     .dashboard-header h1 {
       font-size: 1.75rem;
-      color: #0f172a;
+      color: #0f1a1c;
       font-weight: 700;
       margin: 0 0 0.25rem 0;
     }
 
     .subtitle {
-      color: #64748b;
+      color: #5f6c6e;
       margin: 0;
       font-size: 0.95rem;
     }
 
     .role-badge {
-      background-color: #e2e8f0;
-      color: #475569;
+      background-color: #e3e9ea;
+      color: #4a5759;
       padding: 0.2rem 0.5rem;
       border-radius: 9999px;
       font-size: 0.8rem;
@@ -42,8 +42,8 @@
 
     .btn-refresh {
       background-color: white;
-      border: 1px solid #e2e8f0;
-      color: #334155;
+      border: 1px solid #e3e9ea;
+      color: #374345;
       padding: 0.6rem 1.2rem;
       border-radius: 0.5rem;
       font-size: 0.875rem;
@@ -57,15 +57,15 @@
     }
     
     .btn-refresh:hover {
-      background-color: #f1f5f9;
-      border-color: #cbd5e1;
+      background-color: #f0f6f7;
+      border-color: #c9d7da;
     }
 
     .tab-controls {
       display: flex;
       flex-wrap: wrap;                 // dar ekranda butonlar alt satıra sarsın (mobil erişilebilirlik)
       gap: 0.5rem;
-      background-color: #e2e8f0;
+      background-color: #e3e9ea;
       padding: 0.25rem;
       border-radius: 0.5rem;
       margin-bottom: 1.5rem;
@@ -80,14 +80,14 @@
       border-radius: 0.375rem;
       font-size: 0.875rem;
       font-weight: 600;
-      color: #64748b;
+      color: #5f6c6e;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .tab-controls button.active {
       background-color: white;
-      color: #0f172a;
+      color: #0f1a1c;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
@@ -97,7 +97,7 @@
 
     .view-title-bar h3 {
       font-size: 1.15rem;
-      color: #1e293b;
+      color: #202b2d;
       margin: 0;
       font-weight: 600;
     }
@@ -112,7 +112,7 @@
     .metric-card {
       background-color: white;
       border-radius: 0.75rem;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e3e9ea;
       padding: 1.25rem;
       display: flex;
       gap: 1rem;
@@ -136,11 +136,11 @@
       width: 3.5rem;
       height: 3.5rem;
       border-radius: 0.5rem;
-      background-color: #f1f5f9;
+      background-color: #f0f6f7;
       
       .card-material-icon {
         font-size: 1.75rem !important;
-        color: #3b82f6;
+        color: #1a8798;
       }
     }
 
@@ -152,7 +152,7 @@
 
     .card-label {
       font-size: 0.8rem;
-      color: #64748b;
+      color: #5f6c6e;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -160,7 +160,7 @@
 
     .card-value {
       font-size: 1.85rem;
-      color: #0f172a;
+      color: #0f1a1c;
       font-weight: 700;
       line-height: 1.2;
       margin: 0.25rem 0;
@@ -168,20 +168,15 @@
 
     .card-sub {
       font-size: 0.75rem;
-      color: #94a3b8;
+      color: #97a5a7;
     }
 
     /* Gradients */
-    .gradient-blue { border-left: 4px solid #3b82f6; }
-    .gradient-green { border-left: 4px solid #10b981; }
-    .gradient-red { border-left: 4px solid #ef4444; }
-    .gradient-orange { border-left: 4px solid #f97316; }
-    .gradient-purple { border-left: 4px solid #8b5cf6; }
 
     .progress-bar {
       width: 100%;
       height: 6px;
-      background-color: #e2e8f0;
+      background-color: #e3e9ea;
       border-radius: 3px;
       margin-top: 0.5rem;
       overflow: hidden;
@@ -189,7 +184,7 @@
 
     .progress {
       height: 100%;
-      background-color: #3b82f6;
+      background-color: #1a8798;
       border-radius: 3px;
       transition: width 0.3s;
     }
@@ -200,13 +195,13 @@
       gap: 0.5rem;
       margin-top: 0.5rem;
       font-size: 0.8rem;
-      color: #64748b;
+      color: #5f6c6e;
     }
     .mini-grid div {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #f8fafc;
+      background: #f5fbfc;
       padding: 0.35rem 0.2rem;
       border-radius: 0.25rem;
     }
@@ -227,7 +222,7 @@
     .detail-block {
       background-color: white;
       border-radius: 0.75rem;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e3e9ea;
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0,0,0,0.02);
     }
@@ -235,7 +230,7 @@
     .detail-block h4 {
       margin: 0 0 1rem 0;
       font-size: 1.05rem;
-      color: #0f172a;
+      color: #0f1a1c;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -243,7 +238,7 @@
       
       .heading-material-icon {
         font-size: 1.25rem !important;
-        color: #64748b;
+        color: #5f6c6e;
       }
     }
 
@@ -260,49 +255,49 @@
 
     .list-table th {
       padding: 0.5rem 0.75rem;
-      color: #64748b;
+      color: #5f6c6e;
       font-weight: 600;
-      border-bottom: 2px solid #f1f5f9;
+      border-bottom: 2px solid #f0f6f7;
     }
 
     .list-table td {
       padding: 0.75rem;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
+      border-bottom: 1px solid #f0f6f7;
+      color: #374345;
     }
 
     .list-table tr:hover {
-      background-color: #f8fafc;
+      background-color: #f5fbfc;
     }
 
     .empty-list {
       text-align: center;
-      color: #94a3b8;
+      color: #97a5a7;
       padding: 1.5rem !important;
     }
 
     /* Mini Progress */
-    .mini-pagination { display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 0.75rem; background: #f8fafc; border-top: 1px solid #e2e8f0; border-radius: 0 0 0.5rem 0.5rem; font-size: 0.75rem; color: #64748b; flex-wrap: wrap; gap: 0.5rem; }
-    .mini-pagination .page-info strong { color: #0f172a; }
+    .mini-pagination { display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 0.75rem; background: #f5fbfc; border-top: 1px solid #e3e9ea; border-radius: 0 0 0.5rem 0.5rem; font-size: 0.75rem; color: #5f6c6e; flex-wrap: wrap; gap: 0.5rem; }
+    .mini-pagination .page-info strong { color: #0f1a1c; }
     .mini-pagination .page-controls { display: flex; align-items: center; gap: 0.5rem; }
     .mini-pagination select { padding: 0.2rem 0.4rem; border: 1px solid #cbd5e0; border-radius: 0.25rem; font-size: 0.75rem; background: white; }
     .mini-pagination button { padding: 0.25rem 0.625rem; border: 1px solid #cbd5e0; background: white; border-radius: 0.25rem; cursor: pointer; font-size: 0.75rem; }
     .mini-pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .mini-pagination .page-num { font-weight: 600; color: #0f172a; }
+    .mini-pagination .page-num { font-weight: 600; color: #0f1a1c; }
     .occupancy-cell { display: flex; align-items: center; gap: 0.5rem; min-width: 160px; }
-    .occupancy-text { font-size: 0.75rem; font-weight: 600; color: #475569; min-width: 38px; text-align: right; }
+    .occupancy-text { font-size: 0.75rem; font-weight: 600; color: #4a5759; min-width: 38px; text-align: right; }
     .occupancy-text.text-danger { color: #b91c1c; }
     .mini-progress.over-capacity { background-color: #dc2626 !important; }
     .mini-progress-bar {
       width: 100%;
       height: 8px;
-      background-color: #e2e8f0;
+      background-color: #e3e9ea;
       border-radius: 4px;
       overflow: hidden;
     }
     .mini-progress {
       height: 100%;
-      background-color: #8b5cf6;
+      background-color: #1a8798;
       border-radius: 4px;
     }
 
@@ -317,9 +312,9 @@
     }
     .badge-critical { background-color: #fee2e2; color: #ef4444; }
     .badge-urgent { background-color: #ffedd5; color: #f97316; }
-    .badge-skill { background-color: #f1f5f9; color: #475569; margin-right: 0.25rem; }
+    .badge-skill { background-color: #f0f6f7; color: #4a5759; margin-right: 0.25rem; }
     .badge-green { background-color: #d1fae5; color: #059669; }
-    .badge-blue { background-color: #dbeafe; color: #2563eb; }
+    .badge-blue { background-color: #ddecef; color: #026f7e; }
     .badge-orange { background-color: #ffedd5; color: #d97706; }
 
     .score-indicator {
@@ -337,7 +332,7 @@
     .btn-action {
       display: inline-block;
       padding: 0.35rem 0.75rem;
-      background-color: #3b82f6;
+      background-color: #1a8798;
       color: white;
       text-decoration: none;
       border-radius: 0.375rem;
@@ -346,7 +341,7 @@
       transition: background-color 0.2s;
     }
     .btn-action:hover {
-      background-color: #2563eb;
+      background-color: #026f7e;
     }
 
     .btn-action-remind {
@@ -404,19 +399,19 @@
       .quick-report-link {
         display: block;
         padding: 0.75rem 1rem;
-        background-color: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background-color: #f5fbfc;
+        border: 1px solid #e3e9ea;
         border-radius: 0.5rem;
-        color: #1e293b;
+        color: #202b2d;
         text-decoration: none;
         font-weight: 500;
         font-size: 0.9rem;
         transition: all 0.18s ease;
 
         &:hover {
-          background-color: #eef2ff;
-          border-color: #6366f1;
-          color: #4338ca;
+          background-color: #f0f6f8;
+          border-color: #1a8798;
+          color: #015d6a;
           transform: translateX(2px);
         }
       }
@@ -453,7 +448,7 @@
       justify-content: space-between;
       font-size: 0.8rem;
       margin-top: 0.4rem;
-      color: #64748b;
+      color: #5f6c6e;
     }
     .capacity-warning {
       font-size: 0.8rem;
@@ -474,13 +469,13 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      background-color: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background-color: #f5fbfc;
+      border: 1px solid #e3e9ea;
       padding: 0.75rem 1.25rem;
       border-radius: 0.75rem;
       margin-bottom: 1.25rem;
       font-size: 0.875rem;
-      color: #334155;
+      color: #374345;
       
       label {
         font-weight: 600;
@@ -490,16 +485,16 @@
         padding: 0.4rem 0.75rem;
         font-size: 0.85rem;
         border-radius: 0.5rem;
-        border: 1px solid #cbd5e1;
+        border: 1px solid #c9d7da;
         background-color: white;
-        color: #0f172a;
+        color: #0f1a1c;
         outline: none;
         cursor: pointer;
         min-width: 250px;
         transition: border-color 0.15s ease;
         
         &:hover {
-          border-color: #94a3b8;
+          border-color: #97a5a7;
         }
       }
     }
@@ -517,16 +512,16 @@
         color: #065f46;
       }
       &.status-busy {
-        background-color: #dbeafe;
-        color: #1e40af;
+        background-color: #ddecef;
+        color: #024a55;
       }
       &.status-on-leave {
         background-color: #fef3c7;
         color: #92400e;
       }
       &.status-inactive {
-        background-color: #f3f4f6;
-        color: #374151;
+        background-color: #f0f5f6;
+        color: #374345;
       }
     }
 
@@ -535,53 +530,53 @@
 // Dark mode variants
 // ====================================================================
 :host-context(body.dark-theme) {
-  .dashboard-container { background: #0b0f19; }
+  .dashboard-container { background: #071113; }
   .dashboard-header {
-    background: #111827;
-    border-color: #1f2937;
-    h1 { color: #f9fafb; }
-    .subtitle { color: #9ca3af; strong { color: #f9fafb; } }
-    .role-badge { background: #1e3a8a; color: #dbeafe; }
+    background: #101a1d;
+    border-color: #1f2b2d;
+    h1 { color: #f6fbfc; }
+    .subtitle { color: #98a5a8; strong { color: #f6fbfc; } }
+    .role-badge { background: #013d46; color: #ddecef; }
   }
   .btn-refresh {
-    background: #1f2937; color: #f9fafb; border-color: #374151;
-    &:hover { background: #374151; }
+    background: #1f2b2d; color: #f6fbfc; border-color: #374345;
+    &:hover { background: #374345; }
   }
 
   .tab-controls {
-    background: #111827; border-color: #1f2937;
+    background: #101a1d; border-color: #1f2b2d;
     button {
-      background: transparent; color: #cbd5e1;
-      &:hover { background: #1f2937; color: #f9fafb; }
-      &.active { background: #1e40af; color: white; }
+      background: transparent; color: #c9d7da;
+      &:hover { background: #1f2b2d; color: #f6fbfc; }
+      &.active { background: #024a55; color: white; }
     }
   }
 
-  .view-title-bar h3 { color: #f9fafb; }
+  .view-title-bar h3 { color: #f6fbfc; }
 
   /* Metric kart — bu projede gradient-* sınıfları sadece sol kenar çubuğu;
      hepsi beyaz arka planlı, bu yüzden hepsini koyu yapıyoruz */
   .metric-card {
-    background: #111827 !important;
-    border-color: #1f2937 !important;
-    .card-label { color: #9ca3af !important; }
-    .card-value { color: #f9fafb !important; }
-    .card-sub { color: #9ca3af !important; }
+    background: #101a1d !important;
+    border-color: #1f2b2d !important;
+    .card-label { color: #98a5a8 !important; }
+    .card-value { color: #f6fbfc !important; }
+    .card-sub { color: #98a5a8 !important; }
     .card-icon {
-      background: #1f2937 !important;
-      .card-material-icon { color: #60a5fa !important; }
+      background: #1f2b2d !important;
+      .card-material-icon { color: #5b9fad !important; }
     }
     &:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
   }
 
   /* Araç Durum Özeti içindeki mini-grid */
   .mini-grid {
-    color: #9ca3af !important;
+    color: #98a5a8 !important;
     div {
-      background: #1f2937 !important;
-      color: #f3f4f6 !important;
-      span { color: #9ca3af !important; }
-      strong { color: #f9fafb !important; }
+      background: #1f2b2d !important;
+      color: #f0f5f6 !important;
+      span { color: #98a5a8 !important; }
+      strong { color: #f6fbfc !important; }
     }
   }
 
@@ -595,48 +590,48 @@
 
   /* Şube seçim panel'i (Dispatcher / Operasyon görünümünde "Denetlenecek Şube Seçin") */
   .branch-override-panel, .branch-selector-panel, .config-panel {
-    background: #1f2937 !important;
-    border-color: #374151 !important;
-    label { color: #f9fafb !important; }
+    background: #1f2b2d !important;
+    border-color: #374345 !important;
+    label { color: #f6fbfc !important; }
     select, .form-control {
-      background: #0b0f19 !important;
-      color: #f9fafb !important;
-      border-color: #374151 !important;
-      &:focus { border-color: #2563eb !important; }
+      background: #071113 !important;
+      color: #f6fbfc !important;
+      border-color: #374345 !important;
+      &:focus { border-color: #026f7e !important; }
     }
   }
 
   .detail-block {
-    background: #111827;
-    border-color: #1f2937;
-    h4 { color: #f9fafb; }
+    background: #101a1d;
+    border-color: #1f2b2d;
+    h4 { color: #f6fbfc; }
   }
 
   .quick-report-links .quick-report-link {
-    background-color: #1f2937;
-    border-color: #374151;
-    color: #e5e7eb;
+    background-color: #1f2b2d;
+    border-color: #374345;
+    color: #e3e8e9;
 
     &:hover {
-      background-color: #312e81;
-      border-color: #818cf8;
-      color: #c7d2fe;
+      background-color: #013d46;
+      border-color: #5b9fad;
+      color: #c4dee3;
     }
   }
 
   .list-wrapper {
     .list-table {
-      th { background: #1f2937 !important; color: #f9fafb !important; border-bottom-color: #374151 !important; }
-      td { background: #111827 !important; color: #e5e7eb !important; border-bottom-color: #1f2937 !important; }
-      tr:hover td { background: #1f2937 !important; }
+      th { background: #1f2b2d !important; color: #f6fbfc !important; border-bottom-color: #374345 !important; }
+      td { background: #101a1d !important; color: #e3e8e9 !important; border-bottom-color: #1f2b2d !important; }
+      tr:hover td { background: #1f2b2d !important; }
     }
-    .empty-list { color: #6b7280 !important; }
+    .empty-list { color: #5f6c6e !important; }
   }
 
   .badge {
     &.badge-critical { background: #7f1d1d; color: #fecaca; }
     &.badge-urgent { background: #92400e; color: #fde68a; }
-    &.badge-skill { background: #1e3a8a; color: #dbeafe; }
+    &.badge-skill { background: #013d46; color: #ddecef; }
   }
 
   .score-indicator { color: white; }
@@ -644,35 +639,35 @@
   .text-danger { color: #f87171 !important; }
   .text-warning { color: #fbbf24 !important; }
 
-  .progress-bar { background: #374151; .progress { background: #60a5fa; } }
-  .mini-progress-bar { background: #374151; }
+  .progress-bar { background: #374345; .progress { background: #5b9fad; } }
+  .mini-progress-bar { background: #374345; }
 
   .btn-action {
-    background: #1e3a8a; color: #dbeafe;
-    &:hover { background: #1e40af; }
+    background: #013d46; color: #ddecef;
+    &:hover { background: #024a55; }
   }
 
-  .occupancy-text { color: #cbd5e1; &.text-danger { color: #fca5a5 !important; } }
+  .occupancy-text { color: #c9d7da; &.text-danger { color: #fca5a5 !important; } }
 
   /* Mini pagination */
   .mini-pagination {
-    background: #1f2937 !important;
-    border-color: #374151 !important;
-    color: #cbd5e1;
-    .page-info strong { color: #f9fafb; }
-    .page-num { color: #f9fafb; }
+    background: #1f2b2d !important;
+    border-color: #374345 !important;
+    color: #c9d7da;
+    .page-info strong { color: #f6fbfc; }
+    .page-num { color: #f6fbfc; }
     .page-controls button {
-      background: #0b0f19; color: #cbd5e1; border-color: #374151;
-      &:hover:not(:disabled) { background: #374151; }
+      background: #071113; color: #c9d7da; border-color: #374345;
+      &:hover:not(:disabled) { background: #374345; }
     }
   }
 
   .clickable-card:hover { box-shadow: 0 8px 20px -4px rgba(0,0,0,0.4); }
 
   .kpi-card {
-    background: #111827;
-    border-color: #1f2937;
-    .kpi-label { color: #9ca3af; }
-    .kpi-value { color: #f9fafb; }
+    background: #101a1d;
+    border-color: #1f2b2d;
+    .kpi-label { color: #98a5a8; }
+    .kpi-value { color: #f6fbfc; }
   }
 }

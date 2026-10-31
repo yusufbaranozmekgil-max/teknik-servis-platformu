@@ -12,29 +12,23 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
   imports: [CommonModule, ReactiveFormsModule, FormFieldComponent],
   template: `
     <div class="login-page">
-      <div class="login-wrapper">
         <!-- Sol Bölüm: Logo ve Tanıtım -->
         <div class="intro-section">
           <div class="logo-box">
-            <span class="logo-icon" aria-hidden="true">👷</span>
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14.7 6.3a4 4 0 0 0-5.2 5.2L3.8 17.2a2.1 2.1 0 0 0 3 3l5.7-5.7a4 4 0 0 0 5.2-5.2l-2.6 2.6-2.8-.6-.6-2.8z"/>
+            </svg>
           </div>
-          <h1>Teknik Servis Operasyon Platformu</h1>
-          <p class="subtitle">Çok şubeli saha operasyon, stok ve iş emri yönetimi</p>
-          
-          <div class="glass-feature-list">
-            <div class="feature-item">
-              
-              <span>Dinamik Kaynak Skorlama & Planlama</span>
-            </div>
-            <div class="feature-item">
-              
-              <span>RBAC Yetkilendirme & İş Kuralları</span>
-            </div>
-            <div class="feature-item">
-              
-              <span>Gerçek Zamanlı Audit Log Diff Takibi</span>
-            </div>
+          <div>
+            <h1>Teknik Servis Operasyon Platformu</h1>
+            <p class="subtitle">Çok şubeli saha operasyon, stok ve iş emri yönetimi</p>
           </div>
+
+          <ul class="feature-list">
+            <li>Dinamik Kaynak Skorlama & Planlama</li>
+            <li>RBAC Yetkilendirme & İş Kuralları</li>
+            <li>Gerçek Zamanlı Audit Log Diff Takibi</li>
+          </ul>
         </div>
 
         <!-- Sağ Bölüm: Login Formu -->
@@ -71,7 +65,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
           </form>
 
           <div class="demo-accounts-section">
-            <p class="demo-title"> Demo Kullanıcıları (Şifre: 123456)</p>
+            <p class="demo-title">Demo Kullanıcıları (Şifre: 123456)</p>
             <div class="demo-pills">
               <button type="button" (click)="fillDemo('admin@demo.com')" class="demo-pill">Sistem Yöneticisi</button>
               <button type="button" (click)="fillDemo('operation@demo.com')" class="demo-pill">Operasyon Müdürü</button>
@@ -83,7 +77,6 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
             </div>
           </div>
         </div>
-      </div>
     </div>
   `,
   styleUrls: ['./login.component.scss']

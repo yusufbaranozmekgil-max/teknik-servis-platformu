@@ -33,13 +33,22 @@ interface MenuGroup {
       <header class="app-header">
         <div class="header-left">
           <button class="sidebar-toggle" type="button" (click)="toggleSidebar()" [title]="collapsed() ? 'Menüyü aç' : 'Menüyü kapat'">
-            {{ collapsed() ? '☰' : '✕' }}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path *ngIf="collapsed()" d="M4 7h16M4 12h16M4 17h16"/>
+              <path *ngIf="!collapsed()" d="M6 6l12 12M18 6L6 18"/>
+            </svg>
           </button>
           <div class="logo">Saha Operasyon Yönetimi</div>
         </div>
         <div class="user-profile" *ngIf="authState.currentUser() as user">
           <button (click)="toggleDarkMode()" class="dark-mode-toggle" [title]="isDarkMode() ? 'Açık Tema' : 'Karanlık Tema'">
-            {{ isDarkMode() ? '☀️' : '🌙' }}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ng-container *ngIf="isDarkMode()">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>
+              </ng-container>
+              <path *ngIf="!isDarkMode()" d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>
+            </svg>
           </button>
           <app-notification-bell></app-notification-bell>
           <span class="user-info">{{ user.fullName }} ({{ user.role | roleLabel }})</span>

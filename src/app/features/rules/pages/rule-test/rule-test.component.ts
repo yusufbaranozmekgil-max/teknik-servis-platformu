@@ -145,29 +145,29 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
       padding: 1.5rem;
       max-width: 1200px;
       margin: 0 auto;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Barlow', sans-serif;
     }
     .header-section { margin-bottom: 2rem; }
-    h2 { font-size: 1.875rem; color: #0f172a; margin: 0 0 0.5rem; font-weight: 700; }
-    .subtitle { color: #64748b; font-size: 1rem; margin: 0; }
+    h2 { font-size: 1.875rem; color: #0f1a1c; margin: 0 0 0.5rem; font-weight: 700; }
+    .subtitle { color: #5f6c6e; font-size: 1rem; margin: 0; }
     
     .btn-back {
       padding: 0.5rem 1rem;
       background: white;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #c9d7da;
       border-radius: 0.375rem;
-      color: #334155;
+      color: #374345;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       font-size: 0.875rem;
     }
-    .btn-back:hover { background: #f8fafc; }
+    .btn-back:hover { background: #f5fbfc; }
 
     .sandbox-container {
       background: white;
       border-radius: 0.75rem;
-      border: 1px solid #e2e8f0;
+      border: 1px solid #e3e9ea;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       padding: 2rem;
     }
@@ -188,23 +188,23 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
       label {
         font-size: 0.875rem;
         font-weight: 600;
-        color: #334155;
+        color: #374345;
       }
     }
 
     .form-control {
       padding: 0.625rem;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #c9d7da;
       border-radius: 0.375rem;
       font-size: 0.875rem;
       outline: none;
     }
-    .form-control:focus { border-color: #2563eb; }
+    .form-control:focus { border-color: #026f7e; }
 
     .simulate-btn {
       width: 100%;
       padding: 0.75rem;
-      background: #2563eb;
+      background: #026f7e;
       color: white;
       border: none;
       border-radius: 0.375rem;
@@ -213,18 +213,18 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
       cursor: pointer;
       transition: background 0.2s;
     }
-    .simulate-btn:hover { background: #1d4ed8; }
+    .simulate-btn:hover { background: #015d6a; }
 
     .sandbox-results {
       margin-top: 2.5rem;
-      border-top: 2px dashed #e2e8f0;
+      border-top: 2px dashed #e3e9ea;
       padding-top: 2rem;
     }
 
     .alert-info {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
+      background: #f0f6f8;
+      border: 1px solid #c4dee3;
+      color: #024a55;
       padding: 1rem;
       border-radius: 0.5rem;
       font-size: 0.9rem;
@@ -237,39 +237,39 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
         font-size: 0.85rem;
         text-transform: uppercase;
         font-weight: 700;
-        color: #475569;
+        color: #4a5759;
         margin-bottom: 0.5rem;
         letter-spacing: 0.05em;
       }
     }
 
     .rule-result-item {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #f5fbfc;
+      border: 1px solid #e3e9ea;
       border-radius: 0.5rem;
       padding: 1rem;
       margin-bottom: 1rem;
 
       &.winner {
-        border-left: 5px solid #2563eb;
-        background: #f8fafc;
+        border-left: 1px solid #026f7e;
+        background: #f5fbfc;
       }
 
       &.loser {
         opacity: 0.75;
-        border-left: 5px solid #64748b;
+        border-left: 1px solid #5f6c6e;
       }
 
       .rule-title {
         font-weight: 700;
-        color: #0f172a;
+        color: #0f1a1c;
         margin: 0 0 0.25rem 0;
         font-size: 0.95rem;
       }
 
       .rule-details {
         font-size: 0.8rem;
-        color: #64748b;
+        color: #5f6c6e;
         margin: 0 0 0.5rem 0;
         display: flex;
         align-items: center;
@@ -278,12 +278,12 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
 
       .rule-reason {
         font-size: 0.85rem;
-        color: #334155;
+        color: #374345;
         margin: 0;
         background: white;
         padding: 0.5rem;
         border-radius: 0.25rem;
-        border: 1px solid #f1f5f9;
+        border: 1px solid #f0f6f7;
       }
     }
 

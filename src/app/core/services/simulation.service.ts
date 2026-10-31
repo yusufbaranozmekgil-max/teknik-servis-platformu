@@ -16,6 +16,9 @@ export class SimulationService {
   runCorruptStorageSim(): { logs: { text: string; type: 'info' | 'success' | 'error' | 'default' }[]; recoveredCount: number } {
     const logs: { text: string; type: 'info' | 'success' | 'error' | 'default' }[] = [];
     
+    // Test demo verisini silmesin diye iş emirleri kenara alınır, sonunda geri yüklenir
+    const originalWorkOrders = this.storage.getCollection<WorkOrder>(STORAGE_KEYS.WORK_ORDERS);
+
     // Malformed JSON write (ham erişim StorageService içinde kapsüllü)
     this.storage.simulateCorruptCollection(STORAGE_KEYS.WORK_ORDERS);
 
@@ -27,6 +30,9 @@ export class SimulationService {
     
     logs.push({ text: `Sonuç: StorageService bozuk yapıyı tespit etti ve yedekledi. Kurtarılan kayıt adedi: ${list.length}`, type: 'success' });
     logs.push({ text: 'Bozuk ham veri yedekleme amaçlı "backup_corrupted_ts_work_orders_..." anahtarına taşınmıştır.', type: 'info' });
+
+    this.storage.setCollection(STORAGE_KEYS.WORK_ORDERS, originalWorkOrders);
+    logs.push({ text: `Test bitti: ${originalWorkOrders.length} iş emri geri yüklendi.`, type: 'success' });
 
     this.auditLogService.logAction({
       actionType: 'SYSTEM_EVENT',
