@@ -15,10 +15,9 @@ import { FormFieldComponent } from '../../../../shared/components/form-field/for
 import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-request-create',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
-  template: `
+    selector: 'app-request-create',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -184,7 +183,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
       </div>
     </div>
   `,
-  styleUrls: ['./request-create.component.scss']
+    styleUrls: ['./request-create.component.scss']
 })
 export class RequestCreatePage implements OnInit, ComponentCanDeactivate {
   private requestService = inject(ServiceRequestService);

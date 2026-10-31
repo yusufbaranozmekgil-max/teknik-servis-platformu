@@ -72,10 +72,9 @@ const SKILL_LABELS: Record<string, string> = {
 };
 
 @Component({
-  selector: 'app-reports-dashboard',
-  standalone: true,
-  imports: [CommonModule, SmartDateInputComponent],
-  template: `
+    selector: 'app-reports-dashboard',
+    imports: [CommonModule, SmartDateInputComponent],
+    template: `
     <div class="reports-container">
       <!-- Üst başlık + global KPI şeridi -->
       <header class="reports-header">
@@ -250,7 +249,7 @@ const SKILL_LABELS: Record<string, string> = {
       </div>
     </div>
   `,
-  styleUrls: ['./reports-dashboard.component.scss']
+    styleUrls: ['./reports-dashboard.component.scss']
 })
 export class ReportsDashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   private storage = inject(StorageService);

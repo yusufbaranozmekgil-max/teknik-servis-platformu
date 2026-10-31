@@ -6,10 +6,9 @@ import { Branch } from '../../../../core/models/branch.model';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 
 @Component({
-  selector: 'app-branch-detail',
-  standalone: true,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent],
-  template: `
+    selector: 'app-branch-detail',
+    imports: [CommonModule, RouterModule, StatusBadgeComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -66,7 +65,7 @@ import { StatusBadgeComponent } from '../../../../shared/components/status-badge
       </div>
     </div>
   `,
-  styleUrls: ['./branch-detail.component.scss']
+    styleUrls: ['./branch-detail.component.scss']
 })
 export class BranchDetailPage implements OnInit {
   private branchService = inject(BranchService);

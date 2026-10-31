@@ -7,10 +7,9 @@ import { Notification } from '../../../../core/models/notification.model';
 import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
 
 @Component({
-  selector: 'app-notification-center',
-  standalone: true,
-  imports: [CommonModule, StatusLabelPipe],
-  template: `
+    selector: 'app-notification-center',
+    imports: [CommonModule, StatusLabelPipe],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <h2>Bildirim Merkezi</h2>
@@ -66,7 +65,7 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
       </div>
     </div>
   `,
-  styleUrls: ['./notification-center.component.scss']
+    styleUrls: ['./notification-center.component.scss']
 })
 export class NotificationCenterComponent implements OnInit {
   private notifService = inject(NotificationService);

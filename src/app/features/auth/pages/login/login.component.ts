@@ -7,10 +7,9 @@ import { FormFieldComponent } from '../../../../shared/components/form-field/for
 import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormFieldComponent],
-  template: `
+    selector: 'app-login',
+    imports: [CommonModule, ReactiveFormsModule, FormFieldComponent],
+    template: `
     <div class="login-page">
         <!-- Sol Bölüm: Logo ve Tanıtım -->
         <div class="intro-section">
@@ -79,7 +78,7 @@ import { FIELD_LIMITS } from '../../../../core/constants/form-limits.const';
         </div>
     </div>
   `,
-  styleUrls: ['./login.component.scss']
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);

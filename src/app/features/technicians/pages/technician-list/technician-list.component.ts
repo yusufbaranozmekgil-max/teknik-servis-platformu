@@ -12,10 +12,9 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { TECHNICIAN_LEVEL_LABELS } from '../../../../core/constants/labels.const';
 
 @Component({
-  selector: 'app-technician-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, DataTableComponent],
-  template: `
+    selector: 'app-technician-list',
+    imports: [CommonModule, RouterModule, DataTableComponent],
+    template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Teknisyen Yönetimi</h2>
@@ -41,7 +40,7 @@ import { TECHNICIAN_LEVEL_LABELS } from '../../../../core/constants/labels.const
       </div>
     </div>
   `,
-  styleUrls: ['./technician-list.component.scss']
+    styleUrls: ['./technician-list.component.scss']
 })
 export class TechnicianListComponent implements OnInit {
   private techService = inject(TechnicianService);

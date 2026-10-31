@@ -9,10 +9,9 @@ import { Branch } from '../../../../core/models/branch.model';
 import { DataTableComponent, TableColumn } from '../../../../shared/components/data-table/data-table.component';
 
 @Component({
-  selector: 'app-request-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, DataTableComponent],
-  template: `
+    selector: 'app-request-list',
+    imports: [CommonModule, RouterModule, DataTableComponent],
+    template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Servis Talepleri Yönetimi</h2>
@@ -44,7 +43,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
     </div>
   `,
-  styleUrls: ['./request-list.component.scss']
+    styleUrls: ['./request-list.component.scss']
 })
 export class RequestListComponent implements OnInit {
   private requestService = inject(ServiceRequestService);

@@ -25,10 +25,9 @@ interface MenuGroup {
 }
 
 @Component({
-  selector: 'app-main-layout',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, RoleLabelPipe],
-  template: `
+    selector: 'app-main-layout',
+    imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, NotificationBellComponent, RoleLabelPipe],
+    template: `
     <div class="layout-container">
       <header class="app-header">
         <div class="header-left">
@@ -96,7 +95,7 @@ interface MenuGroup {
       </div>
     </div>
   `,
-  styleUrls: ['./main-layout.component.scss']
+    styleUrls: ['./main-layout.component.scss']
 })
 export class MainLayoutComponent implements OnInit {
   permissionService = inject(PermissionService);

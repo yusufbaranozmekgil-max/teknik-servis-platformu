@@ -9,10 +9,9 @@ import { ConfirmService } from '../../../../core/services/confirm.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
-  selector: 'app-branch-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, DataTableComponent],
-  template: `
+    selector: 'app-branch-list',
+    imports: [CommonModule, RouterModule, DataTableComponent],
+    template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Şube Yönetimi</h2>
@@ -35,7 +34,7 @@ import { ToastService } from '../../../../core/services/toast.service';
       </div>
     </div>
   `,
-  styleUrls: ['./branch-list.component.scss']
+    styleUrls: ['./branch-list.component.scss']
 })
 export class BranchListComponent implements OnInit {
   private branchService = inject(BranchService);

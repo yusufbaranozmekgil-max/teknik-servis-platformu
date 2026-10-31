@@ -37,15 +37,14 @@ const LEGACY_LABELS: Record<string, string> = {
 };
 
 @Component({
-  selector: 'app-status-badge',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-status-badge',
+    imports: [CommonModule],
+    template: `
     <span class="badge" [class]="statusClass">
       {{ statusLabel }}
     </span>
   `,
-  styleUrls: ['./status-badge.component.scss']
+    styleUrls: ['./status-badge.component.scss']
 })
 export class StatusBadgeComponent {
   @Input() status: string = '';

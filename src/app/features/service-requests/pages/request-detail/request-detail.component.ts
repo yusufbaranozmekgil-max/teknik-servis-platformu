@@ -19,10 +19,9 @@ const SKILL_LABELS: Record<string, string> = {
 };
 
 @Component({
-  selector: 'app-request-detail',
-  standalone: true,
-  imports: [CommonModule, RouterModule, StatusLabelPipe, PriorityLabelPipe],
-  template: `
+    selector: 'app-request-detail',
+    imports: [CommonModule, RouterModule, StatusLabelPipe, PriorityLabelPipe],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -102,7 +101,7 @@ const SKILL_LABELS: Record<string, string> = {
       </div>
     </div>
   `,
-  styleUrls: ['./request-detail.component.scss']
+    styleUrls: ['./request-detail.component.scss']
 })
 export class RequestDetailPage implements OnInit {
   private requestService = inject(ServiceRequestService);

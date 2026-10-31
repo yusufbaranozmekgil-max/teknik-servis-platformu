@@ -13,17 +13,16 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
  * - Reactive Forms uyumlu (ControlValueAccessor). Değer: "YYYY-MM-DD" string ya da null.
  */
 @Component({
-  selector: 'app-smart-date-input',
-  standalone: true,
-  imports: [CommonModule],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => SmartDateInputComponent),
-      multi: true
-    }
-  ],
-  template: `
+    selector: 'app-smart-date-input',
+    imports: [CommonModule],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => SmartDateInputComponent),
+            multi: true
+        }
+    ],
+    template: `
     <div class="smart-date-wrapper" [class.disabled]="disabled">
       <input
         #dayInput
@@ -74,7 +73,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       />
     </div>
   `,
-  styleUrls: ['./smart-date-input.component.scss']
+    styleUrls: ['./smart-date-input.component.scss']
 })
 export class SmartDateInputComponent implements ControlValueAccessor, OnChanges {
   @Input() minYear = 1900;

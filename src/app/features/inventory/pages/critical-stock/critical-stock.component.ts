@@ -8,10 +8,9 @@ import { SparePart } from '../../../../core/models/spare-part.model';
 import { DataTableComponent, TableColumn } from '../../../../shared/components/data-table/data-table.component';
 
 @Component({
-  selector: 'app-critical-stock',
-  standalone: true,
-  imports: [CommonModule, RouterModule, DataTableComponent],
-  template: `
+    selector: 'app-critical-stock',
+    imports: [CommonModule, RouterModule, DataTableComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -33,7 +32,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
     </div>
   `,
-  styleUrls: ['./critical-stock.component.scss']
+    styleUrls: ['./critical-stock.component.scss']
 })
 export class CriticalStockPage implements OnInit {
   private inventoryService = inject(InventoryService);

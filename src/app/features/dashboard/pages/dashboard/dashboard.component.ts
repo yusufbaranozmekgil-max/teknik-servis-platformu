@@ -13,10 +13,9 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { PermissionService } from '../../../../core/services/permission.service';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterLink, RoleLabelPipe, PriorityLabelPipe, TechLevelLabelPipe, PermissionVisibilityDirective, StatusBadgeComponent],
-  template: `
+    selector: 'app-dashboard',
+    imports: [CommonModule, RouterLink, RoleLabelPipe, PriorityLabelPipe, TechLevelLabelPipe, PermissionVisibilityDirective, StatusBadgeComponent],
+    template: `
     <div class="dashboard-container">
       <!-- Welcome Header -->
       <header class="dashboard-header animate-fade-in">
@@ -851,7 +850,7 @@ import { PermissionService } from '../../../../core/services/permission.service'
       </div>
     </ng-template>
   `,
-  styleUrls: ['./dashboard.component.scss']
+    styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);

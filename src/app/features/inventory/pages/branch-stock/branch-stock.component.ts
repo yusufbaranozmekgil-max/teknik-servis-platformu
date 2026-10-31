@@ -10,10 +10,9 @@ import { SparePart } from '../../../../core/models/spare-part.model';
 import { DataTableComponent, TableColumn } from '../../../../shared/components/data-table/data-table.component';
 
 @Component({
-  selector: 'app-branch-stock',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, DataTableComponent],
-  template: `
+    selector: 'app-branch-stock',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, DataTableComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -64,7 +63,7 @@ import { DataTableComponent, TableColumn } from '../../../../shared/components/d
       </div>
     </div>
   `,
-  styleUrls: ['./branch-stock.component.scss']
+    styleUrls: ['./branch-stock.component.scss']
 })
 export class BranchStockPage implements OnInit {
   private inventoryService = inject(InventoryService);

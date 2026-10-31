@@ -16,10 +16,9 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
 import { FIELD_LIMITS, NUMERIC_LIMITS, todayISO } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-technician-edit',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
-  template: `
+    selector: 'app-technician-edit',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -224,7 +223,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, todayISO } from '../../../../core/constan
       </div>
     </div>
   `,
-  styleUrls: ['./technician-edit.component.scss']
+    styleUrls: ['./technician-edit.component.scss']
 })
 export class TechnicianEditPage implements OnInit, ComponentCanDeactivate {
   private techService = inject(TechnicianService);

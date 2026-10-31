@@ -17,10 +17,9 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
 import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-vehicle-edit',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
-  template: `
+    selector: 'app-vehicle-edit',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent, SmartDateInputComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -164,7 +163,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS, DATE_LIMITS, todayISO } from '../../../..
       </div>
     </div>
   `,
-  styleUrls: ['./vehicle-edit.component.scss']
+    styleUrls: ['./vehicle-edit.component.scss']
 })
 export class VehicleEditPage implements OnInit, ComponentCanDeactivate {
   private vehicleService = inject(VehicleService);

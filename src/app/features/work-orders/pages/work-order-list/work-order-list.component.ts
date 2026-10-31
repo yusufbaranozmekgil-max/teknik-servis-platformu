@@ -16,10 +16,9 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_ORDER_STATUS_LABELS } from '../../../../core/constants/labels.const';
 
 @Component({
-  selector: 'app-work-order-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent, SmartDateInputComponent],
-  template: `
+    selector: 'app-work-order-list',
+    imports: [CommonModule, RouterModule, StatusBadgeComponent, SmartDateInputComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <h2>İş Emirleri Yönetimi</h2>
@@ -299,7 +298,7 @@ import { FAILURE_REASON_OPTIONS, FailureReasonCode, FAILURE_REASON_LABELS, WORK_
 
     </div>
   `,
-  styleUrls: ['./work-order-list.component.scss']
+    styleUrls: ['./work-order-list.component.scss']
 })
 export class WorkOrderListComponent implements OnInit {
   private woService = inject(WorkOrderService);

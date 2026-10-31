@@ -12,10 +12,9 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
 import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pipe';
 
 @Component({
-  selector: 'app-technician-schedule',
-  standalone: true,
-  imports: [CommonModule, RouterModule, StatusBadgeComponent, StatusLabelPipe, SmartDateInputComponent, TechLevelLabelPipe],
-  template: `
+    selector: 'app-technician-schedule',
+    imports: [CommonModule, RouterModule, StatusBadgeComponent, StatusLabelPipe, SmartDateInputComponent, TechLevelLabelPipe],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -115,7 +114,7 @@ import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pi
       </div>
     </div>
   `,
-  styleUrls: ['./technician-schedule.component.scss']
+    styleUrls: ['./technician-schedule.component.scss']
 })
 export class TechnicianSchedulePage implements OnInit {
   private techService = inject(TechnicianService);

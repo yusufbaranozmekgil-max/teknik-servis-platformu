@@ -10,10 +10,9 @@ import { RoleLabelPipe } from '../../../../shared/pipes/role-label.pipe';
 import { SmartDateInputComponent } from '../../../../shared/components/smart-date-input/smart-date-input.component';
 
 @Component({
-  selector: 'app-audit-list',
-  standalone: true,
-  imports: [CommonModule, StatusLabelPipe, RoleLabelPipe, SmartDateInputComponent],
-  template: `
+    selector: 'app-audit-list',
+    imports: [CommonModule, StatusLabelPipe, RoleLabelPipe, SmartDateInputComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div>
@@ -235,7 +234,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
       </div>
     </div>
   `,
-  styleUrls: ['./audit-list.component.scss']
+    styleUrls: ['./audit-list.component.scss']
 })
 export class AuditListComponent implements OnInit {
   private auditService = inject(AuditLogService);

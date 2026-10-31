@@ -10,10 +10,9 @@ import { FormFieldComponent } from '../../../../shared/components/form-field/for
 import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-branch-create',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
-  template: `
+    selector: 'app-branch-create',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -171,7 +170,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
       </div>
     </div>
   `,
-  styleUrls: ['./branch-create.component.scss']
+    styleUrls: ['./branch-create.component.scss']
 })
 export class BranchCreatePage {
   private branchService = inject(BranchService);

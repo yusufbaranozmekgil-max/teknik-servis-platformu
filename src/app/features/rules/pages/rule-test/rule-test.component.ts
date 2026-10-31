@@ -7,10 +7,9 @@ import { ToastService } from '../../../../core/services/toast.service';
 import { RuleResult } from '../../../../core/models/rule-result.model';
 
 @Component({
-  selector: 'app-rule-test',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
+    selector: 'app-rule-test',
+    imports: [CommonModule, RouterModule],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -140,7 +139,7 @@ import { RuleResult } from '../../../../core/models/rule-result.model';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .page-container {
       padding: 1.5rem;
       max-width: 1200px;

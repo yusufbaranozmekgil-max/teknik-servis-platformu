@@ -14,10 +14,9 @@ import { RULE_TRIGGER_LABELS } from '../../../../core/constants/labels.const';
 import { RoleVisibilityDirective } from '../../../../shared/directives/role-visibility.directive';
 
 @Component({
-  selector: 'app-rule-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, RoleVisibilityDirective],
-  template: `
+    selector: 'app-rule-list',
+    imports: [CommonModule, RouterModule, RoleVisibilityDirective],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
@@ -248,7 +247,7 @@ import { RoleVisibilityDirective } from '../../../../shared/directives/role-visi
       </div>
     </div>
   `,
-  styleUrls: ['./rule-list.component.scss']
+    styleUrls: ['./rule-list.component.scss']
 })
 export class RuleListComponent implements OnInit {
   private ruleService = inject(RuleEngineService);

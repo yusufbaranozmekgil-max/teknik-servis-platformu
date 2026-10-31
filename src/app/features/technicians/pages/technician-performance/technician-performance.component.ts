@@ -6,10 +6,9 @@ import { Technician, SkillType } from '../../../../core/models/technician.model'
 import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pipe';
 
 @Component({
-  selector: 'app-technician-performance',
-  standalone: true,
-  imports: [CommonModule, RouterModule, TechLevelLabelPipe],
-  template: `
+    selector: 'app-technician-performance',
+    imports: [CommonModule, RouterModule, TechLevelLabelPipe],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -87,7 +86,7 @@ import { TechLevelLabelPipe } from '../../../../shared/pipes/tech-level-label.pi
       </div>
     </div>
   `,
-  styleUrls: ['./technician-performance.component.scss']
+    styleUrls: ['./technician-performance.component.scss']
 })
 export class TechnicianPerformancePage implements OnInit {
   private techService = inject(TechnicianService);

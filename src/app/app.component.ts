@@ -5,11 +5,10 @@ import { ToastsComponent } from './shared/components/toasts/toasts.component';
 import { StorageService } from './core/storage/storage.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, ConfirmDialogComponent, ToastsComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+    selector: 'app-root',
+    imports: [RouterOutlet, ConfirmDialogComponent, ToastsComponent],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
   title = 'technical-service-app';

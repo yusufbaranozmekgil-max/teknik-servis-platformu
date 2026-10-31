@@ -3,10 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-form-field',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  template: `
+    selector: 'app-form-field',
+    imports: [CommonModule, ReactiveFormsModule],
+    template: `
     <div class="form-group-wrapper">
       <div class="label-wrapper" *ngIf="label">
         <label [for]="id">
@@ -126,7 +125,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
       </div>
     </div>
   `,
-  styleUrls: ['./form-field.component.scss']
+    styleUrls: ['./form-field.component.scss']
 })
 export class FormFieldComponent {
   @Input() id = 'field-' + Math.random().toString(36).substring(2, 9);

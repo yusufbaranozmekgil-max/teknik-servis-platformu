@@ -5,10 +5,9 @@ import { NotificationService } from '../../../core/services/notification.service
 import { Notification } from '../../../core/models/notification.model';
 
 @Component({
-  selector: 'app-notification-bell',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-notification-bell',
+    imports: [CommonModule],
+    template: `
     <div class="bell-container">
       <!-- Bell Icon and Badge -->
       <button class="bell-button" (click)="toggleDropdown($event)" title="Bildirimler">
@@ -54,7 +53,7 @@ import { Notification } from '../../../core/models/notification.model';
       </div>
     </div>
   `,
-  styleUrls: ['./notification-bell.component.scss']
+    styleUrls: ['./notification-bell.component.scss']
 })
 export class NotificationBellComponent implements OnInit {
   private notifService = inject(NotificationService);

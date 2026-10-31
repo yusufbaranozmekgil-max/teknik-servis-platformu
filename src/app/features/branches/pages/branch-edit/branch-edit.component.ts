@@ -12,10 +12,9 @@ import { FormFieldComponent } from '../../../../shared/components/form-field/for
 import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-branch-edit',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
-  template: `
+    selector: 'app-branch-edit',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -180,7 +179,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
       </div>
     </div>
   `,
-  styleUrls: ['./branch-edit.component.scss']
+    styleUrls: ['./branch-edit.component.scss']
 })
 export class BranchEditPage implements OnInit, ComponentCanDeactivate {
   private branchService = inject(BranchService);

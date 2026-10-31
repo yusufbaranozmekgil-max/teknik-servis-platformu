@@ -13,10 +13,9 @@ import { PermissionVisibilityDirective } from '../../../../shared/directives/per
 import { TooltipDirective } from '../../../../shared/directives/tooltip.directive';
 
 @Component({
-  selector: 'app-spare-part-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, DataTableComponent, PermissionVisibilityDirective, TooltipDirective],
-  template: `
+    selector: 'app-spare-part-list',
+    imports: [CommonModule, RouterModule, DataTableComponent, PermissionVisibilityDirective, TooltipDirective],
+    template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Yedek Parça ve Stok Yönetimi</h2>
@@ -44,7 +43,7 @@ import { TooltipDirective } from '../../../../shared/directives/tooltip.directiv
       </div>
     </div>
   `,
-  styleUrls: ['./spare-part-list.component.scss']
+    styleUrls: ['./spare-part-list.component.scss']
 })
 export class SparePartListComponent implements OnInit {
   private inventoryService = inject(InventoryService);

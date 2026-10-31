@@ -18,10 +18,9 @@ export interface TableColumn {
 }
 
 @Component({
-  selector: 'app-data-table',
-  standalone: true,
-  imports: [CommonModule, StatusBadgeComponent, SmartDateInputComponent],
-  template: `
+    selector: 'app-data-table',
+    imports: [CommonModule, StatusBadgeComponent, SmartDateInputComponent],
+    template: `
     <div class="table-wrapper">
       <!-- Search & Filters Controls -->
       <div class="table-header-controls" *ngIf="showSearch">
@@ -191,7 +190,7 @@ export interface TableColumn {
       </div>
     </div>
   `,
-  styleUrls: ['./data-table.component.scss']
+    styleUrls: ['./data-table.component.scss']
 })
 export class DataTableComponent implements OnInit, OnChanges {
   @Input() data: any[] = [];

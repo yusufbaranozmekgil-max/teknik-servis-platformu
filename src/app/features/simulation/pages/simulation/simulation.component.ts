@@ -21,10 +21,9 @@ import { ConfirmService } from '../../../../core/services/confirm.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
-  selector: 'app-simulation',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-simulation',
+    imports: [CommonModule],
+    template: `
     <div class="simulation-container">
       <header class="simulation-header animate-fade-in">
         <h1>Saha Simülasyon Kontrol Paneli</h1>
@@ -146,7 +145,7 @@ import { ToastService } from '../../../../core/services/toast.service';
       </div>
     </div>
   `,
-  styleUrls: ['./simulation.component.scss']
+    styleUrls: ['./simulation.component.scss']
 })
 export class SimulationComponent implements OnInit {
   private storage = inject(StorageService);

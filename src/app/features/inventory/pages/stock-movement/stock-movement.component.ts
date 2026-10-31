@@ -17,10 +17,9 @@ import { STOCK_MOVEMENT_TYPE_LABELS } from '../../../../core/constants/labels.co
 type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
 
 @Component({
-  selector: 'app-stock-movement',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, DataTableComponent, FormFieldComponent],
-  template: `
+    selector: 'app-stock-movement',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, DataTableComponent, FormFieldComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -254,7 +253,7 @@ type MovementMode = 'STANDARD' | 'TRANSFER' | 'FIRE' | 'ADJUSTMENT';
       </div>
     </div>
   `,
-  styleUrls: ['./stock-movement.component.scss']
+    styleUrls: ['./stock-movement.component.scss']
 })
 export class StockMovementPage implements OnInit {
   private movementService = inject(StockMovementService);

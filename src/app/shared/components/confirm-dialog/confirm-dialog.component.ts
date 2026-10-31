@@ -3,10 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ConfirmService } from '../../../core/services/confirm.service';
 
 @Component({
-  selector: 'app-confirm-dialog',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-confirm-dialog',
+    imports: [CommonModule],
+    template: `
     <div class="confirm-backdrop" *ngIf="confirmService.state() as state">
       <div class="confirm-box">
         <h3>{{ state.title }}</h3>
@@ -18,7 +17,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
       </div>
     </div>
   `,
-  styleUrls: ['./confirm-dialog.component.scss']
+    styleUrls: ['./confirm-dialog.component.scss']
 })
 export class ConfirmDialogComponent {
   confirmService = inject(ConfirmService);

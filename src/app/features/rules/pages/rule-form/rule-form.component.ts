@@ -10,10 +10,9 @@ import { Rule, RuleActionType } from '../../../../core/models/rule.model';
 import { CustomValidators } from '../../../../shared/validators/custom-validators';
 
 @Component({
-  selector: 'app-rule-form',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  template: `
+    selector: 'app-rule-form',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule],
+    template: `
     <div class="page-container">
       <div class="header">
         <h2>{{ isEdit ? 'Kuralı Düzenle' : 'Yeni Kural Oluştur' }}</h2>
@@ -110,7 +109,7 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
       </form>
     </div>
   `,
-  styleUrls: ['./rule-form.component.scss']
+    styleUrls: ['./rule-form.component.scss']
 })
 export class RuleFormComponent implements OnInit {
   private fb = inject(FormBuilder);

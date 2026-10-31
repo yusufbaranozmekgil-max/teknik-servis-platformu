@@ -19,10 +19,9 @@ import { ComponentCanDeactivate } from '../../../../core/guards/pending-changes.
 import { SmartDateInputComponent } from '../../../../shared/components/smart-date-input/smart-date-input.component';
 
 @Component({
-  selector: 'app-schedule-board',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, SmartDateInputComponent],
-  template: `
+    selector: 'app-schedule-board',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, SmartDateInputComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <h2>İş Emri Planlama ve Kaynak Atama</h2>
@@ -251,7 +250,7 @@ import { SmartDateInputComponent } from '../../../../shared/components/smart-dat
       </div>
     </div>
   `,
-  styleUrls: ['./schedule-board.component.scss']
+    styleUrls: ['./schedule-board.component.scss']
 })
 export class ScheduleBoardComponent implements OnInit, ComponentCanDeactivate {
   private requestService = inject(ServiceRequestService);

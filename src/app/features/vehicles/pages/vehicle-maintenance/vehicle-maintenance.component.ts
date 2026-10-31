@@ -6,10 +6,9 @@ import { Vehicle } from '../../../../core/models/vehicle.model';
 import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
 
 @Component({
-  selector: 'app-vehicle-maintenance',
-  standalone: true,
-  imports: [CommonModule, RouterModule, StatusLabelPipe],
-  template: `
+    selector: 'app-vehicle-maintenance',
+    imports: [CommonModule, RouterModule, StatusLabelPipe],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -79,7 +78,7 @@ import { StatusLabelPipe } from '../../../../shared/pipes/status-label.pipe';
       </div>
     </div>
   `,
-  styleUrls: ['./vehicle-maintenance.component.scss']
+    styleUrls: ['./vehicle-maintenance.component.scss']
 })
 export class VehicleMaintenancePage implements OnInit {
   private vehicleService = inject(VehicleService);

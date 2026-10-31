@@ -13,10 +13,9 @@ import { ConfirmService } from '../../../../core/services/confirm.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
-  selector: 'app-vehicle-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule, DataTableComponent],
-  template: `
+    selector: 'app-vehicle-list',
+    imports: [CommonModule, RouterModule, DataTableComponent],
+    template: `
     <div class="crud-container">
       <div class="header-section">
         <h2>Saha Araçları Yönetimi</h2>
@@ -38,7 +37,7 @@ import { ToastService } from '../../../../core/services/toast.service';
       </div>
     </div>
   `,
-  styleUrls: ['./vehicle-list.component.scss']
+    styleUrls: ['./vehicle-list.component.scss']
 })
 export class VehicleListComponent implements OnInit {
   private vehicleService = inject(VehicleService);

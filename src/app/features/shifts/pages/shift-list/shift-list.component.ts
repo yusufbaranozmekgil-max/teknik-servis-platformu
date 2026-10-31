@@ -23,10 +23,9 @@ interface EligibleEntry {
 }
 
 @Component({
-  selector: 'app-shift-list',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormFieldComponent, DataTableComponent, PermissionVisibilityDirective],
-  template: `
+    selector: 'app-shift-list',
+    imports: [CommonModule, ReactiveFormsModule, FormFieldComponent, DataTableComponent, PermissionVisibilityDirective],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div>
@@ -230,7 +229,7 @@ interface EligibleEntry {
       </div>
     </div>
   `,
-  styleUrls: ['./shift-list.component.scss']
+    styleUrls: ['./shift-list.component.scss']
 })
 export class ShiftListComponent implements OnInit {
   private shiftService = inject(ShiftAssignmentService);

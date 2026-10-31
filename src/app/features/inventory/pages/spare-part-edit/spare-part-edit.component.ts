@@ -15,10 +15,9 @@ import { FormFieldComponent } from '../../../../shared/components/form-field/for
 import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-limits.const';
 
 @Component({
-  selector: 'app-spare-part-edit',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
-  template: `
+    selector: 'app-spare-part-edit',
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, FormFieldComponent],
+    template: `
     <div class="page-container">
       <div class="header-section">
         <div class="title-area">
@@ -147,7 +146,7 @@ import { FIELD_LIMITS, NUMERIC_LIMITS } from '../../../../core/constants/form-li
       </div>
     </div>
   `,
-  styleUrls: ['./spare-part-edit.component.scss']
+    styleUrls: ['./spare-part-edit.component.scss']
 })
 export class SparePartEditPage implements OnInit, ComponentCanDeactivate {
   private inventoryService = inject(InventoryService);
